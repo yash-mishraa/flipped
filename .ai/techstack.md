@@ -58,17 +58,20 @@ This document details the chosen technologies, exact dependency versions, archit
 
 ## 5. Development Commands
 
-| Command                | Action                                                       | Suitable Environments      |
-| :--------------------- | :----------------------------------------------------------- | :------------------------- |
-| `npm run dev`          | Starts Next.js development server on `http://localhost:3000` | Local development          |
-| `npm run build`        | Compiles production-optimized Next.js bundle                 | CI / Production deployment |
-| `npm run start`        | Serves the compiled production build                         | Production runtime         |
-| `npm run lint`         | Runs ESLint analysis across all project files                | Local & CI                 |
-| `npm run typecheck`    | Executes TypeScript compiler (`tsc --noEmit`)                | Local & CI                 |
-| `npm run test`         | Runs all Vitest unit tests deterministically once            | Local & CI                 |
-| `npm run test:watch`   | Starts Vitest in interactive watch mode                      | Local development          |
-| `npm run format:check` | Verifies formatting compliance with Prettier                 | Local & CI                 |
-| `npm run format`       | Automatically formats files with Prettier                    | Local development          |
+| Command                  | Action                                                       | Suitable Environments       |
+| :----------------------- | :----------------------------------------------------------- | :-------------------------- |
+| `npm run dev`            | Starts Next.js development server on `http://localhost:3000` | Local development           |
+| `npm run build`          | Compiles production-optimized Next.js bundle                 | CI / Production deployment  |
+| `npm run start`          | Serves the compiled production build                         | Production runtime          |
+| `npm run lint`           | Runs ESLint analysis across all project files                | Local & CI                  |
+| `npm run typecheck`      | Executes TypeScript compiler (`tsc --noEmit`)                | Local & CI                  |
+| `npm run test`           | Runs all Vitest unit tests deterministically once            | Local & CI                  |
+| `npm run test:watch`     | Starts Vitest in interactive watch mode                      | Local development           |
+| `npm run format:check`   | Verifies formatting compliance with Prettier                 | Local & CI                  |
+| `npm run format`         | Automatically formats files with Prettier                    | Local development           |
+| `npx prisma generate`    | Generates Prisma Client types from `schema.prisma`           | Local & CI                  |
+| `npx prisma migrate dev` | Applies PostgreSQL database migrations                       | Local development           |
+| `npx prisma db seed`     | Seeds curated puzzle bank and calendar assignments           | Local development & Staging |
 
 ---
 
@@ -90,3 +93,25 @@ Configured in `tsconfig.json`:
 - **Zero External Dependencies**: The entire core puzzle engine (`src/features/game/domain/`) is implemented in pure, vanilla TypeScript with zero external runtime libraries.
 - **Framework Independence**: No React hooks, Next.js server components, browser globals, or DOM methods are imported in the domain logic.
 - **Future Testability**: Engine modules are testable with 100% determinism in any standard JavaScript/TypeScript environment.
+
+---
+
+## 8. Backend, Database & Validation (Part 6)
+
+| Technology / Library | Version    | Purpose & Responsibility                                          |
+| :------------------- | :--------- | :---------------------------------------------------------------- |
+| **Prisma ORM**       | `^6.19.3`  | Next-generation type-safe ORM for PostgreSQL schema & migrations  |
+| **@prisma/client**   | `^6.19.3`  | Generated type-safe database query client                         |
+| **Zod**              | `^4.6.6`   | Runtime request body and environment schema validation            |
+| **PostgreSQL**       | `16` (DDL) | Relational database engine for puzzles, attempts & guest profiles |
+| **Node Crypto**      | Built-in   | Cryptographic HMAC-SHA256 signatures for guest session cookies    |
+
+### Environment Configuration
+
+Documented in `.env.example`:
+
+| Variable               | Default / Example                     | Description                                                    |
+| :--------------------- | :------------------------------------ | :------------------------------------------------------------- |
+| `DATABASE_URL`         | `postgresql://postgres:postgres@...`  | PostgreSQL connection string. When unset, memory store is used |
+| `GUEST_SESSION_SECRET` | `development-guest-secret-key-at-...` | HMAC-SHA256 secret key for signing guest cookies               |
+| `APP_TIMEZONE`         | `Asia/Kolkata`                        | Authoritative game clock reference timezone                    |

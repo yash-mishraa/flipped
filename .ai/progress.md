@@ -2,10 +2,10 @@
 
 ## 1. Current Project Status
 
-- **Current Stage**: Part 5 (Daily and Classic Game Modes, Calendar Scheduling & Local Persistence)
+- **Current Stage**: Part 6 (Build the Backend, Database, and Secure Game Infrastructure)
 - **Status**: **Completed & Fully Verified**
 - **Date**: 2026-10-12
-- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 145/145 unit tests passing.
+- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 172/172 unit and integration tests passing.
 
 ---
 
@@ -181,6 +181,56 @@
    - `src/app/classic/page.tsx`: Classic mode flow with tier selection, repetition-free puzzle sequencing, live win rate tracking, and unlimited replay.
    - `src/app/archive/page.tsx`: Daily archive listing past calendar challenges and player completion status.
 
+### Stage 6 (Backend, Database & Secure Game Infrastructure) — Completed
+
+1. **Prisma Relational Database & Migrations (`prisma/schema.prisma`, `prisma/migrations/`)**:
+   - Normalized schema with `Puzzle`, `DailyAssignment`, `GuestProfile`, and `GameAttempt` models.
+   - Enforces `@@unique([guestId, dailyDate])` preventing multiple scored daily attempts on the same calendar date.
+   - Initial PostgreSQL DDL migration: `prisma/migrations/20261012000000_init/migration.sql`.
+   - Repeatable seed script: `prisma/seed.ts` upserting 12 curated puzzles and published schedule.
+
+2. **Database Client & In-Memory Fallback Adapter (`src/server/db/client.ts`)**:
+   - Singleton Prisma client handling PostgreSQL connections.
+   - Seamless `InMemoryDatabase` fallback providing zero-config execution for unit tests and local/CI builds when `DATABASE_URL` is omitted.
+
+3. **Signed Guest Session Security (`src/server/auth/guest-session.ts`)**:
+   - Cryptographically signed cookie tokens (`guestId.timestamp.hmac`) using HMAC-SHA256.
+   - Constant-time verification (`crypto.timingSafeEqual`) preventing timing attacks.
+   - Cookie security directives: `httpOnly: true`, `sameSite: "lax"`, `secure` in production.
+
+4. **Sliding-Window Rate Limiting (`src/server/utils/rate-limit.ts`)**:
+   - In-memory rate limiter tracking IP/guest attempt bursts to protect submission endpoints from dictionary attacks.
+
+5. **Server Puzzle Repository & Zero Answer Leakage (`src/server/puzzles/puzzle-repository.ts`)**:
+   - `createSafeGameplayPayload`: strictly omits canonical answers, approved variants, and transformation target words.
+   - `createFinalizedResultPayload`: reveals answers only after the attempt has reached `WON` or `TIMED_OUT`.
+
+6. **Authoritative Game Lifecycle & Attempt Service (`src/server/game/attempt-service.ts`)**:
+   - Server-enforced start timestamps and 60-second deadlines.
+   - Authoritative scoring via `calculateScore` based on server elapsed time and server-tracked hint count.
+   - Strict deadline enforcement: submissions at or after deadline transition to `TIMED_OUT` with 0 points.
+   - Atomic state transitions and idempotent finalized attempt retrieval.
+
+7. **Authoritative Hint Service (`src/server/game/hint-service.ts`)**:
+   - Validates active attempt and deadline window.
+   - Dispatches only the single next letter in reading order with its position, deducting 5 points. Never reveals full solution.
+
+8. **App Router API Route Handlers (`src/app/api/`)**:
+   - `/api/health`: Health status and database connectivity mode.
+   - `/api/game/daily/start`: Initiates or resumes daily attempt with guest cookie.
+   - `/api/game/classic/start`: Initiates classic round with Zod payload validation.
+   - `/api/game/attempt/[id]/submit`: Validates candidate phrase and finalizes round.
+   - `/api/game/attempt/[id]/timeout`: Finalizes expired attempts.
+   - `/api/game/attempt/[id]/hint`: Authoritative hint dispatch.
+   - `/api/game/attempt/[id]`: Returns finalized results (HTTP 403 while active).
+   - `/api/game/daily/status`: Returns current daily challenge status.
+
+9. **Frontend Integration (`src/features/game/components/ServerGameBoard.tsx`)**:
+   - Plays against `SafeGameplayPayload` without local solution knowledge.
+   - Submits candidate answers to server endpoint.
+   - Fetches authoritative hints via API and renders dynamic board state.
+   - Connected directly to `/daily` and `/classic` pages.
+
 ---
 
 ## 3. Verification Results
@@ -192,11 +242,16 @@ Every development script was executed and verified directly:
 | `npm run typecheck`    | TypeScript compiler (`tsc --noEmit`)    | Checked all files, zero type errors                       | `0` (Success) |
 | `npm run lint`         | ESLint 9 analysis (`eslint .`)          | Analyzed all files, zero errors, zero warnings            | `0` (Success) |
 | `npm run format:check` | Prettier check across code & markdown   | All files formatted cleanly                               | `0` (Success) |
-| `npm run test`         | Vitest unit test suite (18 test suites) | **18/18 test files passed, 145/145 tests passed** (1.53s) | `0` (Success) |
-| `npm run build`        | Next.js production build (`next build`) | Successfully compiled in 1343ms                           | `0` (Success) |
+| `npm run test`         | Vitest unit test suite (23 test suites) | **23/23 test files passed, 172/172 tests passed** (1.81s) | `0` (Success) |
+| `npm run build`        | Next.js production build (`next build`) | Successfully compiled (8 static, 8 dynamic routes)        | `0` (Success) |
 
 ### Test Suite Breakdown:
 
+- `tests/unit/server/api-routes.test.ts`: 7 tests passed
+- `tests/unit/server/attempt-service.test.ts`: 10 tests passed
+- `tests/unit/server/guest-session.test.ts`: 6 tests passed
+- `tests/unit/server/puzzle-security.test.ts`: 3 tests passed
+- `tests/unit/server/rate-limit.test.ts`: 1 test passed
 - `tests/unit/modes/daily-scheduler.test.ts`: 7 tests passed
 - `tests/unit/modes/classic-selector.test.ts`: 6 tests passed
 - `tests/unit/modes/round-configuration.test.ts`: 4 tests passed
@@ -226,4 +281,4 @@ Every development script was executed and verified directly:
 
 ## 5. Exact Next Step
 
-- **Part 6**: Implement Backend Architecture, PostgreSQL Database Integration, User Accounts, and Competitive Leaderboards.
+- **Part 7**: Visual Redesign, UI Polish, Onboarding Tutorial, and Responsive Enhancements.

@@ -6,16 +6,16 @@ This document outlines the multi-stage implementation plan for the Flipped word 
 
 ## Stage Overview & Status
 
-| Stage      | Name                                         | Status                   | Dependencies |
-| :--------- | :------------------------------------------- | :----------------------- | :----------- |
-| **Part 1** | Foundation & Development Shell               | **Completed (Verified)** | None         |
-| **Part 2** | Pure Puzzle Engine & Letter Validation       | **Completed (Verified)** | Part 1       |
-| **Part 3** | Interactive Letter Grid & Gameplay UI        | **Completed (Verified)** | Part 2       |
-| **Part 4** | 60-Second Gameplay Loop, Timer & Results     | **Completed (Verified)** | Part 3       |
-| **Part 5** | Game Modes (Daily/Classic) & Persistence     | **Completed (Verified)** | Part 4       |
-| **Part 6** | Player Statistics, Streaks & Share System    | Planned                  | Part 5       |
-| **Part 7** | Backend Architecture & Database (PostgreSQL) | Planned                  | Part 6       |
-| **Part 8** | Production Hardening, E2E Testing & Launch   | Planned                  | Part 7       |
+| Stage      | Name                                        | Status                   | Dependencies |
+| :--------- | :------------------------------------------ | :----------------------- | :----------- |
+| **Part 1** | Foundation & Development Shell              | **Completed (Verified)** | None         |
+| **Part 2** | Pure Puzzle Engine & Letter Validation      | **Completed (Verified)** | Part 1       |
+| **Part 3** | Interactive Letter Grid & Gameplay UI       | **Completed (Verified)** | Part 2       |
+| **Part 4** | 60-Second Gameplay Loop, Timer & Results    | **Completed (Verified)** | Part 3       |
+| **Part 5** | Game Modes (Daily/Classic) & Persistence    | **Completed (Verified)** | Part 4       |
+| **Part 6** | Backend, Database & Secure Game Infra       | **Completed (Verified)** | Part 5       |
+| **Part 7** | Visual Polish, Onboarding & User Experience | Planned                  | Part 6       |
+| **Part 8** | Global Leaderboards, Hardening & Launch     | Planned                  | Part 7       |
 
 ---
 
@@ -98,46 +98,38 @@ This document outlines the multi-stage implementation plan for the Flipped word 
 
 ### Part 5 — Game Modes (Daily/Classic), Scheduling & State Persistence
 
-- **Status**: Planned
+- **Status**: **Completed (Verified)**
 - **Dependencies**: Part 4.
 - **Deliverables**:
-  - Daily mode scheduling with synchronized UTC midnight rollover.
-  - Classic mode endless puzzle generator with selectable difficulty tiers.
-  - LocalStorage snapshot persistence for in-progress game recovery.
-  - Mode-specific rule enforcers.
+  - Daily mode deterministic scheduling using `Asia/Kolkata` (IST) reference timezone.
+  - Published daily schedule and past challenge archive (`/archive`).
+  - Classic mode repetition-free puzzle selector by difficulty tier (`EASY`, `MEDIUM`, `HARD`).
+  - Versioned local progress persistence (`flipped_progress_v1`) with single-attempt daily lock.
+  - Interactive mode cards on home screen (`/`), dedicated Daily (`/daily`) and Classic (`/classic`) routes.
 - **Completion Criteria**:
-  - Refreshing or closing browser tab preserves current puzzle progress; daily puzzle consistently loads identical word across players.
+  - Both Daily and Classic modes fully playable; single daily attempt strictly enforced locally; 145/145 tests pass.
 
 ---
 
-### Part 5 — Player Statistics, Streaks & Share System
+### Part 6 — Backend, Database & Secure Game Infrastructure
 
-- **Status**: Planned
-- **Dependencies**: Part 4.
-- **Deliverables**:
-  - Persistent player statistics (games played, win rate, current/max streak, guess distribution).
-  - Spoiler-free visual share card generator (grid emojis / copy to clipboard).
-  - Completion modal with summary statistics.
-- **Completion Criteria**:
-  - Solves update local stats correctly; share card copies formatted results matching Wordle-style spoiler conventions.
-
----
-
-### Part 6 — Backend Architecture & Database (PostgreSQL)
-
-- **Status**: Planned
+- **Status**: **Completed (Verified)**
 - **Dependencies**: Part 5.
 - **Deliverables**:
-  - PostgreSQL schema for daily puzzles, users, and game results.
-  - Database migrations and connection pooling.
-  - Server-authoritative daily puzzle API endpoint.
-  - Secure score submission and validation endpoint to prevent client tampering.
+  - PostgreSQL schema via Prisma 6 (`Puzzle`, `DailyAssignment`, `GuestProfile`, `GameAttempt`).
+  - Migration DDL (`20261012000000_init/migration.sql`) and database seed script (`prisma/seed.ts`).
+  - Resilient database client with transparent `InMemoryDatabase` fallback for tests and offline builds.
+  - Zero answer leakage: active gameplay payload (`SafeGameplayPayload`) strips solutions; answers revealed only after terminal state.
+  - Server-authoritative timing (60s deadline), scoring, and hint deduction (5 points per hint).
+  - HMAC-SHA256 signed guest sessions via `HttpOnly` cookies.
+  - App Router route handlers (`/api/game/daily/start`, `/api/game/classic/start`, `/api/game/attempt/[id]/submit`, `/api/game/attempt/[id]/hint`, `/api/game/attempt/[id]/timeout`, `/api/health`).
+  - Frontend integration (`ServerGameBoard.tsx`) connected to `/daily` and `/classic`.
 - **Completion Criteria**:
-  - Daily challenge answers are securely verified on the server; client cannot inspect solution payload in browser DevTools.
+  - Solutions remain server-only during active play; scores and elapsed times computed authoritatively on server; 172/172 tests pass across 23 test suites.
 
 ---
 
-### Part 7 — Player Authentication & Global Leaderboards
+### Part 7 — Visual Polish, Onboarding & User Experience
 
 - **Status**: Planned
 - **Dependencies**: Part 6.

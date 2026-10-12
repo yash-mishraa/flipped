@@ -1,53 +1,62 @@
-# Flipped — Session Handoff (Part 5 -> Part 6)
+# Flipped — Session Handoff (Part 6 -> Part 7)
 
 ## 1. What Exists Today
 
-- **Game Modes & Scheduling Architecture (`src/features/game/modes/`)**:
-  - `mode-types.ts`: typed domain contracts for `GameMode`, `DailyPuzzleAssignment`, `DailyAttemptRecord`, `ClassicHistoryRecord`, `DailyPuzzleResult`, `RoundConfiguration`.
-  - `daily-scheduler.ts`: deterministic `getDailyDateString` using `Asia/Kolkata` (IST) reference timezone, returning strict `YYYY-MM-DD` identifiers; `getDailyPuzzle` returning `AVAILABLE`, `FUTURE_UNPUBLISHED`, or `UNAVAILABLE`; `getPublishedDailySchedule`.
-  - `classic-selector.ts`: `selectClassicPuzzle` with strict difficulty filtering, recent ID exclusion, and exhausted pool wrapping without immediate repetition.
-  - `round-configuration.ts`: `createDailyRoundConfiguration` and `createClassicRoundConfiguration`.
+- **Database Layer & Migrations (`prisma/`, `src/server/db/`)**:
+  - `prisma/schema.prisma`: Normalized PostgreSQL schema with `Puzzle`, `DailyAssignment`, `GuestProfile`, and `GameAttempt` models. Enforces `@@unique([guestId, dailyDate])` for Daily attempt locking.
+  - `prisma/migrations/20261012000000_init/migration.sql`: Reproducible PostgreSQL DDL with enums, tables, foreign keys, unique constraints, and indexes.
+  - `prisma/seed.ts`: Repeatable seed script upserting 12 curated puzzles and published schedule without duplication.
+  - `src/server/db/client.ts`: Singleton `PrismaClient` with `InMemoryDatabase` fallback ensuring 100% testability and offline build resilience when `DATABASE_URL` is unconfigured.
 
-- **Persistence Adapter (`src/features/game/persistence/local-progress.ts`)**:
-  - Versioned storage schema `flipped_progress_v1` tracking Daily attempt records and Classic history (`recentlyPlayedIds`, `totalPlayed`, `totalWins`, `lastDifficulty`).
-  - Safe parsing with automatic fallback on corruption, plus in-memory fallback for SSR and restricted private browsing environments.
-  - Single-attempt daily lock: both `WON` and `TIMED_OUT` persist records, locking scored re-attempts on that calendar date.
+- **Security & Guest Identity (`src/server/auth/`, `src/server/utils/`)**:
+  - `src/server/auth/guest-session.ts`: Cryptographically signed guest tokens (`guestId.timestamp.hmac`), constant-time verification, and `HttpOnly`, `SameSite=Lax`, `Secure` cookie directives.
+  - `src/server/utils/rate-limit.ts`: In-memory sliding-window rate limiter protecting submission endpoints against brute-force attacks.
 
-- **Presentation & Dedicated Routes (`src/app/`, `src/features/game/components/`)**:
-  - `DifficultySelector.tsx`: interactive radio cards for Easy, Medium, and Hard tiers.
-  - `DailyCompletionCard.tsx`: read-only review of completed daily puzzles, preserving score, elapsed time, hints, explanations, and solved letter grid.
-  - `SuccessScreen.tsx` & `TimeoutScreen.tsx`: mode-aware outcome actions (Daily locked vs Classic replay).
-  - `GameBoard.tsx`: mode-aware orchestration, persisting attempts upon completion.
-  - `src/app/page.tsx`: production home screen with active Daily and Classic launch cards, archive link, and rules overview.
-  - `src/app/daily/page.tsx`: functional Daily challenge flow enforcing the single-attempt lock.
-  - `src/app/classic/page.tsx`: functional Classic mode with tier picker, repetition-minimized sequencing, and live win rate tracking.
-  - `src/app/archive/page.tsx`: Daily archive listing past calendar challenges and player completion status.
+- **Server-Authoritative Game Engine & Security (`src/server/game/`, `src/server/puzzles/`, `src/server/scheduling/`)**:
+  - `src/server/puzzles/puzzle-repository.ts`: `createSafeGameplayPayload` (strictly omits canonical answers, variants, and transformation answers) and `createFinalizedResultPayload` (reveals answers only after `WON` or `TIMED_OUT`).
+  - `src/server/game/attempt-service.ts`: Authoritative attempt lifecycle managing start, resumption, atomic deadline enforcement, authoritative scoring via `calculateScore`, win/timeout finalization, and idempotent submissions.
+  - `src/server/game/hint-service.ts`: Authoritative hint service validating active deadline and returning only the single authorized letter and position with 5-point deduction.
+  - `src/server/scheduling/daily-scheduler.ts`: Deterministic date resolution in `Asia/Kolkata` and assignment resolution.
+
+- **Next.js App Router API Routes (`src/app/api/`)**:
+  - `/api/health`: Health status and database mode.
+  - `/api/game/daily/start`: Initiates or resumes daily attempt with guest cookie.
+  - `/api/game/classic/start`: Initiates classic round with Zod validation.
+  - `/api/game/attempt/[id]/submit`: Validates candidate phrase and finalizes round.
+  - `/api/game/attempt/[id]/timeout`: Finalizes expired attempts.
+  - `/api/game/attempt/[id]/hint`: Authoritative hint dispatch.
+  - `/api/game/attempt/[id]`: Returns finalized result (HTTP 403 while active).
+  - `/api/game/daily/status`: Returns current daily challenge status.
+
+- **Frontend Server Integration (`src/features/game/components/ServerGameBoard.tsx`)**:
+  - Communicates directly with server API routes; zero solution leakage to browser.
+  - Integrated into `/daily` and `/classic` routes.
 
 - **Verification Metrics**:
-  - **145 / 145 unit and component tests passing** across 18 test suites in ~1.5s (`npm run test`).
+  - **172 / 172 unit and integration tests passing** across 23 test suites in ~1.8s (`npm run test`).
   - Zero TypeScript compiler errors (`npm run typecheck`).
   - Zero ESLint errors or warnings (`npm run lint`).
   - Clean Prettier formatting (`npm run format:check`).
-  - Successful Next.js production build with static prerendering (`npm run build`).
+  - Successful Next.js production build (`npm run build`) generating 8 static pages and 8 dynamic API routes.
 
 ---
 
-## 2. What Part 6 Must Implement
+## 2. What Part 7 Must Implement
 
-In **Part 6 — Backend Architecture, PostgreSQL Database Integration & User Accounts**, the engineer will build:
+In **Part 7 — Visual Polish, UI Redesign, Onboarding & User Experience**, the engineer will build:
 
-1. **PostgreSQL Database Schema & Migrations**:
-   - Schema for users, daily puzzles, puzzle bank, attempt records, and leaderboards.
-   - Database connection management with connection pooling.
+1. **Visual Redesign & Tactile Physicality**:
+   - Refine letter tile aesthetics with bespoke physical feel (smooth 3D flips, paper texture, subtle shadows).
+   - High-fidelity typography, spacing, and micro-interactions.
+   - Smooth state transitions for lock, reveal, pending, and eliminated states.
 
-2. **Authentication & User Identity**:
-   - Player account creation / guest-to-registered migration.
-   - Secure session handling.
+2. **First-Time User Onboarding & Interactive Tutorial**:
+   - Guided interactive tutorial / modal explaining the Flipped game mechanics.
+   - Demonstration of semantic clue transformations and letter-frequency rules.
 
-3. **Server-Authoritative Daily Results & Sync**:
-   - Server endpoints to validate and record daily attempts.
-   - Sync local storage progress to authenticated user profiles.
+3. **Responsive Design & Mobile Ergonomics**:
+   - Touchscreen keyboard ergonomics, layout stability during virtual keyboard summon.
+   - Viewport scaling and safe-area adjustments across phone and tablet screens.
 
-4. **Competitive Global Leaderboards**:
-   - Daily challenge leaderboard rankings by score and solve speed.
-   - Streak tracking across calendar days.
+4. **Audio & Haptic Feedback (Optional / Accessible)**:
+   - Subtle acoustic cues for key presses, flips, hints, and victory (with toggle and `prefers-reduced-motion` compliance).

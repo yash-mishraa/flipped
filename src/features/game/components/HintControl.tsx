@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 export interface HintControlProps {
   readonly hintsUsed: number;
   readonly isRoundOver: boolean;
-  readonly onUseHint: () => { success: boolean; message: string };
+  readonly onUseHint: () =>
+    { success: boolean; message: string } | Promise<{ success: boolean; message: string }>;
 }
 
 /**
@@ -21,8 +22,8 @@ export function HintControl({
 }: HintControlProps): React.JSX.Element {
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
-  const handleClick = () => {
-    const res = onUseHint();
+  const handleClick = async () => {
+    const res = await onUseHint();
     setFeedbackNotice(res.message);
 
     // Auto-dismiss transient notice after 3 seconds

@@ -217,3 +217,59 @@ The round follows a strict, irreversible state progression:
   - `daily`: Record of date strings (`YYYY-MM-DD`) mapped to `DailyAttemptRecord`
   - `classic`: `recentlyPlayedIds`, `lastDifficulty`, `totalPlayed`, `totalWins`
 - **Resilience**: Safe JSON parse with automatic rollback to defaults on corruption, and in-memory store fallback for SSR and restricted private browsing environments.
+
+---
+
+## 10. Backend Architecture, Database Persistence & Secure Game Infrastructure (Part 6)
+
+### Security Boundaries & Zero Answer Leakage
+
+In competitive word games, exposing target solutions in frontend props or network payloads allows players to inspect answers via DevTools. Part 6 enforces strict server-authoritative security boundaries:
+
+- **Active Round Isolation (`SafeGameplayPayload`)**: When an attempt starts, the client receives only:
+  - `attemptId`, `mode`, `status: "IN_PROGRESS"`, `startedAt`, `deadline` (timestamp ms)
+  - `clueWords`: Array of clue words
+  - `wordLengths`: Tuple of target word lengths (e.g. `[4, 4]`)
+  - `firstLetters`: Initial revealed clue letters (e.g. `["F", "F"]`)
+  - `transformations`: Array of clue transformations displaying transformation type and explanation, but with target answer words omitted.
+- **Canonical Answers Kept Server-Side**: Canonical answers, approved variants, and transformation target words remain exclusively on the server in database storage.
+- **Terminal Reveal Only (`FinalizedResultPayload`)**: Full answer words, variants, and transformation explanations are returned only after the attempt has reached a terminal state (`WON` or `TIMED_OUT`). Active attempts requesting results receive HTTP 403 Forbidden.
+
+### Server-Authoritative Clock & Attempt Lifecycle
+
+Client-supplied timers, scores, and status flags are strictly untrusted:
+
+1. **Attempt Initiation (`/api/game/daily/start`, `/api/game/classic/start`)**:
+   - Computes authoritative `startedAt = Date.now()` and `deadline = startedAt + 60,000ms`.
+   - Persists the attempt in PostgreSQL / memory store.
+   - For Daily mode, resolves the date via `Asia/Kolkata` timezone and checks for existing attempts. If an attempt is active, returns the existing attempt; if completed, returns the finalized result.
+2. **Authoritative Submission (`/api/game/attempt/[id]/submit`)**:
+   - Accepts player candidate phrase.
+   - Evaluates elapsed time against authoritative server `deadline`.
+   - If submitted at or after deadline ($\text{now} \ge \text{deadline}$), marks attempt `TIMED_OUT` with score 0.
+   - Validates candidate phrase against canonical solution and approved variants using `areAnswersEquivalent`.
+   - If correct and before deadline: marks attempt `WON`, calculates score via $\max(0, \min(100, 100 - \lfloor\text{elapsed}/5\rfloor - 5\times\text{hints}))$, and seals the record atomically.
+3. **Atomic Timeout Finalization (`/api/game/attempt/[id]/timeout`)**:
+   - Atomically transitions active attempts that expired to `TIMED_OUT` with score 0.
+4. **Authoritative Hint Delivery (`/api/game/attempt/[id]/hint`)**:
+   - Enforces active status and deadline validity.
+   - Finds the next non-revealed tile in reading order.
+   - Increments server-tracked `hintsUsed` and deducts 5 points.
+   - Dispatches only `{ wordIndex, letterIndex, letter, hintsUsed, remainingHints }` without leaking the rest of the target phrase.
+
+### Signed Guest Identity & Anti-Cheating
+
+- **Guest Session Token**: Cryptographically signed cookie (`guestId.timestamp.hmac`) generated using Node.js `crypto.createHmac("sha256", secret)`.
+- **Constant-Time Verification**: Uses `crypto.timingSafeEqual` to prevent timing attacks.
+- **Cookie Directives**: Stored in `flipped_guest_session` with `httpOnly: true`, `sameSite: "lax"`, `secure: process.env.NODE_ENV === "production"`, `maxAge: 365 days`.
+- **Sliding-Window Rate Limiting**: In-memory rate limiter tracks IP/guest request bursts, mitigating brute-force answer discovery attacks.
+
+### Relational Schema & Persistence Layer
+
+- **Prisma Schema (`prisma/schema.prisma`)**:
+  - `Puzzle`: Unique ID, clue words, answer words, transformations, difficulty, approved variants.
+  - `DailyAssignment`: Calendar date (`YYYY-MM-DD`), puzzle relation, publish timestamp.
+  - `GuestProfile`: Unique guest ID, creation timestamp, last active timestamp.
+  - `GameAttempt`: Primary key UUID, guest relation, puzzle relation, mode enum (`DAILY` | `CLASSIC`), status enum (`IN_PROGRESS` | `WON` | `TIMED_OUT`), `startedAt`, `deadline`, `finishedAt`, `score`, `elapsedSeconds`, `hintsUsed`, `dailyDate`.
+  - Composite Unique Constraint: `@@unique([guestId, dailyDate])` prevents race conditions or multi-tab exploits on Daily challenges.
+- **Fallback Architecture**: `src/server/db/client.ts` implements `InMemoryDatabase` alongside `PrismaClient`. Development, test runs, and static builds run seamlessly without requiring a running PostgreSQL service.

@@ -225,3 +225,36 @@ This document records architectural decisions, their context, alternatives consi
   - Provides a complete, fully playable client-side experience for both Daily and Classic modes before Stage 6 backend deployment.
   - Prevents cheating or re-rolling of daily scores on the same browser.
   - Graceful fallback ensures no crashes occur during SSR pre-rendering or in restricted browser security contexts.
+
+---
+
+## ADR-017: Server-Authoritative Timing, Zero Answer Leakage & Signed Guest Sessions
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: In client-rendered puzzle games, solutions transmitted in JSON payloads or props are trivially inspectable via browser Developer Tools. Furthermore, untrusted client-supplied timers and scores can be manipulated. Daily challenge integrity requires that canonical solutions remain server-side until game completion, and that time limits, scoring, and hints are calculated authoritatively on the server.
+- **Decision**:
+  1. **Zero Answer Leakage**: The server never transmits canonical answers, approved variants, or transformation target words to the client during active gameplay (`SafeGameplayPayload`). The client receives only clue words, word lengths, and initial clue letters (`firstLetters`).
+  2. **Authoritative Deadline & Score Evaluation**: Round start (`/api/game/daily/start`, `/api/game/classic/start`) records `startedAt` and an immutable 60-second `deadline` on the server. When answers are submitted (`/api/game/attempt/[id]/submit`), the server checks answer equivalence, evaluates the timestamp against the deadline, computes the score using `calculateScore(elapsedSeconds, hintsUsed)`, and seals the record atomically.
+  3. **Authoritative Hint Dispatch**: Hints are requested via `/api/game/attempt/[id]/hint`. The server validates that the attempt is still active, tracks hint count, applies the 5-point deduction, and returns only the single authorized letter and target cell coordinates without disclosing other letters.
+  4. **Signed Guest Session Model**: Unauthenticated players receive a cryptographically signed guest session token (`guestId.timestamp.hmac`) generated with HMAC-SHA256, persisted in `HttpOnly`, `SameSite=Lax`, `Secure` cookies.
+  5. **Rate-Limiting**: Submission endpoints are protected by an in-memory sliding-window rate limiter to prevent automated brute-force attacks against target words.
+- **Rationale**:
+  - Protects game fairness and prevents inspection of unpublished daily solutions in network tabs.
+  - Guarantees valid elapsed times and scores without trusting client clocks.
+  - Enables zero-friction guest play while enforcing the strict one-attempt-per-day rule.
+
+---
+
+## ADR-018: PostgreSQL Persistence with Prisma ORM and In-Memory Fallback Adapter
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: The game requires structured relational storage for puzzles, scheduled assignments, guest sessions, and attempts. However, automated testing suites, Next.js build compilation (`next build`), and local developer setups must execute seamlessly even in environments without a live PostgreSQL instance running on port 5432.
+- **Decision**:
+  1. **Prisma ORM & PostgreSQL Schema**: Define normalized models (`Puzzle`, `DailyAssignment`, `GameAttempt`, `GuestProfile`) in `prisma/schema.prisma` with explicit DDL migrations (`prisma/migrations/20261012000000_init/migration.sql`) and a repeatable seed script (`prisma/seed.ts`).
+  2. **Database Unique Constraints**: Enforce the Daily single-attempt rule at the database level with `@@unique([guestId, dailyDate])` on `GameAttempt`, eliminating race conditions between concurrent tabs.
+  3. **In-Memory Fallback Store**: Implement `InMemoryDatabase` alongside `PrismaClient` in `src/server/db/client.ts`. When `DATABASE_URL` is unset or unavailable, the repository smoothly delegates to the deterministic in-memory store.
+- **Rationale**:
+  - Provides full production schema rigor and ACID guarantees for PostgreSQL deployments.
+  - Guarantees that `npm test` and `next build` execute reliably in CI and offline developer environments with zero external service dependencies.

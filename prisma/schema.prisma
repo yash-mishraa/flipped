@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DifficultyTier {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum PublicationState {
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum GameModeType {
+  DAILY
+  CLASSIC
+}
+
+enum AttemptStatusType {
+  ACTIVE
+  WON
+  TIMED_OUT
+}
+
+model Puzzle {
+  id                String           @id
+  clueWord1         String
+  clueWord2         String
+  answerWord1       String
+  answerWord2       String
+  relationship1     String           // "SYNONYM" | "ANTONYM"
+  relationship2     String           // "SYNONYM" | "ANTONYM"
+  explanation1      String
+  explanation2      String
+  difficulty        DifficultyTier   @default(MEDIUM)
+  approvedVariants  String[]         @default([])
+  hints             String[]         @default([])
+  publicationStatus PublicationState @default(PUBLISHED)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  dailyAssignments  DailyAssignment[]
+  attempts          GameAttempt[]
+
+  @@map("puzzles")
+}
+
+model DailyAssignment {
+  id                String           @id @default(cuid())
+  date              String           @unique // YYYY-MM-DD
+  puzzleId          String
+  puzzle            Puzzle           @relation(fields: [puzzleId], references: [id], onDelete: Restrict)
+  publicationStatus PublicationState @default(PUBLISHED)
+  note              String?
+  createdAt         DateTime         @default(now())
+
+  @@index([date])
+  @@map("daily_assignments")
+}
+
+model GameAttempt {
+  id             String            @id @default(uuid())
+  guestId        String
+  mode           GameModeType
+  dailyDate      String?           // YYYY-MM-DD when mode is DAILY
+  puzzleId       String
+  puzzle         Puzzle            @relation(fields: [puzzleId], references: [id], onDelete: Restrict)
+  status         AttemptStatusType @default(ACTIVE)
+  startedAt      DateTime          @default(now())
+  deadline       DateTime
+  endedAt        DateTime?
+  elapsedSeconds Int               @default(0)
+  hintsUsed      Int               @default(0)
+  finalScore     Int               @default(0)
+  isWon          Boolean           @default(false)
+  solvedPhrase   String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([guestId, dailyDate], name: "unique_guest_daily_attempt")
+  @@index([guestId])
+  @@index([puzzleId])
+  @@index([mode])
+  @@map("game_attempts")
+}
+
+model GuestProfile {
+  guestId            String   @id
+  currentDailyStreak Int      @default(0)
+  longestDailyStreak Int      @default(0)
+  lastDailyDate      String?
+  classicPlayed      Int      @default(0)
+  classicWins        Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("guest_profiles")
+}

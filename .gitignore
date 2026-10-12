@@ -43,3 +43,5 @@ lerna-debug.log*
 # TypeScript declaration cache
 next-env.d.ts
 *.tsbuildinfo
+
+/src/generated/prisma

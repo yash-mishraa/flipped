@@ -1,24 +1,30 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, Compass, RotateCcw, Trophy } from "lucide-react";
-import type { Difficulty, Puzzle } from "@/features/game/domain/types";
-import { GameBoard } from "@/features/game/components/GameBoard";
+import type { Difficulty } from "@/features/game/domain/types";
 import { DifficultySelector } from "@/features/game/components/DifficultySelector";
-import { selectClassicPuzzle } from "@/features/game/modes/classic-selector";
+import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
+import type {
+  SafeGameplayPayload,
+  FinalizedResultPayload,
+} from "@/server/puzzles/puzzle-repository";
 import {
   getClassicLastDifficulty,
   getClassicRecentPuzzleIds,
+  recordClassicGame,
   loadProgress,
 } from "@/features/game/persistence/local-progress";
 
 export default function ClassicPage(): React.JSX.Element {
-  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [difficulty, setDifficulty] = useState<Difficulty>("MEDIUM");
-  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
-  const [puzzleKey, setPuzzleKey] = useState<number>(0);
+  const [payload, setPayload] = useState<SafeGameplayPayload | null>(null);
   const [stats, setStats] = useState({ totalPlayed: 0, totalWins: 0 });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const recentIdsRef = useRef<string[]>([]);
 
   const refreshStats = useCallback(() => {
     const progress = loadProgress();
@@ -26,27 +32,48 @@ export default function ClassicPage(): React.JSX.Element {
       totalPlayed: progress.classic.totalPlayed,
       totalWins: progress.classic.totalWins,
     });
+    recentIdsRef.current = [...progress.classic.recentlyPlayedIds];
   }, []);
 
   const loadNextPuzzle = useCallback(
-    (selectedDifficulty: Difficulty) => {
-      const recentIds = getClassicRecentPuzzleIds();
-      const result = selectClassicPuzzle(selectedDifficulty, { recentPuzzleIds: recentIds });
+    async (selectedDifficulty: Difficulty) => {
+      setLoading(true);
+      setErrorMsg(null);
 
-      if (result.status === "SUCCESS") {
-        setCurrentPuzzle(result.puzzle);
-        setPuzzleKey((prev) => prev + 1);
+      try {
+        const res = await fetch("/api/game/classic/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            difficulty: selectedDifficulty,
+            recentPuzzleIds: recentIdsRef.current,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.status === "STARTED") {
+          setPayload(data.payload);
+        } else if (data.status === "EMPTY_POOL") {
+          setErrorMsg(data.message || "No puzzles available for this difficulty.");
+        } else {
+          setErrorMsg(data.error || "Failed to start Classic round.");
+        }
+      } catch {
+        setErrorMsg("Network error connecting to game server.");
+      } finally {
+        setLoading(false);
+        refreshStats();
       }
-      refreshStats();
     },
     [refreshStats]
   );
 
   useEffect(() => {
     const initialDifficulty = getClassicLastDifficulty();
+    recentIdsRef.current = [...getClassicRecentPuzzleIds()];
     setDifficulty(initialDifficulty);
     loadNextPuzzle(initialDifficulty);
-    setMounted(true);
   }, [loadNextPuzzle]);
 
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
@@ -59,16 +86,10 @@ export default function ClassicPage(): React.JSX.Element {
     loadNextPuzzle(difficulty);
   };
 
-  if (!mounted || !currentPuzzle) {
-    return (
-      <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center p-6">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
-        <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-stone-400">
-          Loading Classic Mode...
-        </p>
-      </main>
-    );
-  }
+  const handleFinalized = (result: FinalizedResultPayload) => {
+    recordClassicGame(result.puzzleId, difficulty, result.isWon);
+    refreshStats();
+  };
 
   const winRate =
     stats.totalPlayed > 0 ? Math.round((stats.totalWins / stats.totalPlayed) * 100) : 0;
@@ -88,7 +109,7 @@ export default function ClassicPage(): React.JSX.Element {
 
           <div className="inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
             <Compass className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
-            <span>Classic Mode • Unlimited Replay</span>
+            <span>Classic Mode • Server Authoritative</span>
           </div>
 
           <button
@@ -138,21 +159,38 @@ export default function ClassicPage(): React.JSX.Element {
 
       {/* Main Interactive Game Board */}
       <section className="my-8 w-full flex-1 flex flex-col justify-center">
-        <GameBoard
-          key={`${currentPuzzle.id}-${puzzleKey}`}
-          puzzle={currentPuzzle}
-          mode="CLASSIC"
-          onNextPuzzle={handleNextPuzzle}
-          nextPuzzleLabel="Next Classic Puzzle"
-          onPuzzleComplete={refreshStats}
-        />
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-stone-400">
+              Loading Classic Puzzle...
+            </p>
+          </div>
+        ) : errorMsg ? (
+          <div className="rounded-2xl border border-coral-200 bg-white p-6 text-center shadow-xs">
+            <p className="text-sm font-semibold text-coral-800">{errorMsg}</p>
+            <button
+              type="button"
+              onClick={handleNextPuzzle}
+              className="mt-4 rounded-xl bg-coral-500 px-4 py-2 text-xs font-bold text-white hover:bg-coral-600"
+            >
+              Try Next Puzzle
+            </button>
+          </div>
+        ) : payload ? (
+          <ServerGameBoard
+            key={payload.attemptId}
+            payload={payload}
+            mode="CLASSIC"
+            onFinalized={handleFinalized}
+            onNextClassic={handleNextPuzzle}
+          />
+        ) : null}
       </section>
 
       {/* Footer Notice */}
       <footer className="border-t border-stone-200/80 pt-4 text-center text-xs text-stone-500">
-        <p>
-          Classic Mode • Repetition-minimized puzzle selection across Easy, Medium, and Hard tiers
-        </p>
+        <p>Classic Mode • Server-verified rounds across Easy, Medium, and Hard tiers</p>
       </footer>
     </main>
   );

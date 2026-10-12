@@ -1,42 +1,113 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Calendar, AlertCircle } from "lucide-react";
-import { GameBoard } from "@/features/game/components/GameBoard";
+import { ArrowLeft, Calendar, AlertCircle, RotateCcw } from "lucide-react";
+import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
 import { DailyCompletionCard } from "@/features/game/components/DailyCompletionCard";
-import { getDailyDateString, getDailyPuzzle } from "@/features/game/modes/daily-scheduler";
-import { getDailyAttempt } from "@/features/game/persistence/local-progress";
-import type { DailyPuzzleResult, DailyAttemptRecord } from "@/features/game/modes/mode-types";
+import type {
+  SafeGameplayPayload,
+  FinalizedResultPayload,
+} from "@/server/puzzles/puzzle-repository";
+import type { Puzzle } from "@/features/game/domain/types";
+import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
+
+function convertFinalizedToCardProps(finalized: FinalizedResultPayload): {
+  puzzle: Puzzle;
+  attempt: DailyAttemptRecord;
+} {
+  const puzzle: Puzzle = {
+    id: finalized.puzzleId,
+    clueWords: [
+      finalized.transformations[0]?.clueWord || "",
+      finalized.transformations[1]?.clueWord || "",
+    ],
+    answerWords: (finalized.canonicalPhrase.split(" ") as [string, string]) || ["", ""],
+    transformations: [
+      {
+        clueWord: finalized.transformations[0]?.clueWord || "",
+        answerWord: finalized.transformations[0]?.answerWord || "",
+        relationship: finalized.transformations[0]?.relationship || "SYNONYM",
+        explanation: finalized.transformations[0]?.explanation || "",
+      },
+      {
+        clueWord: finalized.transformations[1]?.clueWord || "",
+        answerWord: finalized.transformations[1]?.answerWord || "",
+        relationship: finalized.transformations[1]?.relationship || "SYNONYM",
+        explanation: finalized.transformations[1]?.explanation || "",
+      },
+    ],
+    difficulty: "MEDIUM",
+  };
+
+  const attempt: DailyAttemptRecord = {
+    date: finalized.date || new Date().toISOString().slice(0, 10),
+    puzzleId: finalized.puzzleId,
+    status: finalized.status,
+    finalScore: finalized.finalScore,
+    elapsedSeconds: finalized.elapsedSeconds,
+    hintsUsed: finalized.hintsUsed,
+    solvedPhrase: finalized.solvedPhrase || finalized.canonicalPhrase,
+    completedAt: finalized.completedAt,
+  };
+
+  return { puzzle, attempt };
+}
 
 export default function DailyPage(): React.JSX.Element {
-  const [mounted, setMounted] = useState(false);
-  const [dailyResult, setDailyResult] = useState<DailyPuzzleResult | null>(null);
-  const [attempt, setAttempt] = useState<DailyAttemptRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [payload, setPayload] = useState<SafeGameplayPayload | null>(null);
+  const [completedResult, setCompletedResult] = useState<FinalizedResultPayload | null>(null);
 
-  useEffect(() => {
-    const todayStr = getDailyDateString();
-    const result = getDailyPuzzle(todayStr);
-    const savedAttempt = getDailyAttempt(todayStr);
+  const fetchDailyChallenge = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg(null);
 
-    setDailyResult(result);
-    setAttempt(savedAttempt);
-    setMounted(true);
+    try {
+      const res = await fetch("/api/game/daily/start", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (data.status === "ALREADY_COMPLETED") {
+        setCompletedResult(data.result);
+        setPayload(null);
+      } else if (data.status === "STARTED" || data.status === "IN_PROGRESS") {
+        setPayload(data.payload);
+        setCompletedResult(null);
+      } else if (data.status === "UNAVAILABLE") {
+        setErrorMsg(data.message || "No daily challenge is available today.");
+      } else if (data.error) {
+        setErrorMsg(data.error);
+      } else {
+        setErrorMsg("Failed to initialize daily challenge.");
+      }
+    } catch {
+      setErrorMsg("Network error connecting to game server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  if (!mounted || !dailyResult) {
+  useEffect(() => {
+    fetchDailyChallenge();
+  }, [fetchDailyChallenge]);
+
+  if (loading) {
     return (
       <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center p-6">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
         <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-stone-400">
-          Loading Today&apos;s Daily Challenge...
+          Loading Today&apos;s Authoritative Challenge...
         </p>
       </main>
     );
   }
 
-  // Handle unavailable or unpublished daily puzzle
-  if (dailyResult.status !== "AVAILABLE") {
+  // Handle unavailable or unpublished daily challenge
+  if (errorMsg) {
     return (
       <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-12 text-center">
         <div className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
@@ -44,19 +115,27 @@ export default function DailyPage(): React.JSX.Element {
             <AlertCircle className="h-6 w-6" aria-hidden="true" />
           </div>
           <h1 className="text-2xl font-bold text-stone-900">Daily Challenge Notice</h1>
-          <p className="mt-2 text-sm text-stone-600">{dailyResult.message}</p>
+          <p className="mt-2 text-sm text-stone-600">{errorMsg}</p>
           <div className="mt-6 flex justify-center gap-3">
+            <button
+              type="button"
+              onClick={fetchDailyChallenge}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Retry</span>
+            </button>
             <Link
               href="/"
               className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
             >
-              Return Home
+              Home
             </Link>
             <Link
               href="/classic"
               className="rounded-xl bg-coral-500 px-4 py-2 text-sm font-bold text-white hover:bg-coral-600"
             >
-              Play Classic Mode
+              Play Classic
             </Link>
           </div>
         </div>
@@ -64,7 +143,7 @@ export default function DailyPage(): React.JSX.Element {
     );
   }
 
-  const { puzzle, date } = dailyResult;
+  const currentDateDisplay = payload?.date || completedResult?.date || "Today";
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col justify-between px-4 py-8 sm:px-8 sm:py-12">
@@ -81,7 +160,7 @@ export default function DailyPage(): React.JSX.Element {
 
           <div className="inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
             <Calendar className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
-            <span>Daily Challenge • {date}</span>
+            <span>Daily Challenge • {currentDateDisplay}</span>
           </div>
 
           <Link
@@ -104,30 +183,26 @@ export default function DailyPage(): React.JSX.Element {
 
       {/* Main Interactive or Review View */}
       <section className="my-8 w-full flex-1 flex flex-col justify-center">
-        {attempt ? (
-          <DailyCompletionCard date={date} puzzle={puzzle} attempt={attempt} />
-        ) : (
-          <GameBoard
-            puzzle={puzzle}
+        {completedResult ? (
+          (() => {
+            const { puzzle, attempt } = convertFinalizedToCardProps(completedResult);
+            return (
+              <DailyCompletionCard date={currentDateDisplay} puzzle={puzzle} attempt={attempt} />
+            );
+          })()
+        ) : payload ? (
+          <ServerGameBoard
+            key={payload.attemptId}
+            payload={payload}
             mode="DAILY"
-            date={date}
-            onPuzzleComplete={() => {
-              // Re-read attempt once saved
-              const updatedAttempt = getDailyAttempt(date);
-              if (updatedAttempt) {
-                setAttempt(updatedAttempt);
-              }
-            }}
+            onFinalized={(result) => setCompletedResult(result)}
           />
-        )}
+        ) : null}
       </section>
 
       {/* Footer Notice */}
       <footer className="border-t border-stone-200/80 pt-4 text-center text-xs text-stone-500">
-        <p>
-          Flipped Daily Challenge • Daily reset timezone: Asia/Kolkata (IST) • Single attempt per
-          day
-        </p>
+        <p>Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day</p>
       </footer>
     </main>
   );

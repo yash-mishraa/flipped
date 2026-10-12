@@ -30,6 +30,7 @@ export * from "./persistence/local-progress";
 
 // Interactive React components and hooks
 export { GameBoard } from "./components/GameBoard";
+export { ServerGameBoard } from "./components/ServerGameBoard";
 export { GameHUD } from "./components/GameHUD";
 export { GameTimer } from "./components/GameTimer";
 export { SuccessScreen } from "./components/SuccessScreen";
