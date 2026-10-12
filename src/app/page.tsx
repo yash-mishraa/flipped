@@ -16,6 +16,8 @@ import {
   Hourglass,
 } from "lucide-react";
 import { Header } from "@/components/Header";
+import { AcidSquares } from "@/components/AcidSquares";
+import DecryptedText from "@/components/DecryptedText";
 import { Footer } from "@/components/Footer";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
 import { loadProgress, isOnboardingCompleted } from "@/features/game/persistence/local-progress";
@@ -78,7 +80,8 @@ export default function HomePage(): React.JSX.Element {
   const isDailyAvailable = dailyScheduleStatus === "AVAILABLE";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+    <div className="home-page flex min-h-screen flex-col">
+      <AcidSquares className="home-acid-background" color="#f5f1e8" accentColor="#b64c38" />
       <Header />
 
       <main className="mx-auto flex flex-1 w-full max-w-5xl flex-col px-4 py-8 sm:px-6 sm:py-12">
@@ -89,8 +92,17 @@ export default function HomePage(): React.JSX.Element {
             <span>The Daily Mental Deduction Challenge</span>
           </div>
 
-          <h1 className="text-4xl font-black tracking-tight text-stone-900 sm:text-5xl md:text-6xl">
-            FLIPPED
+          <h1 aria-label="FLIPPED" className="home-wordmark text-4xl font-black tracking-tight text-stone-900 sm:text-5xl md:text-6xl">
+            <DecryptedText
+              text="FLIPPED"
+              animateOn="view"
+              sequential
+              revealDirection="center"
+              speed={75}
+              className="wordmark-letter"
+              encryptedClassName="wordmark-encrypted"
+              parentClassName="wordmark-animation"
+            />
           </h1>
 
           <p className="mx-auto max-w-xl text-base sm:text-lg text-stone-600 leading-relaxed">

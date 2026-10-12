@@ -1,0 +1,64 @@
+"use client";
+
+import Link from "next/link";
+import { Archive, BarChart2, BookOpen, Calendar, ChevronRight, Compass, House, Moon, Sun } from "lucide-react";
+
+export interface BreadcrumbNavigationProps {
+  readonly pathname: string;
+  readonly theme: "light" | "dark";
+  readonly onToggleTheme: () => void;
+  readonly onOpenInstructions: () => void;
+}
+
+const links = [
+  { href: "/daily", label: "Daily", icon: Calendar },
+  { href: "/classic", label: "Classic", icon: Compass },
+  { href: "/archive", label: "Archive", icon: Archive },
+  { href: "/stats", label: "Statistics", icon: BarChart2 },
+] as const;
+
+function Separator(): React.JSX.Element {
+  return <ChevronRight className="breadcrumb-separator" aria-hidden="true" />;
+}
+
+export default function BreadcrumbNavigation({
+  pathname,
+  theme,
+  onToggleTheme,
+  onOpenInstructions,
+}: BreadcrumbNavigationProps): React.JSX.Element {
+  return (
+    <nav className="breadcrumb-navigation" aria-label="Main Navigation">
+      <Link href="/" aria-label="Flipped home" aria-current={pathname === "/" ? "page" : undefined} className="breadcrumb-home">
+        <House aria-hidden="true" />
+        <span>FLIPPED</span>
+      </Link>
+      <Separator />
+      {links.map(({ href, label, icon: Icon }, index) => (
+        <span className="breadcrumb-item" key={href}>
+          {index > 0 && <Separator />}
+          <Link href={href} aria-current={pathname === href ? "page" : undefined}>
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </Link>
+        </span>
+      ))}
+      <span className="breadcrumb-item breadcrumb-utilities">
+        <Separator />
+        <button type="button" onClick={onOpenInstructions}>
+          <BookOpen aria-hidden="true" />
+          <span>How to Play</span>
+        </button>
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
+          <span>{theme === "dark" ? "Light" : "Dark"}</span>
+        </button>
+      </span>
+    </nav>
+  );
+}

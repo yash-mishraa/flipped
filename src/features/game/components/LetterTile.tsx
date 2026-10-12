@@ -4,6 +4,7 @@ import React from "react";
 import { Check, Lock, Slash } from "lucide-react";
 import type { LetterTile as TileModel } from "../domain/types";
 import { cn } from "@/lib/utils";
+import TechText from "@/components/TechText";
 
 export interface LetterTileProps {
   readonly tile: TileModel;
@@ -69,6 +70,7 @@ export function LetterTile({
       data-testid={`tile-${wordIndex}-${letterIndex}`}
       data-feedback={feedback}
       data-fixed={isFixed}
+      data-has-letter={Boolean(letter)}
       data-selected={isSelected}
       className={cn(
         "relative flex h-14 w-11 sm:h-16 sm:w-13 md:h-18 md:w-15 items-center justify-center rounded-lg border-2 text-xl sm:text-2xl font-bold select-none transition-all duration-150 motion-reduce:transition-none motion-reduce:transform-none",
@@ -78,9 +80,27 @@ export function LetterTile({
         !isFixed && !isRoundOver && "cursor-pointer active:scale-95"
       )}
     >
-      {/* Letter glyph */}
-      <span aria-hidden="true" className="tracking-wide">
-        {letter}
+      {/* Canvas glyph follows the controlled tile value exactly, including clears and hints. */}
+      <span aria-hidden="true" className="tile-tech-glyph">
+        <span className="sr-only">{letter}</span>
+        <TechText
+          text={letter || " "}
+          fontFamily="Georgia, serif"
+          fontWeight={700}
+          fontSize={58}
+          letterSpacing={0}
+          color="currentColor"
+          accentColor="currentColor"
+          reveal="off"
+          specks={0}
+          selection={false}
+          labels={false}
+          draggable={false}
+          sweep={false}
+          className="tile-tech-text"
+          style={{}}
+          aria-hidden="true"
+        />
       </span>
 
       {/* Non-color visual indicator badges */}
