@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-coral-50: #fff4f0;
+  --color-coral-100: #ffe4dc;
+  --color-coral-200: #fecabd;
+  --color-coral-500: #e26d5c;
+  --color-coral-600: #cc5442;
+  --color-coral-700: #ab3e2e;
+}
+
+:root {
+  --bg-primary: #fcfbf9;
+  --text-charcoal: #24272c;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-charcoal);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
