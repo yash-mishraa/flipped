@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { type NextResponse } from "next/server";
 
 export const GUEST_COOKIE_NAME = "flipped_guest_token";
 
@@ -69,15 +70,18 @@ export function extractCookie(cookieHeader: string | null, name: string): string
   return null;
 }
 
+export interface GuestSession {
+  guestId: string;
+  isNew: boolean;
+  cookieToSet: string | null;
+  tokenToSet: string | null;
+}
+
 /**
  * Retrieves the validated guest ID from the incoming Request.
  * If none exists or signature fails, creates a new cryptographically signed guest session.
  */
-export function resolveGuestSession(request: Request): {
-  guestId: string;
-  isNew: boolean;
-  cookieToSet: string | null;
-} {
+export function resolveGuestSession(request: Request): GuestSession {
   const cookieHeader = request.headers.get("cookie");
   const rawToken = extractCookie(cookieHeader, GUEST_COOKIE_NAME);
   const existingGuestId = verifyGuestToken(rawToken);
@@ -87,6 +91,7 @@ export function resolveGuestSession(request: Request): {
       guestId: existingGuestId,
       isNew: false,
       cookieToSet: null,
+      tokenToSet: null,
     };
   }
 
@@ -106,5 +111,32 @@ export function resolveGuestSession(request: Request): {
     guestId: newGuestId,
     isNew: true,
     cookieToSet,
+    tokenToSet: newToken,
   };
+}
+
+/**
+ * Attaches the guest session cookie to a NextResponse using Next.js ResponseCookies API.
+ */
+export function attachGuestCookie<T>(
+  response: NextResponse<T>,
+  sessionOrToken: GuestSession | string | null | undefined
+): NextResponse<T> {
+  const token =
+    typeof sessionOrToken === "string" ? sessionOrToken : (sessionOrToken?.tokenToSet ?? null);
+
+  if (token) {
+    const isProd = process.env.NODE_ENV === "production";
+    response.cookies.set({
+      name: GUEST_COOKIE_NAME,
+      value: token,
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: isProd,
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
+  return response;
 }

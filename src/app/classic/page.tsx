@@ -8,7 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DifficultySelector } from "@/features/game/components/DifficultySelector";
 import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
-import { getPuzzleCountsByDifficulty } from "@/features/game/modes/classic-selector";
+import { getPuzzleCountsByDifficulty } from "@/features/game/data/public-puzzles";
 import type {
   SafeGameplayPayload,
   FinalizedResultPayload,

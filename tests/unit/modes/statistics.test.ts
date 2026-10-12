@@ -40,6 +40,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-10T12:00:00Z",
         },
         "2026-10-11": {
           date: "2026-10-11",
@@ -48,6 +49,7 @@ describe("Statistics Engine", () => {
           finalScore: 85,
           elapsedSeconds: 25,
           hintsUsed: 1,
+          completedAt: "2026-10-11T12:00:00Z",
         },
         "2026-10-12": {
           date: "2026-10-12",
@@ -56,6 +58,7 @@ describe("Statistics Engine", () => {
           finalScore: 95,
           elapsedSeconds: 15,
           hintsUsed: 0,
+          completedAt: "2026-10-12T12:00:00Z",
         },
       };
 
@@ -73,6 +76,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-10T12:00:00Z",
         },
         "2026-10-11": {
           date: "2026-10-11",
@@ -81,6 +85,7 @@ describe("Statistics Engine", () => {
           finalScore: 85,
           elapsedSeconds: 25,
           hintsUsed: 1,
+          completedAt: "2026-10-11T12:00:00Z",
         },
       };
 
@@ -99,6 +104,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-11T12:00:00Z",
         },
         "2026-10-12": {
           date: "2026-10-12",
@@ -107,6 +113,7 @@ describe("Statistics Engine", () => {
           finalScore: 0,
           elapsedSeconds: 60,
           hintsUsed: 2,
+          completedAt: "2026-10-12T12:00:00Z",
         },
       };
 
@@ -124,6 +131,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-01T12:00:00Z",
         },
         "2026-10-02": {
           date: "2026-10-02",
@@ -132,6 +140,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-02T12:00:00Z",
         },
         "2026-10-03": {
           date: "2026-10-03",
@@ -140,6 +149,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-03T12:00:00Z",
         },
         "2026-10-04": {
           date: "2026-10-04",
@@ -148,6 +158,7 @@ describe("Statistics Engine", () => {
           finalScore: 0,
           elapsedSeconds: 60,
           hintsUsed: 0,
+          completedAt: "2026-10-04T12:00:00Z",
         },
         "2026-10-11": {
           date: "2026-10-11",
@@ -156,6 +167,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-11T12:00:00Z",
         },
         "2026-10-12": {
           date: "2026-10-12",
@@ -164,6 +176,7 @@ describe("Statistics Engine", () => {
           finalScore: 90,
           elapsedSeconds: 20,
           hintsUsed: 0,
+          completedAt: "2026-10-12T12:00:00Z",
         },
       };
 
@@ -209,6 +222,7 @@ describe("Statistics Engine", () => {
             finalScore: 90,
             elapsedSeconds: 20,
             hintsUsed: 0,
+            completedAt: "2026-10-11T12:00:00Z",
           },
           "2026-10-12": {
             date: "2026-10-12",
@@ -217,6 +231,7 @@ describe("Statistics Engine", () => {
             finalScore: 80,
             elapsedSeconds: 30,
             hintsUsed: 1,
+            completedAt: "2026-10-12T12:00:00Z",
           },
           "2026-10-10": {
             date: "2026-10-10",
@@ -225,6 +240,7 @@ describe("Statistics Engine", () => {
             finalScore: 0,
             elapsedSeconds: 60,
             hintsUsed: 2,
+            completedAt: "2026-10-10T12:00:00Z",
           },
         },
         classic: {

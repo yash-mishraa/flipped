@@ -290,3 +290,23 @@ This document records architectural decisions, their context, alternatives consi
   - Protects the competitive integrity and daily mystery of Flipped.
   - Provides rewarding, accurate stats that drive daily retention without misleading players with fabricated analytics.
   - Ensures seamless sharing across all browsers and operating systems.
+
+---
+
+## ADR-021: Zero Client Bundle Answer Leakage, App Router Cookie Security & Global Singleton State
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Security audits during Part 8 revealed three critical vectors:
+  1. Client bundle analysis revealed that pages importing static puzzle arrays (`CURATED_PUZZLES`) bundled all target answer words into `.next/static/chunks/*.js`, allowing players to inspect solutions via `View Source` or DevTools network responses.
+  2. Next.js App Router route handlers using raw `response.headers.set("Set-Cookie", ...)` failed to serialize `Set-Cookie` directives reliably in Chromium, breaking guest session persistence on reload.
+  3. In Next.js dev server, isolated route handler compilation chunks generated separate instances of `inMemoryDb`, preventing attempts created in `/start` from being located in `/hint` or `/timeout`.
+- **Decision**:
+  1. **Strict Public vs Privileged Separation**: Created `src/features/game/data/public-puzzles.ts` exposing `PUBLIC_PUZZLE_METADATA` containing strictly `id`, `clueWords`, `difficulty`, and `wordLengths`. Client routes (`/archive`, `/classic`, `/`, `/daily`) and client helpers (`classic-selector.ts`, `daily-scheduler.ts`) import exclusively from `public-puzzles.ts`. Master puzzles with solutions (`puzzles.ts`) are strictly restricted to server repositories (`puzzle-repository.ts`).
+  2. **Production Route Protection**: Unprotected development route `/play` redirects in production (`redirect("/classic")`) to prevent dev fixtures from being bundled into client assets.
+  3. **Native Next.js Cookie Attachment (`attachGuestCookie`)**: Standardized all API routes on `response.cookies.set({ name, value, path, httpOnly, sameSite, secure, maxAge })`, ensuring reliable cookie setting and CSRF/Lax compliance.
+  4. **Global Singleton in Dev Server**: Attached `inMemoryDb` to `globalThis` (`globalForDb.inMemoryDb = inMemoryDb`), mirroring the standard Prisma pattern and guaranteeing atomic state sharing across route handler invocations.
+- **Rationale**:
+  - Eliminates 100% of answer leakage from client-side JavaScript bundles (`0 occurrences` verified via binary bundle search).
+  - Guarantees seamless guest session continuity across all modern browsers and test runners.
+  - Fixes cross-route in-memory state desynchronization in local and CI environments.

@@ -19,9 +19,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
 import { loadProgress, isOnboardingCompleted } from "@/features/game/persistence/local-progress";
-import { getDailyDateString, getDailyPuzzle } from "@/features/game/modes/daily-scheduler";
+import { getDailyDateString, getDailyScheduleStatus } from "@/features/game/modes/daily-scheduler";
 import { calculateDailyStreaks } from "@/features/game/modes/statistics";
-import { getPuzzleCountsByDifficulty } from "@/features/game/modes/classic-selector";
+import { getPuzzleCountsByDifficulty } from "@/features/game/data/public-puzzles";
 import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
 
 function getTimeUntilMidnightIST(): string {
@@ -74,7 +74,7 @@ export default function HomePage(): React.JSX.Element {
     return () => clearInterval(interval);
   }, []);
 
-  const dailyScheduleStatus = todayDateStr ? getDailyPuzzle(todayDateStr).status : "AVAILABLE";
+  const dailyScheduleStatus = todayDateStr ? getDailyScheduleStatus(todayDateStr) : "AVAILABLE";
   const isDailyAvailable = dailyScheduleStatus === "AVAILABLE";
 
   return (

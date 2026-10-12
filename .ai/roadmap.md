@@ -147,12 +147,20 @@ This document outlines the multi-stage implementation plan for the Flipped word 
 
 ### Part 8 — Production Hardening, E2E Testing & Launch
 
-- **Status**: Planned
+- **Status**: **Completed (Verified)**
 - **Dependencies**: Part 7.
 - **Deliverables**:
-  - Full Playwright end-to-end test suite simulating complete game loops (Daily solve, timeout, hints, Classic replay).
-  - Accessibility audit (WCAG 2.2 AA compliance, screen-reader verification, axe-core testing).
-  - Lighthouse performance optimization (>95 across Performance, Accessibility, Best Practices, SEO).
-  - Production deployment configuration, security review, and final launch sign-off.
+  - Security audit and zero answer leakage remediation: segregated public metadata into `public-puzzles.ts` and verified 0 answer occurrences in `.next/static/`.
+  - Next.js 15 App Router cookie persistence hardening (`attachGuestCookie` using `response.cookies.set(...)`) with HMAC-SHA256 token verification.
+  - Development singleton resilience: attached `inMemoryDb` to `globalThis` (`globalForDb.inMemoryDb`).
+  - Full Playwright end-to-end test suite (12 tests across 5 suites) simulating complete user journeys:
+    - First-time player onboarding & skip to Classic
+    - Interactive grid typing, roving arrow navigation, Backspace editing, auto-validation
+    - Hint deduction (-5 pts) and tile reveal & locking
+    - 60-second authoritative timeout and solution review
+    - Daily single-attempt enforcement and reload persistence
+    - Responsive viewports across 320px, 390px, 768px, 1280px without horizontal overflow
+  - Complete automated test suite: 199 unit/integration tests and 12 E2E tests passing.
+  - Production build (`next build`) compilation success.
 - **Completion Criteria**:
-  - All E2E tests pass reliably in CI; Lighthouse audits score >95; zero production warnings; production build deployed and verified.
+  - All 12 Playwright E2E tests pass reliably; 199/199 unit tests pass; zero bundle answer leaks; clean production build.

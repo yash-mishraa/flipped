@@ -36,6 +36,7 @@ describe("StatisticsPage Component", () => {
           finalScore: 92,
           elapsedSeconds: 18,
           hintsUsed: 0,
+          completedAt: "2026-10-12T12:00:00Z",
         },
       },
       classic: {

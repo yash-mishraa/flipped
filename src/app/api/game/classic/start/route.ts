@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { resolveGuestSession } from "@/server/auth/guest-session";
+import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
 import { startClassicAttempt } from "@/server/game/attempt-service";
 import { checkRateLimit } from "@/server/utils/rate-limit";
 
@@ -12,9 +12,9 @@ const classicStartSchema = z.object({
 });
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const { guestId, cookieToSet } = resolveGuestSession(request);
+  const session = resolveGuestSession(request);
 
-  const rateLimit = checkRateLimit(`classic_start_${guestId}`, 60, 60_000);
+  const rateLimit = checkRateLimit(`classic_start_${session.guestId}`, 60, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many requests. Please wait a moment." },
@@ -41,15 +41,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const { difficulty, recentPuzzleIds } = parseResult.data;
-  const result = await startClassicAttempt(guestId, difficulty, recentPuzzleIds);
+  const result = await startClassicAttempt(session.guestId, difficulty, recentPuzzleIds);
 
   const response = NextResponse.json(result, {
     status: result.status === "EMPTY_POOL" ? 404 : 200,
   });
 
-  if (cookieToSet) {
-    response.headers.set("Set-Cookie", cookieToSet);
-  }
-
-  return response;
+  return attachGuestCookie(response, session);
 }

@@ -3,10 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Terminal, Layers } from "lucide-react";
+import { redirect } from "next/navigation";
 import { GameBoard } from "@/features/game/components/GameBoard";
-import { TEST_PUZZLES } from "@/features/game";
+import { TEST_PUZZLES } from "@/features/game/data/test-puzzles";
 
 export default function PlayPage(): React.JSX.Element {
+  if (process.env.NODE_ENV === "production") {
+    redirect("/classic");
+  }
+
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const currentPuzzle = TEST_PUZZLES[puzzleIndex] || TEST_PUZZLES[0]!;
 

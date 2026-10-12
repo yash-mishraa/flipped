@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveGuestSession } from "@/server/auth/guest-session";
+import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
 import { getServerDailyDateString } from "@/server/scheduling/daily-scheduler";
 import { inMemoryDb } from "@/server/db/client";
 import {
@@ -10,10 +10,10 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const { guestId, cookieToSet } = resolveGuestSession(request);
+  const session = resolveGuestSession(request);
   const todayStr = getServerDailyDateString();
 
-  const attempt = inMemoryDb.findDailyAttempt(guestId, todayStr);
+  const attempt = inMemoryDb.findDailyAttempt(session.guestId, todayStr);
 
   if (!attempt) {
     const response = NextResponse.json({
@@ -21,8 +21,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       status: "UNPLAYED",
       hasCompleted: false,
     });
-    if (cookieToSet) response.headers.set("Set-Cookie", cookieToSet);
-    return response;
+    return attachGuestCookie(response, session);
   }
 
   const now = Date.now();
@@ -47,8 +46,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       hasCompleted: true,
       result,
     });
-    if (cookieToSet) response.headers.set("Set-Cookie", cookieToSet);
-    return response;
+    return attachGuestCookie(response, session);
   }
 
   // Active in progress
@@ -59,6 +57,5 @@ export async function GET(request: Request): Promise<NextResponse> {
     attemptId: attempt.id,
     deadline: attempt.deadline.toISOString(),
   });
-  if (cookieToSet) response.headers.set("Set-Cookie", cookieToSet);
-  return response;
+  return attachGuestCookie(response, session);
 }

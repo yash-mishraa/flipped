@@ -43,6 +43,7 @@ export function HintControl({
     <div className="flex flex-col items-center gap-2">
       <button
         type="button"
+        data-testid="use-hint-button"
         onClick={handleClick}
         disabled={isRoundOver || isProcessing}
         aria-label={`Use a hint. Cost is 5 points deduction. ${hintsUsed} used so far.`}

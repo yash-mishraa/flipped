@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md}\""
   },

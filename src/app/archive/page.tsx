@@ -9,7 +9,7 @@ import {
   getPublishedDailySchedule,
   getDailyDateString,
 } from "@/features/game/modes/daily-scheduler";
-import { PUZZLES_BY_ID } from "@/features/game/data/puzzles";
+import { PUBLIC_PUZZLES_BY_ID } from "@/features/game/data/public-puzzles";
 import { loadProgress } from "@/features/game/persistence/local-progress";
 import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
 
@@ -102,7 +102,7 @@ export default function ArchivePage(): React.JSX.Element {
         <section className="my-8 w-full flex-1" aria-label="Published Daily Puzzles">
           <div className="space-y-3">
             {sortedSchedule.map((assignment) => {
-              const puzzle = PUZZLES_BY_ID.get(assignment.puzzleId);
+              const puzzle = PUBLIC_PUZZLES_BY_ID.get(assignment.puzzleId);
               const attempt = dailyAttempts[assignment.date];
               const isToday = assignment.date === todayStr;
 

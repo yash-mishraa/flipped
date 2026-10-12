@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { resolveGuestSession } from "@/server/auth/guest-session";
+import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
 import { startDailyAttempt } from "@/server/game/attempt-service";
 import { checkRateLimit } from "@/server/utils/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const { guestId, cookieToSet } = resolveGuestSession(request);
+  const session = resolveGuestSession(request);
 
   // Rate limiting protection
-  const rateLimit = checkRateLimit(`daily_start_${guestId}`, 30, 60_000);
+  const rateLimit = checkRateLimit(`daily_start_${session.guestId}`, 30, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many requests. Please wait a moment." },
@@ -17,15 +17,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const result = await startDailyAttempt(guestId);
+  const result = await startDailyAttempt(session.guestId);
 
   const response = NextResponse.json(result, {
     status: result.status === "UNAVAILABLE" ? 503 : 200,
   });
 
-  if (cookieToSet) {
-    response.headers.set("Set-Cookie", cookieToSet);
-  }
-
-  return response;
+  return attachGuestCookie(response, session);
 }

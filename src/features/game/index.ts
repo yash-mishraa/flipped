@@ -15,8 +15,7 @@ export * from "./domain/scoring";
 export * from "./domain/hints";
 export * from "./domain/round-state";
 export * from "./domain/timer-utils";
-export * from "./data/test-puzzles";
-export * from "./data/puzzles";
+export * from "./data/public-puzzles";
 export * from "./data/daily-schedule";
 
 // Game Modes & Scheduling

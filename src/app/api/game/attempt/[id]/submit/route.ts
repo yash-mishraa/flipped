@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { resolveGuestSession } from "@/server/auth/guest-session";
+import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
 import { submitAuthoritativeAttempt } from "@/server/game/attempt-service";
 import { checkRateLimit } from "@/server/utils/rate-limit";
 
@@ -15,10 +15,10 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   const { id: attemptId } = await context.params;
-  const { guestId, cookieToSet } = resolveGuestSession(request);
+  const session = resolveGuestSession(request);
 
   // Rate limiting against answer enumeration
-  const rateLimit = checkRateLimit(`submit_${guestId}`, 120, 60_000);
+  const rateLimit = checkRateLimit(`submit_${session.guestId}`, 120, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many answer submissions. Please slow down." },
@@ -42,14 +42,10 @@ export async function POST(
   }
 
   const { phrase } = parseResult.data;
-  const result = await submitAuthoritativeAttempt(attemptId, guestId, phrase);
+  const result = await submitAuthoritativeAttempt(attemptId, session.guestId, phrase);
 
   const status = result.status === "ERROR" ? 404 : 200;
   const response = NextResponse.json(result, { status });
 
-  if (cookieToSet) {
-    response.headers.set("Set-Cookie", cookieToSet);
-  }
-
-  return response;
+  return attachGuestCookie(response, session);
 }

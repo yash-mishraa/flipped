@@ -34,6 +34,19 @@ export function getDailyDateString(
 }
 
 /**
+ * Evaluates the publication status of a daily challenge date without loading the full puzzle object.
+ * Safe for client-side evaluation without leaking puzzle answers.
+ */
+export function getDailyScheduleStatus(
+  dateString: string
+): "AVAILABLE" | "FUTURE_UNPUBLISHED" | "UNAVAILABLE" {
+  const assignment = DAILY_SCHEDULE_MAP.get(dateString);
+  if (!assignment) return "UNAVAILABLE";
+  if (assignment.publicationStatus !== "PUBLISHED") return "FUTURE_UNPUBLISHED";
+  return "AVAILABLE";
+}
+
+/**
  * Deterministically retrieves the puzzle assignment for a specific calendar date (YYYY-MM-DD).
  * Ensures future unpublished puzzles do not leak answers to the client.
  */

@@ -2,10 +2,10 @@
 
 ## 1. Current Project Status
 
-- **Current Stage**: Part 7 (Build the Complete Product UI and Production-Quality User Experience)
+- **Current Stage**: Part 8 (Final QA, Security Audit, End-to-End Testing, and Deployment Readiness)
 - **Status**: **Completed & Fully Verified**
 - **Date**: 2026-10-12
-- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 194/194 unit and integration tests passing across 27 test suites.
+- **Repository State**: Clean git repository, zero answer leaks in client bundles, zero lint warnings/errors, 199/199 unit and integration tests passing across 28 test suites, 12/12 Playwright E2E tests passing across 5 test suites.
 
 ---
 
@@ -261,6 +261,28 @@
    - High-contrast visible focus rings across all buttons, tiles, links, and drawer triggers.
    - Full reduced motion query compliance across keyframe animations.
 
+### Stage 8 (Final QA, Security Audit, End-to-End Testing, and Deployment Readiness) — Completed
+
+1. **Security Audit & Bundle De-Leakage**:
+   - Discovered and eliminated client-side bundle answer leakage: created `src/features/game/data/public-puzzles.ts` with safe metadata strictly excluding answers and transformation targets.
+   - Redirected `/play` in production (`redirect("/classic")`) to protect development fixtures.
+   - Verified zero occurrences of target solutions in `.next/static/` via automated script checks and dedicated unit tests (`bundle-leakage.test.ts`).
+2. **Next.js 15 Cookie & In-Memory State Hardening**:
+   - Replaced raw `response.headers.set("Set-Cookie")` with native Next.js `response.cookies.set(...)` (`attachGuestCookie`), ensuring reliable HMAC-SHA256 signed cookie serialization in Chromium and across page reloads.
+   - Attached `inMemoryDb` to `globalThis` (`globalForDb.inMemoryDb`) as an App Router development singleton, preventing state wipeouts across route handler bundles.
+3. **Playwright E2E Test Suite (Journeys A through F)**:
+   - Configured dedicated port `3005` in `playwright.config.ts` to isolate test runs.
+   - Implemented 12 comprehensive end-to-end tests across 5 test specs:
+     - `tests/e2e/smoke.spec.ts`: Landing page shell and title verification.
+     - `tests/e2e/first-time-and-classic.spec.ts`: Journey A (tutorial modal onboarding & skip to Classic) and Journey B (tile entry, editing, backspace, automatic validation).
+     - `tests/e2e/hints-and-timeout.spec.ts`: Journey C (hint deduction & letter reveal) and Journey D (60s authoritative timeout & canonical reveal).
+     - `tests/e2e/daily-restrictions.spec.ts`: Journey E (daily single-attempt lock & reload persistence).
+     - `tests/e2e/resilience-and-accessibility.spec.ts`: Journey F (responsive viewport audit at 320px, 390px, 768px, 1280px without horizontal scroll, keyboard roving tabindex, header routing).
+4. **Complete Verification & Build Success**:
+   - All 199 Vitest unit tests pass across 28 test suites.
+   - All 12 Playwright E2E tests pass across 5 test suites.
+   - Prettier, ESLint, TypeScript (`tsc --noEmit`), and Next.js production build (`next build`) pass with 0 errors and 0 warnings.
+
 ---
 
 ## 3. Verification Results
@@ -272,11 +294,13 @@ Every development script was executed and verified directly:
 | `npm run typecheck`    | TypeScript compiler (`tsc --noEmit`)    | Checked all files, zero type errors                       | `0` (Success) |
 | `npm run lint`         | ESLint 9 analysis (`eslint .`)          | Analyzed all files, zero errors, zero warnings            | `0` (Success) |
 | `npm run format:check` | Prettier check across code & markdown   | All files formatted cleanly                               | `0` (Success) |
-| `npm run test`         | Vitest unit test suite (27 test suites) | **27/27 test files passed, 194/194 tests passed** (2.33s) | `0` (Success) |
+| `npm test`             | Vitest unit test suite (28 test suites) | **28/28 test files passed, 199/199 tests passed** (2.24s) | `0` (Success) |
+| `npx playwright test`  | Playwright E2E suite (5 test suites)    | **5/5 test files passed, 12/12 tests passed** (7.5s)      | `0` (Success) |
 | `npm run build`        | Next.js production build (`next build`) | Successfully compiled (9 static, 7 dynamic routes)        | `0` (Success) |
 
-### Test Suite Breakdown (194 tests across 27 suites):
+### Test Suite Breakdown (199 unit tests across 28 suites):
 
+- `tests/unit/security/bundle-leakage.test.ts`: 5 tests passed
 - `tests/unit/components/share-result.test.tsx`: 6 tests passed
 - `tests/unit/components/tutorial-modal.test.tsx`: 4 tests passed
 - `tests/unit/components/stats-page.test.tsx`: 2 tests passed
@@ -309,10 +333,11 @@ Every development script was executed and verified directly:
 
 ## 4. Outstanding Issues & Notes
 
-- **None**. All 194 unit tests, Next.js build compilation, lints, and type checks pass with 0 warnings and 0 errors.
+- **None**. All 199 unit tests, 12 Playwright E2E tests, Next.js production build, ESLint, and TypeScript checks pass with 0 warnings and 0 errors.
 
 ---
 
-## 5. Exact Next Step
+## 5. Project Roadmap Status
 
-- **Part 8**: Production Hardening, Playwright E2E Integration Suite, Accessibility Audit & Launch.
+- **All Stages (Parts 1 through 8) Complete**.
+- The project is fully tested, hardened, and ready for production deployment.

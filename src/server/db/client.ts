@@ -156,4 +156,13 @@ class InMemoryDatabase {
   }
 }
 
-export const inMemoryDb = new InMemoryDatabase();
+const globalForDb = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+  inMemoryDb: InMemoryDatabase | undefined;
+};
+
+export const inMemoryDb = globalForDb.inMemoryDb ?? new InMemoryDatabase();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForDb.inMemoryDb = inMemoryDb;
+}
