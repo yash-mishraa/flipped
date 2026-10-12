@@ -176,3 +176,39 @@ export function clearProgress(): void {
     }
   }
 }
+
+export const STORAGE_KEY_ONBOARDING = "flipped_onboarding_completed_v1";
+let inMemoryOnboardingCompleted = false;
+
+/**
+ * Checks whether the player has completed or skipped the onboarding tutorial.
+ */
+export function isOnboardingCompleted(): boolean {
+  if (!isLocalStorageAvailable()) {
+    return inMemoryOnboardingCompleted;
+  }
+  try {
+    return window.localStorage.getItem(STORAGE_KEY_ONBOARDING) === "true";
+  } catch {
+    return inMemoryOnboardingCompleted;
+  }
+}
+
+/**
+ * Sets the onboarding completed flag.
+ */
+export function setOnboardingCompleted(completed: boolean = true): void {
+  inMemoryOnboardingCompleted = completed;
+  if (!isLocalStorageAvailable()) {
+    return;
+  }
+  try {
+    if (completed) {
+      window.localStorage.setItem(STORAGE_KEY_ONBOARDING, "true");
+    } else {
+      window.localStorage.removeItem(STORAGE_KEY_ONBOARDING);
+    }
+  } catch {
+    // Ignore storage quota or security exceptions
+  }
+}

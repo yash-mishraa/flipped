@@ -115,3 +115,19 @@ Documented in `.env.example`:
 | `DATABASE_URL`         | `postgresql://postgres:postgres@...`  | PostgreSQL connection string. When unset, memory store is used |
 | `GUEST_SESSION_SECRET` | `development-guest-secret-key-at-...` | HMAC-SHA256 secret key for signing guest cookies               |
 | `APP_TIMEZONE`         | `Asia/Kolkata`                        | Authoritative game clock reference timezone                    |
+
+---
+
+## 9. Product UI, Navigation & Analytics Architecture (Part 7)
+
+| Module / Component         | File Location                                     | Primary Architectural Responsibility                                                              |
+| :------------------------- | :------------------------------------------------ | :------------------------------------------------------------------------------------------------ |
+| **Header**                 | `src/components/Header.tsx`                       | Sticky navigation bar with wordmark, mode links, and mobile responsive drawer                     |
+| **Footer**                 | `src/components/Footer.tsx`                       | Editorial footer with brand notes, keyboard shortcuts, and "How to Play" trigger                  |
+| **TutorialModal**          | `src/features/game/components/TutorialModal.tsx`  | 3-step accessible dialog with interactive 4x4 practice sandbox solving `FAST FOOD`                |
+| **Statistics Engine**      | `src/features/game/modes/statistics.ts`           | Pure metrics calculator (streaks, win rates, averages, solve times) from local records            |
+| **Statistics Route**       | `src/app/stats/page.tsx`                          | Full-featured stats dashboard with KPI cards, tabbed breakdowns, and empty states                 |
+| **Spoiler-Free Share**     | `src/features/game/utils/share-result.ts`         | Formats spoiler-safe emoji result text; invokes Web Share API with clipboard fallback             |
+| **ShareButton**            | `src/features/game/components/ShareButton.tsx`    | Accessible button providing visual "Copied!" feedback and triggering `shareResult`                |
+| **Local Progress Adapter** | `src/features/game/persistence/local-progress.ts` | Manages `flipped_progress_v1` and `flipped_onboarding_completed_v1` with SSR-safe memory fallback |
+| **Home Screen (`/`)**      | `src/app/page.tsx`                                | Editorial landing screen with live IST countdown, real daily status, and mode cards               |

@@ -16,6 +16,8 @@ import type { Puzzle, LetterGrid as LetterGridType, LetterTile } from "../domain
 import type { DailyAttemptRecord } from "../modes/mode-types";
 import { LetterGrid } from "./LetterGrid";
 
+import { ShareButton } from "./ShareButton";
+
 export interface DailyCompletionCardProps {
   readonly date: string;
   readonly puzzle: Puzzle;
@@ -190,6 +192,21 @@ export function DailyCompletionCard({
           Daily challenges can only be played once for score. Come back tomorrow for the next
           puzzle, or play unlimited practice rounds in Classic mode!
         </p>
+      </div>
+
+      {/* Result Sharing */}
+      <div className="w-full flex justify-center">
+        <ShareButton
+          options={{
+            mode: "DAILY",
+            date,
+            isWon,
+            score: attempt.finalScore,
+            elapsedSeconds: attempt.elapsedSeconds,
+            hintsUsed: attempt.hintsUsed,
+            wordLengths: [puzzle.answerWords[0].length, puzzle.answerWords[1].length],
+          }}
+        />
       </div>
 
       {/* Navigation Actions */}

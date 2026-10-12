@@ -1,62 +1,67 @@
-# Flipped — Session Handoff (Part 6 -> Part 7)
+# Flipped — Session Handoff (Part 7 -> Part 8)
 
 ## 1. What Exists Today
 
-- **Database Layer & Migrations (`prisma/`, `src/server/db/`)**:
-  - `prisma/schema.prisma`: Normalized PostgreSQL schema with `Puzzle`, `DailyAssignment`, `GuestProfile`, and `GameAttempt` models. Enforces `@@unique([guestId, dailyDate])` for Daily attempt locking.
-  - `prisma/migrations/20261012000000_init/migration.sql`: Reproducible PostgreSQL DDL with enums, tables, foreign keys, unique constraints, and indexes.
-  - `prisma/seed.ts`: Repeatable seed script upserting 12 curated puzzles and published schedule without duplication.
-  - `src/server/db/client.ts`: Singleton `PrismaClient` with `InMemoryDatabase` fallback ensuring 100% testability and offline build resilience when `DATABASE_URL` is unconfigured.
+- **Complete Product UI & Editorial Design System**:
+  - Bespoke editorial palette: warm paper canvas (`#fcfbf9`), charcoal (`#24272c`), and coral accents (`#e26d5c`).
+  - Tactile letter grid with automatic answer detection, mobile touch targets, and full keyboard navigation.
+  - Sticky header (`Header.tsx`) with wordmark, desktop links, and accessible mobile drawer.
+  - Editorial footer (`Footer.tsx`) with keyboard navigation guides and "How to Play" tutorial trigger.
+  - Production Home Screen (`src/app/page.tsx`): live IST countdown, real daily attempt status, active streak badge, difficulty puzzle counts, "How Flipped Works" visual cards, and quick links.
 
-- **Security & Guest Identity (`src/server/auth/`, `src/server/utils/`)**:
-  - `src/server/auth/guest-session.ts`: Cryptographically signed guest tokens (`guestId.timestamp.hmac`), constant-time verification, and `HttpOnly`, `SameSite=Lax`, `Secure` cookie directives.
-  - `src/server/utils/rate-limit.ts`: In-memory sliding-window rate limiter protecting submission endpoints against brute-force attacks.
+- **Interactive First-Time Onboarding (`TutorialModal.tsx`)**:
+  - Automatic first-visit trigger via `isOnboardingCompleted()` checking `flipped_onboarding_completed_v1`.
+  - 3-step walkthrough explaining core two-word transformation mechanics.
+  - Interactive 4x4 practice sandbox solving `SLOW + MEAL` → `FAST FOOD` with auto-detection.
+  - Accessible dialog (`role="dialog"`, `aria-modal="true"`, focus trap, Escape key dismiss, focus restoration).
 
-- **Server-Authoritative Game Engine & Security (`src/server/game/`, `src/server/puzzles/`, `src/server/scheduling/`)**:
-  - `src/server/puzzles/puzzle-repository.ts`: `createSafeGameplayPayload` (strictly omits canonical answers, variants, and transformation answers) and `createFinalizedResultPayload` (reveals answers only after `WON` or `TIMED_OUT`).
-  - `src/server/game/attempt-service.ts`: Authoritative attempt lifecycle managing start, resumption, atomic deadline enforcement, authoritative scoring via `calculateScore`, win/timeout finalization, and idempotent submissions.
-  - `src/server/game/hint-service.ts`: Authoritative hint service validating active deadline and returning only the single authorized letter and position with 5-point deduction.
-  - `src/server/scheduling/daily-scheduler.ts`: Deterministic date resolution in `Asia/Kolkata` and assignment resolution.
+- **Spoiler-Free Result Sharing System (`share-result.ts`, `ShareButton.tsx`)**:
+  - Never leaks target solution words or approved variants.
+  - Formats masked emoji block grids (`🟩🟩🟩🟩 🟩🟩🟩🟩` for wins, `⬛⬛⬛⬛ ⬛⬛⬛⬛` for timeouts) with score, solve time, and hints used.
+  - Dispatches via native Web Share API (`navigator.share`) with instant clipboard fallback (`navigator.clipboard.writeText`) and 2s visual toast badge.
+  - Integrated into `SuccessScreen`, `TimeoutScreen`, and `DailyCompletionCard`.
 
-- **Next.js App Router API Routes (`src/app/api/`)**:
-  - `/api/health`: Health status and database mode.
-  - `/api/game/daily/start`: Initiates or resumes daily attempt with guest cookie.
-  - `/api/game/classic/start`: Initiates classic round with Zod validation.
-  - `/api/game/attempt/[id]/submit`: Validates candidate phrase and finalizes round.
-  - `/api/game/attempt/[id]/timeout`: Finalizes expired attempts.
-  - `/api/game/attempt/[id]/hint`: Authoritative hint dispatch.
-  - `/api/game/attempt/[id]`: Returns finalized result (HTTP 403 while active).
-  - `/api/game/daily/status`: Returns current daily challenge status.
+- **Authoritative Player Statistics (`statistics.ts`, `src/app/stats/page.tsx`)**:
+  - Dedicated `/stats` page with KPI cards for games played, wins, win rate, best time, average time, total score, and active/longest streaks.
+  - Continuous calendar streak walking across `Asia/Kolkata` date boundaries without simulated data.
+  - Classic difficulty breakdown (`EASY`, `MEDIUM`, `HARD`).
+  - Clean empty states for new players.
 
-- **Frontend Server Integration (`src/features/game/components/ServerGameBoard.tsx`)**:
-  - Communicates directly with server API routes; zero solution leakage to browser.
-  - Integrated into `/daily` and `/classic` routes.
+- **Backend, Database & Security Infrastructure (from Part 6)**:
+  - Prisma ORM schema with PostgreSQL and transparent in-memory fallback adapter.
+  - Server-authoritative 60-second deadline, scoring, and hint deduction (5 points per hint).
+  - Zero answer leakage: active gameplay payload (`SafeGameplayPayload`) strips solutions until terminal state.
+  - Cryptographically signed HMAC-SHA256 guest session cookies with sliding-window rate limiting.
 
 - **Verification Metrics**:
-  - **172 / 172 unit and integration tests passing** across 23 test suites in ~1.8s (`npm run test`).
+  - **194 / 194 unit and integration tests passing** across 27 test suites in ~2.3s (`npm test`).
   - Zero TypeScript compiler errors (`npm run typecheck`).
   - Zero ESLint errors or warnings (`npm run lint`).
   - Clean Prettier formatting (`npm run format:check`).
-  - Successful Next.js production build (`npm run build`) generating 8 static pages and 8 dynamic API routes.
+  - Successful Next.js production build (`npm run build`) generating 9 static pages and 7 dynamic routes.
 
 ---
 
-## 2. What Part 7 Must Implement
+## 2. What Part 8 Must Implement
 
-In **Part 7 — Visual Polish, UI Redesign, Onboarding & User Experience**, the engineer will build:
+In **Part 8 — Production Hardening, Playwright E2E Integration Suite, Accessibility Audit & Launch**, the engineer will deliver:
 
-1. **Visual Redesign & Tactile Physicality**:
-   - Refine letter tile aesthetics with bespoke physical feel (smooth 3D flips, paper texture, subtle shadows).
-   - High-fidelity typography, spacing, and micro-interactions.
-   - Smooth state transitions for lock, reveal, pending, and eliminated states.
+1. **Comprehensive End-to-End Test Suite (Playwright)**:
+   - Full user journeys: Home page visit → interactive onboarding → Daily puzzle solve → spoiler-free share flow.
+   - Timeout flow: 60-second timer expiration, solution reveal, practice score display.
+   - Classic mode: difficulty selection, puzzle completion, replay without immediate repetition.
+   - Keyboard-only navigation journey: completing a round using strictly physical keyboard inputs.
 
-2. **First-Time User Onboarding & Interactive Tutorial**:
-   - Guided interactive tutorial / modal explaining the Flipped game mechanics.
-   - Demonstration of semantic clue transformations and letter-frequency rules.
+2. **Automated Accessibility Audit (WCAG 2.2 AA)**:
+   - axe-core automated audit across all routes (`/`, `/daily`, `/classic`, `/archive`, `/stats`).
+   - Screen-reader announcement verification for grid navigation, hint delivery, and results.
+   - High-contrast visual testing and focus ring verification.
 
-3. **Responsive Design & Mobile Ergonomics**:
-   - Touchscreen keyboard ergonomics, layout stability during virtual keyboard summon.
-   - Viewport scaling and safe-area adjustments across phone and tablet screens.
+3. **Performance & Core Web Vitals Optimization**:
+   - Verify Lighthouse metrics (>95 across Performance, Accessibility, Best Practices, SEO).
+   - Zero layout shift (CLS = 0) during virtual keyboard summon on mobile viewports.
+   - Bundle size inspection and font preloading checks.
 
-4. **Audio & Haptic Feedback (Optional / Accessible)**:
-   - Subtle acoustic cues for key presses, flips, hints, and victory (with toggle and `prefers-reduced-motion` compliance).
+4. **Production Deployment & Launch Verification**:
+   - Production Docker/Vercel configuration readiness.
+   - Final end-to-end verification and release sign-off.

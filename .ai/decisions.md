@@ -258,3 +258,35 @@ This document records architectural decisions, their context, alternatives consi
 - **Rationale**:
   - Provides full production schema rigor and ACID guarantees for PostgreSQL deployments.
   - Guarantees that `npm test` and `next build` execute reliably in CI and offline developer environments with zero external service dependencies.
+
+---
+
+## ADR-019: Editorial Design System, First-Time Onboarding & Focus Trap Dialog
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Players encountering Flipped need immediate clarity on its unique two-word transformation mechanic (`CLUE 1 + CLUE 2 → TARGET PHRASE`). Traditional text explanations without interactive practice lead to high bounce rates. Simultaneously, the application requires consistent editorial styling across home, header, footer, and subpages, with strict keyboard accessibility and focus management.
+- **Decision**:
+  1. **Editorial Design Tokens**: Standardize across all views on warm paper canvas (`#fcfbf9`), charcoal typography (`#24272c`), and coral accents (`#e26d5c`). Letter tiles feature tactile border lines, subtle shadows, and unambiguous state feedback.
+  2. **First-Time Guided Onboarding Modal (`TutorialModal.tsx`)**: Inspects `flipped_onboarding_completed_v1` in `localStorage`. If absent, automatically surfaces a 3-step walkthrough culminating in an interactive practice grid solving `SLOW + MEAL` → `FAST FOOD`. Auto-detects completion and marks onboarding complete.
+  3. **Accessible Modal Architecture**: Adheres to WAI-ARIA dialog patterns with `role="dialog"`, `aria-modal="true"`, background scroll locking, trapping focus, listening to Escape keys, and restoring focus to the prior active element upon closure.
+- **Rationale**:
+  - Hands-on practice with `FAST FOOD` immediately internalizes the game's mechanics in under 15 seconds.
+  - Full keyboard accessibility and focus restoration ensure compliance with WCAG 2.2 AA standards.
+  - Consistent editorial header and footer unify navigation across `/`, `/daily`, `/classic`, `/archive`, and `/stats`.
+
+---
+
+## ADR-020: Authoritative Player Statistics Engine & Spoiler-Free Result Sharing Flow
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Players require transparent tracking of their performance (win rates, streaks, solve times) and the ability to share results on social platforms and messaging apps without spoiling the daily puzzle solution for others.
+- **Decision**:
+  1. **Authoritative Statistics Calculation (`statistics.ts`, `/stats`)**: Compute all player metrics strictly from persisted attempt records (`DailyAttemptRecord` and Classic completed IDs) without simulated or mock data. Continuous calendar streaks are evaluated chronologically against the authoritative `Asia/Kolkata` date sequence, correctly detecting broken streaks while preserving active status for today's pending challenges.
+  2. **Spoiler-Free Result Sharing (`share-result.ts`, `ShareButton.tsx`)**: Result text never exposes the target words or approved variants. Instead, it generates an emoji grid representing word lengths (`🟩🟩🟩🟩 🟩🟩🟩🟩` for wins, `⬛⬛⬛⬛ ⬛⬛⬛⬛` for timeouts) accompanied by score, elapsed seconds, and hints used.
+  3. **Universal Share Dispatch**: Calls `navigator.share()` on supported mobile devices and gracefully falls back to `navigator.clipboard.writeText()` with a 2-second visual feedback badge (`Copied to Clipboard!`).
+- **Rationale**:
+  - Protects the competitive integrity and daily mystery of Flipped.
+  - Provides rewarding, accurate stats that drive daily retention without misleading players with fabricated analytics.
+  - Ensures seamless sharing across all browsers and operating systems.

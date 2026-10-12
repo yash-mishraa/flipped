@@ -75,3 +75,16 @@ export function selectClassicPuzzle(
     puzzle: selected,
   };
 }
+
+/**
+ * Counts actual available curated puzzles per difficulty tier.
+ */
+export function getPuzzleCountsByDifficulty(): Record<Difficulty, number> {
+  const counts: Record<Difficulty, number> = { EASY: 0, MEDIUM: 0, HARD: 0 };
+  for (const puzzle of CURATED_PUZZLES) {
+    if (counts[puzzle.difficulty] !== undefined) {
+      counts[puzzle.difficulty]++;
+    }
+  }
+  return counts;
+}

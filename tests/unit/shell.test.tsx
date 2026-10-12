@@ -1,25 +1,42 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import HomePage from "@/app/page";
+import { setOnboardingCompleted } from "@/features/game/persistence/local-progress";
 
-describe("Application Shell (HomePage)", () => {
-  it("renders the game title and tagline", () => {
-    render(<HomePage />);
-    expect(screen.getByRole("heading", { name: "Flipped", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/The tactile word puzzle where letters shift/i)).toBeInTheDocument();
+describe("Production Home Screen (HomePage)", () => {
+  beforeEach(() => {
+    setOnboardingCompleted(true); // Prevent auto-opening tutorial during home screen layout tests
   });
 
-  it("renders both Daily and Classic mode informational cards", () => {
+  it("renders the game title and core challenge headline", () => {
     render(<HomePage />);
-    expect(screen.getByRole("heading", { name: "Daily Puzzle", level: 3 })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Classic Mode", level: 3 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "FLIPPED", level: 1 })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Flip the meanings of two clue words to uncover a familiar phrase/i)
+    ).toBeInTheDocument();
   });
 
-  it("displays the explicit development notice about gameplay mechanics", () => {
+  it("renders both Daily and Classic mode challenge sections", () => {
+    render(<HomePage />);
+    expect(screen.getByTestId("home-daily-card")).toBeInTheDocument();
+    expect(screen.getByTestId("home-classic-card")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Daily Mode", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Classic Mode", level: 2 })).toBeInTheDocument();
+  });
+
+  it("renders How Flipped Works section with semantic examples", () => {
     render(<HomePage />);
     expect(
-      screen.getByText(/Development Notice — Gameplay Mechanics Pending/i)
+      screen.getByRole("heading", { name: "How Flipped Works", level: 2 })
     ).toBeInTheDocument();
+    expect(screen.getByText("SLOW + MEAL")).toBeInTheDocument();
+    expect(screen.getByText("FAST FOOD")).toBeInTheDocument();
+  });
+
+  it("renders navigation links to Archive and Statistics", () => {
+    render(<HomePage />);
+    expect(screen.getAllByRole("link", { name: /Archive/i })[0]).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Statistics/i })[0]).toBeInTheDocument();
   });
 });

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Hourglass, RotateCcw, Home, Clock, Sparkles, Lightbulb } from "lucide-react";
 import type { Puzzle, TerminalResult } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
+import { ShareButton } from "./ShareButton";
 
 export interface TimeoutScreenProps {
   readonly puzzle: Puzzle;
@@ -13,6 +14,7 @@ export interface TimeoutScreenProps {
   readonly mode?: GameMode;
   readonly onNextPuzzle?: () => void;
   readonly nextPuzzleLabel?: string;
+  readonly date?: string;
 }
 
 /**
@@ -30,6 +32,7 @@ export function TimeoutScreen({
   mode,
   onNextPuzzle,
   nextPuzzleLabel = "Next Puzzle",
+  date,
 }: TimeoutScreenProps): React.JSX.Element {
   const { hintsUsed, practiceScore, finalScore } = terminalResult;
   const canonicalPhrase = puzzle.answerWords.join(" ");
@@ -125,8 +128,23 @@ export function TimeoutScreen({
           </div>
         </div>
 
+        {/* Share Result */}
+        <div className="mt-5 w-full flex justify-center">
+          <ShareButton
+            options={{
+              mode: isDaily ? "DAILY" : "CLASSIC",
+              date: isDaily ? (date ?? puzzle.id) : undefined,
+              isWon: false,
+              score: 0,
+              elapsedSeconds: 60,
+              hintsUsed,
+              wordLengths: [puzzle.answerWords[0]?.length || 4, puzzle.answerWords[1]?.length || 4],
+            }}
+          />
+        </div>
+
         {/* Mode-Aware Action Buttons */}
-        <div className="mt-6 flex w-full flex-col gap-2.5 sm:flex-row">
+        <div className="mt-5 flex w-full flex-col gap-2.5 sm:flex-row">
           {isDaily ? (
             <>
               <Link

@@ -273,3 +273,57 @@ Client-supplied timers, scores, and status flags are strictly untrusted:
   - `GameAttempt`: Primary key UUID, guest relation, puzzle relation, mode enum (`DAILY` | `CLASSIC`), status enum (`IN_PROGRESS` | `WON` | `TIMED_OUT`), `startedAt`, `deadline`, `finishedAt`, `score`, `elapsedSeconds`, `hintsUsed`, `dailyDate`.
   - Composite Unique Constraint: `@@unique([guestId, dailyDate])` prevents race conditions or multi-tab exploits on Daily challenges.
 - **Fallback Architecture**: `src/server/db/client.ts` implements `InMemoryDatabase` alongside `PrismaClient`. Development, test runs, and static builds run seamlessly without requiring a running PostgreSQL service.
+
+---
+
+## 11. Complete Product UI, Editorial Aesthetics & Player Experience (Part 7)
+
+### Editorial Puzzle Aesthetic & Design Tokens
+
+Flipped adheres to an intentional editorial aesthetic reminiscent of physical paper broadsheets and literary deduction games:
+
+- **Canvas (`#fcfbf9`)**: Warm paper canvas avoiding harsh electronic white glare.
+- **Charcoal (`#24272c`)**: High-contrast, legible typography across all lighting conditions.
+- **Coral Accent (`#e26d5c`)**: Expressive, controlled accent hue used for active states, semantic transformation indicators, and hero highlights.
+- **Tile Feedback**: Tactile borders, subtle drop-shadows (`shadow-xs` to `shadow-sm`), and distinct non-color feedback indicators (checkmarks, position symbols, dashed borders) to support users with color vision deficiencies.
+
+### Interactive Onboarding & "How to Play" Experience (`TutorialModal.tsx`)
+
+- **First-Time Detection**: Automatically opens on initial visit via `isOnboardingCompleted()` lookup against `flipped_onboarding_completed_v1` in `localStorage`.
+- **Three-Step Guided Walkthrough**:
+  1. _The Challenge_: Explains two clue words transforming into a familiar two-word phrase (e.g. `SLOW + MEAL` → `FAST FOOD`).
+  2. _The Clues & Hints_: Explains initial fixed letters (`F`), antonym/synonym relationships, letter validation feedback, and hints.
+  3. _Interactive Sandbox Grid_: Live, interactive 4x4 letter-grid practice playground where users physically type or click to solve `FAST FOOD`. Auto-detects completion and offers immediate graduation into live play.
+- **Dialog Accessibility**: Accessible dialog (`role="dialog"`, `aria-modal="true"`), full keyboard focus trap, Escape key dismiss with focus restoration, and skippable anytime without blocking gameplay.
+
+### Spoiler-Free Result Sharing System (`share-result.ts`, `ShareButton.tsx`)
+
+Competitive and daily word puzzle communities thrive on sharing results without spoiling puzzle solutions for friends:
+
+- **Strict Anti-Spoiling Guarantee**: Result formatting never includes the canonical target words or approved variants.
+- **Formatted Share Output**:
+  - Daily challenge header: `Flipped Daily (YYYY-MM-DD)` or `Flipped Classic (Difficulty)`.
+  - Score badge and solve time: `Score: 85/100 • 32s`.
+  - Hints used: `Hints: 1/3` (or `None`).
+  - Visual Emoji Grid: Word-length masked blocks (`🟩🟩🟩🟩 🟩🟩🟩🟩` for wins, `⬛⬛⬛⬛ ⬛⬛⬛⬛` for timeouts).
+  - Clean invitation link to play.
+- **Native Web Share API with Clipboard Fallback**: Uses `navigator.share()` on mobile devices with instant fallback to `navigator.clipboard.writeText()` and clear visual "Copied to Clipboard!" toast feedback.
+
+### Authoritative Player Statistics Engine (`statistics.ts`, `/stats`)
+
+Statistics are computed purely from persisted records without fabrication or mock defaults:
+
+- **Core Metrics**: Total games played, games won, win percentage, total score, average solve time, fastest solve time.
+- **Continuous Calendar Streak Walking**:
+  - Walks Daily attempt history chronologically.
+  - Accounts for consecutive calendar days in `Asia/Kolkata` timezone.
+  - Correctly breaks streaks on missed calendar days.
+  - Preserves active streak if today's challenge is already played and won, or if yesterday was won and today has not yet been attempted.
+- **Classic Tier Performance**: Tracks attempts, wins, and average scores broken down by difficulty (`EASY`, `MEDIUM`, `HARD`).
+- **Honest Empty States**: Clean, welcoming empty-state presentation when no rounds have been recorded.
+
+### Accessibility Refinements (WCAG 2.2 AA)
+
+- **Silent Timer Ticks**: Countdown timer employs `aria-live="off"` during standard ticking to eliminate screen-reader chatter, upgrading to `aria-live="assertive"` only during urgency thresholds (<10s) and timeout.
+- **Visible Focus Rings**: High-contrast, 2px focus rings (`focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2`) across all interactive buttons, tiles, selector pills, and links.
+- **Reduced Motion Support**: All keyframe animations and transitions respect `prefers-reduced-motion: reduce`.

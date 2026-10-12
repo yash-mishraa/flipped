@@ -24,9 +24,13 @@ export * from "./modes/mode-types";
 export * from "./modes/daily-scheduler";
 export * from "./modes/classic-selector";
 export * from "./modes/round-configuration";
+export * from "./modes/statistics";
 
 // Local Persistence Adapter
 export * from "./persistence/local-progress";
+
+// Utilities
+export * from "./utils/share-result";
 
 // Interactive React components and hooks
 export { GameBoard } from "./components/GameBoard";
@@ -40,6 +44,8 @@ export { GameFeedback } from "./components/GameFeedback";
 export { GameInstructions } from "./components/GameInstructions";
 export { DifficultySelector } from "./components/DifficultySelector";
 export { DailyCompletionCard } from "./components/DailyCompletionCard";
+export { ShareButton } from "./components/ShareButton";
+export { TutorialModal } from "./components/TutorialModal";
 export { LetterTile as LetterTileUI } from "./components/LetterTile";
 export { LetterGrid as LetterGridUI } from "./components/LetterGrid";
 export { usePuzzleRound } from "./hooks/usePuzzleRound";

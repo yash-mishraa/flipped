@@ -6,6 +6,8 @@ import { Trophy, RotateCcw, Home, Clock, Sparkles, Lightbulb } from "lucide-reac
 import type { Puzzle, TerminalResult } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
 
+import { ShareButton } from "./ShareButton";
+
 export interface SuccessScreenProps {
   readonly puzzle: Puzzle;
   readonly terminalResult: TerminalResult;
@@ -13,6 +15,7 @@ export interface SuccessScreenProps {
   readonly mode?: GameMode;
   readonly onNextPuzzle?: () => void;
   readonly nextPuzzleLabel?: string;
+  readonly date?: string;
 }
 
 /**
@@ -29,6 +32,7 @@ export function SuccessScreen({
   mode,
   onNextPuzzle,
   nextPuzzleLabel = "Next Puzzle",
+  date,
 }: SuccessScreenProps): React.JSX.Element {
   const { finalScore, elapsedSeconds, hintsUsed, solvedPhrase } = terminalResult;
   const canonicalPhrase = puzzle.answerWords.join(" ");
@@ -105,8 +109,23 @@ export function SuccessScreen({
           </div>
         </div>
 
+        {/* Share Result */}
+        <div className="mt-5 w-full flex justify-center">
+          <ShareButton
+            options={{
+              mode: isDaily ? "DAILY" : "CLASSIC",
+              date: isDaily ? date || puzzle.id : undefined,
+              isWon: true,
+              score: finalScore,
+              elapsedSeconds,
+              hintsUsed,
+              wordLengths: [puzzle.answerWords[0]?.length || 4, puzzle.answerWords[1]?.length || 4],
+            }}
+          />
+        </div>
+
         {/* Mode-Aware Action Buttons */}
-        <div className="mt-6 flex w-full flex-col gap-2.5 sm:flex-row">
+        <div className="mt-5 flex w-full flex-col gap-2.5 sm:flex-row">
           {isDaily ? (
             <>
               <Link

@@ -21,15 +21,22 @@ export function HintControl({
   onUseHint,
 }: HintControlProps): React.JSX.Element {
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const handleClick = async () => {
-    const res = await onUseHint();
-    setFeedbackNotice(res.message);
+    if (isProcessing || isRoundOver) return;
+    setIsProcessing(true);
+    try {
+      const res = await onUseHint();
+      setFeedbackNotice(res.message);
 
-    // Auto-dismiss transient notice after 3 seconds
-    setTimeout(() => {
-      setFeedbackNotice(null);
-    }, 3000);
+      // Auto-dismiss transient notice after 3 seconds
+      setTimeout(() => {
+        setFeedbackNotice(null);
+      }, 3000);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -37,21 +44,22 @@ export function HintControl({
       <button
         type="button"
         onClick={handleClick}
-        disabled={isRoundOver}
-        aria-label={`Use a hint. ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"} used so far (-5 points per hint)`}
+        disabled={isRoundOver || isProcessing}
+        aria-label={`Use a hint. Cost is 5 points deduction. ${hintsUsed} used so far.`}
         className={cn(
           "inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50/90 px-4 py-2 text-xs font-semibold text-amber-900 shadow-sm transition-all duration-150 select-none",
           "hover:bg-amber-100 hover:border-amber-300 active:scale-95",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2",
-          isRoundOver && "cursor-not-allowed opacity-50"
+          (isRoundOver || isProcessing) && "cursor-not-allowed opacity-50"
         )}
       >
         <Lightbulb className="h-4 w-4 text-amber-600" aria-hidden="true" />
         <span>Use Hint</span>
+        <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+          -5 pts
+        </span>
         {hintsUsed > 0 && (
-          <span className="rounded-full bg-amber-200/80 px-1.5 py-0.2 text-[10px] font-bold text-amber-900">
-            {hintsUsed} used (-{hintsUsed * 5} pts)
-          </span>
+          <span className="text-[10px] font-medium text-amber-800">({hintsUsed} used)</span>
         )}
       </button>
 

@@ -490,6 +490,7 @@ export function ServerGameBoard({
             puzzle={safePuzzleView}
             terminalResult={terminalResultView}
             mode={mode}
+            date={payload.date}
             onNextPuzzle={onNextClassic}
             nextPuzzleLabel="Next Classic Puzzle"
           />
@@ -500,6 +501,7 @@ export function ServerGameBoard({
             puzzle={safePuzzleView}
             terminalResult={terminalResultView}
             mode={mode}
+            date={payload.date}
             onNextPuzzle={onNextClassic}
             nextPuzzleLabel="Next Classic Puzzle"
           />

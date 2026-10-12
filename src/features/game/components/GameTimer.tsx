@@ -58,7 +58,7 @@ export function GameTimer({
     <div
       role="timer"
       aria-label={`Time remaining: ${formattedTime}`}
-      aria-live={urgency === "critical" ? "assertive" : "polite"}
+      aria-live={urgency === "critical" || urgency === "expired" ? "assertive" : "off"}
       data-testid="game-timer"
       data-urgency={urgency}
       className={cn(
