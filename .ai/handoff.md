@@ -1,26 +1,30 @@
-# Flipped — Session Handoff (Part 4 -> Part 5)
+# Flipped — Session Handoff (Part 5 -> Part 6)
 
 ## 1. What Exists Today
 
-- **Core Game Engine & Timer Modules (`src/features/game/`)**:
-  - `domain/types.ts`: complete domain contracts for `Puzzle`, `LetterTile`, `LetterGrid`, `RoundState` (`READY`, `PLAYING`, `WON`, `TIMED_OUT`), `TerminalResult`, and unique `roundId`.
-  - `domain/timer-utils.ts`: pure time formatting (`01:00`), urgency categorization, and deadline calculations.
-  - `domain/round-state.ts`: immutable round state machine with unique `roundId` generation and atomic deadline enforcement.
-  - `domain/scoring.ts`: deterministic scoring formula.
-  - `domain/hints.ts`: deterministic reading-order hint selection.
-  - `hooks/useGameTimer.ts`: deadline-based countdown timer with tab visibility synchronization.
-  - `hooks/usePuzzleRound.ts`: full round controller tying together grid, timer, hints, auto-win, and timeout.
+- **Game Modes & Scheduling Architecture (`src/features/game/modes/`)**:
+  - `mode-types.ts`: typed domain contracts for `GameMode`, `DailyPuzzleAssignment`, `DailyAttemptRecord`, `ClassicHistoryRecord`, `DailyPuzzleResult`, `RoundConfiguration`.
+  - `daily-scheduler.ts`: deterministic `getDailyDateString` using `Asia/Kolkata` (IST) reference timezone, returning strict `YYYY-MM-DD` identifiers; `getDailyPuzzle` returning `AVAILABLE`, `FUTURE_UNPUBLISHED`, or `UNAVAILABLE`; `getPublishedDailySchedule`.
+  - `classic-selector.ts`: `selectClassicPuzzle` with strict difficulty filtering, recent ID exclusion, and exhausted pool wrapping without immediate repetition.
+  - `round-configuration.ts`: `createDailyRoundConfiguration` and `createClassicRoundConfiguration`.
 
-- **UI & Presentation Components (`src/features/game/components/`)**:
-  - `GameTimer.tsx`: countdown display with multi-stage urgency styling (`normal`, `urgent`, `critical` with pulse, `expired`).
-  - `GameHUD.tsx`: top status bar, timer, live score, hint counter, and prominent "Start Game (60s)" CTA.
-  - `SuccessScreen.tsx`: victory summary with solved phrase, transformation explanations, score, elapsed time, hints, and Play Again.
-  - `TimeoutScreen.tsx`: encouraging timeout summary with canonical answer reveal, practice score distinction, and Play Again.
-  - `GameBoard.tsx`: composite game board supporting untimed / timed modes and result flows.
-  - `src/app/play/page.tsx`: development gameplay sandbox route with fixture switching and 60-second timer.
+- **Persistence Adapter (`src/features/game/persistence/local-progress.ts`)**:
+  - Versioned storage schema `flipped_progress_v1` tracking Daily attempt records and Classic history (`recentlyPlayedIds`, `totalPlayed`, `totalWins`, `lastDifficulty`).
+  - Safe parsing with automatic fallback on corruption, plus in-memory fallback for SSR and restricted private browsing environments.
+  - Single-attempt daily lock: both `WON` and `TIMED_OUT` persist records, locking scored re-attempts on that calendar date.
+
+- **Presentation & Dedicated Routes (`src/app/`, `src/features/game/components/`)**:
+  - `DifficultySelector.tsx`: interactive radio cards for Easy, Medium, and Hard tiers.
+  - `DailyCompletionCard.tsx`: read-only review of completed daily puzzles, preserving score, elapsed time, hints, explanations, and solved letter grid.
+  - `SuccessScreen.tsx` & `TimeoutScreen.tsx`: mode-aware outcome actions (Daily locked vs Classic replay).
+  - `GameBoard.tsx`: mode-aware orchestration, persisting attempts upon completion.
+  - `src/app/page.tsx`: production home screen with active Daily and Classic launch cards, archive link, and rules overview.
+  - `src/app/daily/page.tsx`: functional Daily challenge flow enforcing the single-attempt lock.
+  - `src/app/classic/page.tsx`: functional Classic mode with tier picker, repetition-minimized sequencing, and live win rate tracking.
+  - `src/app/archive/page.tsx`: Daily archive listing past calendar challenges and player completion status.
 
 - **Verification Metrics**:
-  - **121 / 121 unit and component tests passing** across 13 test suites in ~1.3s (`npm run test`).
+  - **145 / 145 unit and component tests passing** across 18 test suites in ~1.5s (`npm run test`).
   - Zero TypeScript compiler errors (`npm run typecheck`).
   - Zero ESLint errors or warnings (`npm run lint`).
   - Clean Prettier formatting (`npm run format:check`).
@@ -28,23 +32,22 @@
 
 ---
 
-## 2. What Part 5 Must Implement
+## 2. What Part 6 Must Implement
 
-In **Part 5 — Game Modes (Daily & Classic), Scheduling & State Persistence**, the engineer will build the official game modes, daily calendar scheduling, and local persistence:
+In **Part 6 — Backend Architecture, PostgreSQL Database Integration & User Accounts**, the engineer will build:
 
-1. **Daily Mode Implementation**:
-   - Deterministic calendar-based puzzle selector tied to UTC midnight.
-   - Generates or selects the canonical daily puzzle for any given UTC date (`YYYY-MM-DD`).
-   - Guarantees all players worldwide receive the identical challenge on the same date.
-   - Daily attempt locking: prevents multiple daily attempts on the same calendar day.
+1. **PostgreSQL Database Schema & Migrations**:
+   - Schema for users, daily puzzles, puzzle bank, attempt records, and leaderboards.
+   - Database connection management with connection pooling.
 
-2. **Classic Mode Implementation**:
-   - Endless procedural or bank-based puzzle progression.
-   - Selectable difficulty tiers (`EASY`, `MEDIUM`, `HARD`).
-   - Unlimited replayability without calendar restrictions.
+2. **Authentication & User Identity**:
+   - Player account creation / guest-to-registered migration.
+   - Secure session handling.
 
-3. **Client-Side State Persistence (LocalStorage)**:
-   - Serialized state snapshots saved to LocalStorage on every action.
-   - Restoration of in-progress games on browser reload.
-   - Safe migration and corruption recovery (graceful fallback to fresh state).
-   - Tracking daily completion status across browser sessions.
+3. **Server-Authoritative Daily Results & Sync**:
+   - Server endpoints to validate and record daily attempts.
+   - Sync local storage progress to authenticated user profiles.
+
+4. **Competitive Global Leaderboards**:
+   - Daily challenge leaderboard rankings by score and solve speed.
+   - Streak tracking across calendar days.

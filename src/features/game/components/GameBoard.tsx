@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import type { Puzzle } from "../domain/types";
+import type { GameMode } from "../modes/mode-types";
+import { saveDailyAttempt, recordClassicGame } from "../persistence/local-progress";
 import { usePuzzleRound } from "../hooks/usePuzzleRound";
 import { LetterGrid } from "./LetterGrid";
 import { HintControl } from "./HintControl";
@@ -16,6 +18,10 @@ export interface GameBoardProps {
   readonly autoStart?: boolean;
   readonly durationSeconds?: number;
   readonly onPuzzleComplete?: () => void;
+  readonly mode?: GameMode;
+  readonly date?: string;
+  readonly onNextPuzzle?: () => void;
+  readonly nextPuzzleLabel?: string;
 }
 
 /**
@@ -27,6 +33,10 @@ export function GameBoard({
   autoStart = false,
   durationSeconds,
   onPuzzleComplete,
+  mode,
+  date,
+  onNextPuzzle,
+  nextPuzzleLabel,
 }: GameBoardProps): React.JSX.Element {
   const {
     state,
@@ -41,16 +51,48 @@ export function GameBoard({
     onPlayAgain,
   } = usePuzzleRound(puzzle, { autoStart, durationSeconds });
 
+  const hasRecordedProgressRef = useRef<boolean>(false);
+
+  // Reset recording ref if puzzle changes
+  useEffect(() => {
+    hasRecordedProgressRef.current = false;
+  }, [puzzle.id]);
+
   const isPlaying = state.status === "PLAYING";
   const isRoundOver = state.status === "WON" || state.status === "TIMED_OUT";
   const isGridDisabled = !isPlaying; // Disabled in READY, WON, and TIMED_OUT
 
-  // Trigger completion callback if provided
+  // Trigger completion callback and persist result when round terminates
   useEffect(() => {
     if (state.status === "WON" && onPuzzleComplete) {
       onPuzzleComplete();
     }
-  }, [state.status, onPuzzleComplete]);
+
+    if (
+      (state.status === "WON" || state.status === "TIMED_OUT") &&
+      !hasRecordedProgressRef.current
+    ) {
+      hasRecordedProgressRef.current = true;
+
+      const solvedPhrase =
+        state.status === "WON" ? state.terminalResult.solvedPhrase : puzzle.answerWords.join(" ");
+
+      if (mode === "DAILY" && date) {
+        saveDailyAttempt({
+          date,
+          puzzleId: puzzle.id,
+          status: state.status,
+          finalScore: state.status === "WON" ? state.score : 0,
+          elapsedSeconds: timer.elapsedSeconds,
+          hintsUsed: state.hintsUsed,
+          solvedPhrase: solvedPhrase ?? puzzle.answerWords.join(" "),
+          completedAt: new Date().toISOString(),
+        });
+      } else if (mode === "CLASSIC") {
+        recordClassicGame(puzzle.id, puzzle.difficulty, state.status === "WON");
+      }
+    }
+  }, [state, timer.elapsedSeconds, puzzle, mode, date, onPuzzleComplete]);
 
   return (
     <div className="flex w-full flex-col items-center gap-6" data-testid="game-board">
@@ -98,6 +140,9 @@ export function GameBoard({
             puzzle={puzzle}
             terminalResult={state.terminalResult}
             onPlayAgain={onPlayAgain}
+            mode={mode}
+            onNextPuzzle={onNextPuzzle}
+            nextPuzzleLabel={nextPuzzleLabel}
           />
         )}
 
@@ -106,6 +151,9 @@ export function GameBoard({
             puzzle={puzzle}
             terminalResult={state.terminalResult}
             onPlayAgain={onPlayAgain}
+            mode={mode}
+            onNextPuzzle={onNextPuzzle}
+            nextPuzzleLabel={nextPuzzleLabel}
           />
         )}
 

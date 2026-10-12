@@ -181,3 +181,39 @@ The round follows a strict, irreversible state progression:
 - **Play Again Action**:
   - Generates a fresh unique `roundId`.
   - Resets state back to `READY`, clears player entries, restores initial clue letters, resets timer to `01:00`, resets hints to 0, score to 100, and clears all scheduled callbacks.
+
+---
+
+## 9. Daily & Classic Game Modes, Calendar Scheduling & Local Persistence (Part 5)
+
+### Daily Challenge Mechanics (`/daily`)
+
+- **Deterministic Assignment**: Deterministically maps the calendar day string (`YYYY-MM-DD`) using the `Asia/Kolkata` reference timezone to a curated master puzzle.
+- **Single-Attempt Enforcement**:
+  - Only one official attempt is permitted per calendar date.
+  - Both `WON` and `TIMED_OUT` outcomes consume the daily attempt and persist a `DailyAttemptRecord`.
+  - Completed daily puzzles render in read-only review mode via `DailyCompletionCard`, locking further scored attempts.
+  - Result screens for Daily mode direct players to Classic mode or the Daily Archive.
+- **Archive Navigation (`/archive`)**:
+  - Lists published historical daily puzzles chronologically.
+  - Displays user solving status (`Solved (XXX pts)`, `Timed Out`, or `Unplayed`).
+  - Provides direct access to play or review today's challenge.
+
+### Classic Mode Mechanics (`/classic`)
+
+- **Difficulty Tiers**: Easy, Medium, and Hard tiers selectable via interactive `DifficultySelector` radio cards.
+- **Repetition-Free Selection**:
+  - Filters curated puzzle bank strictly by requested difficulty.
+  - Excludes the last $N$ played puzzle IDs (`recentlyPlayedIds`).
+  - Gracefully wraps when the difficulty pool is exhausted while avoiding immediate repetition of the previous puzzle.
+- **Unlimited Replay**: Players can skip or play subsequent puzzles indefinitely via "Next Classic Puzzle".
+- **Local Progress Metrics**: Tracks total games played, total wins, win percentage, and last selected difficulty.
+
+### Local Storage Architecture (`src/features/game/persistence/local-progress.ts`)
+
+- **Key**: `flipped_progress_v1`
+- **Schema**:
+  - `version: 1`
+  - `daily`: Record of date strings (`YYYY-MM-DD`) mapped to `DailyAttemptRecord`
+  - `classic`: `recentlyPlayedIds`, `lastDifficulty`, `totalPlayed`, `totalWins`
+- **Resilience**: Safe JSON parse with automatic rollback to defaults on corruption, and in-memory store fallback for SSR and restricted private browsing environments.

@@ -193,3 +193,35 @@ This document records architectural decisions, their context, alternatives consi
 - **Rationale**:
   - Prevents confusing edge cases where delayed UI renders might award a victory after deadline expiration.
   - Encourages player learning without polluting official solve scoring with incomplete puzzles.
+
+---
+
+## ADR-015: Deterministic Calendar Daily Scheduling via Asia/Kolkata Timezone
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: The Daily challenge requires assigning exactly one curated puzzle per calendar day, resetting at midnight. A universal reference timezone is necessary to avoid client device clock tampering and inconsistent date boundaries across players.
+- **Decision**:
+  1. Standardize on `Asia/Kolkata` (IST, UTC+5:30) as the authoritative game timezone using `Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" })` to produce strict `YYYY-MM-DD` strings.
+  2. Map calendar dates deterministically against the curated published schedule (`PUBLISHED_DAILY_SCHEDULE`).
+  3. Reject unpublished future puzzles with `status: "FUTURE_UNPUBLISHED"` to prevent client-side answer leakage.
+- **Rationale**:
+  - `en-CA` locale consistently outputs ISO `YYYY-MM-DD` across Node.js, V8, and browser runtimes.
+  - Consistent timezone ensures all players share the exact same daily puzzle globally.
+  - Clear separation between published archive entries and future unpublished dates protects game integrity.
+
+---
+
+## ADR-016: Local Progress Persistence with Single Daily Attempt Lock and Repetition-Free Classic Selection
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Prior to backend database integration (Stage 6), the application requires client-side completion tracking, daily challenge single-attempt enforcement, and Classic mode replay without immediate repetition.
+- **Decision**:
+  1. Implement a versioned `localStorage` adapter (`flipped_progress_v1`) with in-memory fallback for SSR and restricted private browsing environments.
+  2. Enforce Daily single-attempt rule locally: both `WON` and `TIMED_OUT` outcomes persist a `DailyAttemptRecord`. When visiting `/daily`, an existing record renders `DailyCompletionCard` in read-only mode, disabling scored retries.
+  3. Implement repetition-free Classic selection: filter by difficulty tier, exclude the last $N$ played puzzle IDs (`recentlyPlayedIds`), and wrap gracefully when the tier pool is exhausted while avoiding the immediate previous puzzle.
+- **Rationale**:
+  - Provides a complete, fully playable client-side experience for both Daily and Classic modes before Stage 6 backend deployment.
+  - Prevents cheating or re-rolling of daily scores on the same browser.
+  - Graceful fallback ensures no crashes occur during SSR pre-rendering or in restricted browser security contexts.

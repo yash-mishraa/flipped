@@ -4,11 +4,15 @@ import React from "react";
 import Link from "next/link";
 import { Hourglass, RotateCcw, Home, Clock, Sparkles, Lightbulb } from "lucide-react";
 import type { Puzzle, TerminalResult } from "../domain/types";
+import type { GameMode } from "../modes/mode-types";
 
 export interface TimeoutScreenProps {
   readonly puzzle: Puzzle;
   readonly terminalResult: TerminalResult;
-  readonly onPlayAgain: () => void;
+  readonly onPlayAgain?: () => void;
+  readonly mode?: GameMode;
+  readonly onNextPuzzle?: () => void;
+  readonly nextPuzzleLabel?: string;
 }
 
 /**
@@ -17,17 +21,22 @@ export interface TimeoutScreenProps {
  * - Canonical solution phrase reveal
  * - Both semantic transformations and their explanatory context
  * - Practice potential score (clearly distinguished from completed puzzle score)
- * - Play Again action and Return Home link
+ * - Mode-aware next actions
  */
 export function TimeoutScreen({
   puzzle,
   terminalResult,
   onPlayAgain,
+  mode,
+  onNextPuzzle,
+  nextPuzzleLabel = "Next Puzzle",
 }: TimeoutScreenProps): React.JSX.Element {
   const { hintsUsed, practiceScore, finalScore } = terminalResult;
   const canonicalPhrase = puzzle.answerWords.join(" ");
   // The practice metric is the potential points calculated before expiration
   const displayPracticeScore = practiceScore ?? finalScore;
+  const isDaily = mode === "DAILY";
+  const handleReplayAction = onNextPuzzle ?? onPlayAgain;
 
   return (
     <div
@@ -43,7 +52,7 @@ export function TimeoutScreen({
         </div>
 
         <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-700 uppercase tracking-wider">
-          Time Limit Reached
+          {isDaily ? "Daily Time Limit Reached" : "Time Limit Reached"}
         </span>
 
         <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900">
@@ -116,17 +125,36 @@ export function TimeoutScreen({
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Mode-Aware Action Buttons */}
         <div className="mt-6 flex w-full flex-col gap-2.5 sm:flex-row">
-          <button
-            type="button"
-            onClick={onPlayAgain}
-            data-testid="play-again-button"
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-coral-500 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
-          >
-            <RotateCcw className="h-4 w-4" aria-hidden="true" />
-            <span>Play Again</span>
-          </button>
+          {isDaily ? (
+            <>
+              <Link
+                href="/classic"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-coral-500 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
+              >
+                <span>Play Classic Mode</span>
+              </Link>
+              <Link
+                href="/archive"
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              >
+                <span>Daily Archive</span>
+              </Link>
+            </>
+          ) : (
+            handleReplayAction && (
+              <button
+                type="button"
+                onClick={handleReplayAction}
+                data-testid="play-again-button"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-coral-500 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
+              >
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                <span>{mode === "CLASSIC" ? nextPuzzleLabel : "Play Again"}</span>
+              </button>
+            )
+          )}
 
           <Link
             href="/"

@@ -2,10 +2,10 @@
 
 ## 1. Current Project Status
 
-- **Current Stage**: Part 4 (60-Second Gameplay Loop, Timer, Scoring & Results)
+- **Current Stage**: Part 5 (Daily and Classic Game Modes, Calendar Scheduling & Local Persistence)
 - **Status**: **Completed & Fully Verified**
 - **Date**: 2026-10-12
-- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 121/121 unit tests passing.
+- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 145/145 unit tests passing.
 
 ---
 
@@ -153,6 +153,34 @@
    - Play Again creates a genuinely fresh round with unique `roundId`.
    - Restores initial fixed clue letters, resets timer to 60s, hints to 0, score to 100, and cleans up old callbacks.
 
+### Stage 5 (Daily and Classic Game Modes, Calendar Scheduling & Local Persistence) — Completed
+
+1. **Deterministic Daily Calendar Scheduling (`src/features/game/modes/daily-scheduler.ts`, `data/daily-schedule.ts`)**:
+   - `getDailyDateString`: standardizes on `Asia/Kolkata` (IST) timezone, reliably returning `YYYY-MM-DD` strings.
+   - `getDailyPuzzle`: deterministically retrieves the published daily challenge or safely reports `FUTURE_UNPUBLISHED` or `UNAVAILABLE` without leaking puzzle data.
+   - `getPublishedDailySchedule`: chronologically enumerates all published challenges for the archive.
+
+2. **Repetition-Free Classic Mode Selector (`src/features/game/modes/classic-selector.ts`)**:
+   - `selectClassicPuzzle`: filters curated puzzle bank strictly by requested difficulty (`EASY`, `MEDIUM`, `HARD`).
+   - Excludes recently played puzzle IDs; gracefully wraps when the tier is exhausted while avoiding the immediate previous puzzle.
+
+3. **Local Progress Persistence Adapter (`src/features/game/persistence/local-progress.ts`)**:
+   - Versioned storage schema `flipped_progress_v1` tracking Daily attempt records and Classic history (`recentlyPlayedIds`, `totalPlayed`, `totalWins`, `lastDifficulty`).
+   - In-memory store fallback for SSR and restricted private browsing environments.
+   - Enforces single daily attempt lock: both `WON` and `TIMED_OUT` persist records and prevent further scored attempts on that calendar date.
+
+4. **Difficulty Selector Component (`src/features/game/components/DifficultySelector.tsx`)**:
+   - Interactive radio selection across Easy, Medium, and Hard challenge tiers with visual badges and vocabulary descriptions.
+
+5. **Daily Completion Card (`src/features/game/components/DailyCompletionCard.tsx`)**:
+   - Comprehensive read-only review of completed daily puzzles, preserving score, elapsed time, hints, explanations, and solved letter grid.
+
+6. **Dedicated Pages & Navigation**:
+   - `src/app/page.tsx`: Production home screen with active Daily and Classic mode launch cards, archive link, and rules guide.
+   - `src/app/daily/page.tsx`: Daily challenge flow enforcing the single-attempt lock and rendering `DailyCompletionCard` when completed.
+   - `src/app/classic/page.tsx`: Classic mode flow with tier selection, repetition-free puzzle sequencing, live win rate tracking, and unlimited replay.
+   - `src/app/archive/page.tsx`: Daily archive listing past calendar challenges and player completion status.
+
 ---
 
 ## 3. Verification Results
@@ -164,11 +192,16 @@ Every development script was executed and verified directly:
 | `npm run typecheck`    | TypeScript compiler (`tsc --noEmit`)    | Checked all files, zero type errors                       | `0` (Success) |
 | `npm run lint`         | ESLint 9 analysis (`eslint .`)          | Analyzed all files, zero errors, zero warnings            | `0` (Success) |
 | `npm run format:check` | Prettier check across code & markdown   | All files formatted cleanly                               | `0` (Success) |
-| `npm run test`         | Vitest unit test suite (13 test suites) | **13/13 test files passed, 121/121 tests passed** (1.36s) | `0` (Success) |
-| `npm run build`        | Next.js production build (`next build`) | Successfully compiled in 727ms                            | `0` (Success) |
+| `npm run test`         | Vitest unit test suite (18 test suites) | **18/18 test files passed, 145/145 tests passed** (1.53s) | `0` (Success) |
+| `npm run build`        | Next.js production build (`next build`) | Successfully compiled in 1343ms                           | `0` (Success) |
 
 ### Test Suite Breakdown:
 
+- `tests/unit/modes/daily-scheduler.test.ts`: 7 tests passed
+- `tests/unit/modes/classic-selector.test.ts`: 6 tests passed
+- `tests/unit/modes/round-configuration.test.ts`: 4 tests passed
+- `tests/unit/persistence/local-progress.test.ts`: 5 tests passed
+- `tests/unit/components/mode-components.test.tsx`: 2 tests passed
 - `tests/unit/game/timer-and-lifecycle.test.ts`: 11 tests passed
 - `tests/unit/components/result-screens.test.tsx`: 2 tests passed
 - `tests/unit/components/game-board.test.tsx`: 6 tests passed
@@ -188,10 +221,9 @@ Every development script was executed and verified directly:
 ## 4. Outstanding Issues & Notes
 
 - **None**. All tests, builds, lints, and type checks pass with 0 warnings and 0 errors.
-- Both winning and timeout flows are fully automated and verified under fake timers.
 
 ---
 
 ## 5. Exact Next Step
 
-- **Part 5**: Implement Daily and Classic modes, UTC midnight calendar scheduling, Classic mode endless replay with difficulty tiers, and client-side LocalStorage state persistence.
+- **Part 6**: Implement Backend Architecture, PostgreSQL Database Integration, User Accounts, and Competitive Leaderboards.
