@@ -2,10 +2,10 @@
 
 ## 1. Current Project Status
 
-- **Current Stage**: Part 3 (Interactive Letter Grid & Gameplay UI)
+- **Current Stage**: Part 4 (60-Second Gameplay Loop, Timer, Scoring & Results)
 - **Status**: **Completed & Fully Verified**
 - **Date**: 2026-10-12
-- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 106/106 unit tests passing.
+- **Repository State**: Clean git repository, zero unmanaged files, zero lint warnings/errors, 121/121 unit tests passing.
 
 ---
 
@@ -115,8 +115,43 @@
    - Collapsible instructional guide explaining puzzle mechanics, keyboard navigation shortcuts, and multi-modal feedback legend.
 
 8. **Development Gameplay Sandbox (`src/app/play/page.tsx`)**:
-   - Live interactive development sandbox accessible via "Launch Interactive Grid Sandbox" on home screen.
+   - Live interactive development sandbox accessible via "Launch 60-Second Timed Round" on home screen.
    - Test fixture cycling control allowing immediate testing across all 12 test puzzles.
+
+### Stage 4 (60-Second Gameplay Loop, Timer, Scoring & Results) — Completed
+
+1. **Drift-Free Countdown Timer Hook & Utilities (`src/features/game/hooks/useGameTimer.ts`, `src/features/game/domain/timer-utils.ts`)**:
+   - Computes remaining and elapsed time against an authoritative deadline timestamp ($\text{deadline} = \text{startTime} + 60\,000\,\text{ms}$) rather than error-prone accumulator decrements.
+   - Listens for `visibilitychange` events; tab throttling is reconciled immediately with zero extra time granted upon tab return.
+   - Categorizes urgency states (`normal`, `urgent`, `critical`, `expired`) and formats standard `MM:SS` notation (`01:00` down to `00:00`).
+
+2. **Game Timer Visual Component (`src/features/game/components/GameTimer.tsx`)**:
+   - Urgency visual cues: neutral badge (> 20s), warm amber alert (11–20s), coral alert with restrained pulse animation (1–10s, respecting `prefers-reduced-motion`), and muted expired state (0s).
+   - High-contrast typography with monospace tabular figures and accessible `role="timer"` / `aria-live`.
+
+3. **Live Gameplay Heads-Up Display (`src/features/game/components/GameHUD.tsx`)**:
+   - Status badge (`Ready to Play`, `Round Active`, `Solved`, `Time Expired`), live score, hints used count, and reset button.
+   - Prominent "Start Game (60s)" call-to-action button when in `READY` state.
+   - Clue transformation cards showing clue words, transformation types, and semantic context.
+
+4. **Irreversible Round Lifecycle & Atomic Race Prevention (`src/features/game/hooks/usePuzzleRound.ts`)**:
+   - Strict `READY -> PLAYING -> WON` / `TIMED_OUT` state transitions.
+   - Editable tiles are locked in `READY` until explicit start button click.
+   - Authoritative deadline validation: letter entries or hints processed at or after the deadline atomically trigger `TIMED_OUT` rather than `WON`.
+   - Stops the timer immediately when the round ends and freezes final score.
+
+5. **Celebratory Victory Screen (`src/features/game/components/SuccessScreen.tsx`)**:
+   - Solved answer phrase display, full semantic transformation explanations, frozen final score, elapsed seconds, hints used count.
+   - "Play Again" button and "Home" navigation link.
+
+6. **Encouraging Timeout Screen (`src/features/game/components/TimeoutScreen.tsx`)**:
+   - Encouraging time-expired message, revealed canonical solution phrase, semantic transformations breakdown.
+   - Clear distinction between official solve score (**0**) and practice potential score metric.
+   - "Play Again" button and "Home" navigation link.
+
+7. **Clean Replay & Reset Architecture (`resetRound`, `generateRoundId`)**:
+   - Play Again creates a genuinely fresh round with unique `roundId`.
+   - Restores initial fixed clue letters, resets timer to 60s, hints to 0, score to 100, and cleans up old callbacks.
 
 ---
 
@@ -129,13 +164,15 @@ Every development script was executed and verified directly:
 | `npm run typecheck`    | TypeScript compiler (`tsc --noEmit`)    | Checked all files, zero type errors                       | `0` (Success) |
 | `npm run lint`         | ESLint 9 analysis (`eslint .`)          | Analyzed all files, zero errors, zero warnings            | `0` (Success) |
 | `npm run format:check` | Prettier check across code & markdown   | All files formatted cleanly                               | `0` (Success) |
-| `npm run test`         | Vitest unit test suite (11 test suites) | **11/11 test files passed, 106/106 tests passed** (1.05s) | `0` (Success) |
-| `npm run build`        | Next.js production build (`next build`) | Successfully compiled in 1179ms                           | `0` (Success) |
+| `npm run test`         | Vitest unit test suite (13 test suites) | **13/13 test files passed, 121/121 tests passed** (1.36s) | `0` (Success) |
+| `npm run build`        | Next.js production build (`next build`) | Successfully compiled in 727ms                            | `0` (Success) |
 
 ### Test Suite Breakdown:
 
+- `tests/unit/game/timer-and-lifecycle.test.ts`: 11 tests passed
+- `tests/unit/components/result-screens.test.tsx`: 2 tests passed
+- `tests/unit/components/game-board.test.tsx`: 6 tests passed
 - `tests/unit/components/letter-grid.test.tsx`: 8 tests passed
-- `tests/unit/components/game-board.test.tsx`: 4 tests passed
 - `tests/unit/game/validate-puzzle.test.ts`: 15 tests passed
 - `tests/unit/game/normalize-and-check-answer.test.ts`: 21 tests passed
 - `tests/unit/game/evaluate-letters.test.ts`: 8 tests passed
@@ -151,10 +188,10 @@ Every development script was executed and verified directly:
 ## 4. Outstanding Issues & Notes
 
 - **None**. All tests, builds, lints, and type checks pass with 0 warnings and 0 errors.
-- Both desktop physical keyboards and mobile virtual keyboards are fully supported via the hidden buffer input and roving index.
+- Both winning and timeout flows are fully automated and verified under fake timers.
 
 ---
 
 ## 5. Exact Next Step
 
-- **Part 4**: Implement the 60-second countdown timer, dynamic timer penalty score updates, timeout handling, Daily mode UTC midnight scheduling, Classic mode endless replay, and LocalStorage state persistence.
+- **Part 5**: Implement Daily and Classic modes, UTC midnight calendar scheduling, Classic mode endless replay with difficulty tiers, and client-side LocalStorage state persistence.

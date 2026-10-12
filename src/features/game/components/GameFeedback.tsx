@@ -59,17 +59,9 @@ export function GameFeedback({ state, onRestart }: GameFeedbackProps): React.JSX
 
   // Active round live status
   return (
-    <div className="flex items-center justify-center gap-4 text-xs font-medium text-stone-500">
-      <div className="flex items-center gap-1.5">
-        <Sparkles className="h-3.5 w-3.5 text-coral-500" aria-hidden="true" />
-        <span>
-          Current Score: <strong className="text-stone-800">{state.score}</strong>
-        </span>
-      </div>
-      <span>•</span>
-      <span>
-        {state.status === "READY" ? "Click any tile or type to begin" : "Auto-detecting answers"}
-      </span>
+    <div className="flex items-center justify-center gap-2 text-xs font-medium text-stone-500">
+      <Sparkles className="h-3.5 w-3.5 text-coral-500" aria-hidden="true" />
+      <span>Auto-detecting answers as you type</span>
     </div>
   );
 }

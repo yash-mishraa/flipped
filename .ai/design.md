@@ -131,3 +131,53 @@ To guarantee readability for players with color vision deficiencies, letter tile
    - If the current tile is empty, Backspace moves to the previous editable tile and clears it.
 4. **Directional Roving**: Arrow keys (`ArrowLeft`, `ArrowRight`, `ArrowUp`, `ArrowDown`), `Home`, and `End` traverse editable slots across words.
 5. **Mobile Focus Buffer**: An off-screen input buffer maintains focus state, summoning mobile virtual keyboards without interfering with layout zoom or scrolling.
+
+---
+
+## 8. 60-Second Timed Round Loop, Scoring & Result Screens (Part 4)
+
+### Lifecycle State Machine & Terminal Transitions
+
+The round follows a strict, irreversible state progression:
+
+- `READY`: Game begins here. Clues and fixed clue letters are displayed. Editable letter tiles are locked/inactive. The countdown displays `01:00`. The prominent "Start Game (60s)" button initiates the round.
+- `PLAYING`: Timer counts down from 60 seconds. Editable tiles unlock. Input, backspace, navigation, and hints are enabled. Scoring clock updates dynamically.
+- `WON`: Automatically triggered when all answer letters are entered correctly before the deadline. Timer stops immediately. Board is preserved. Final score is frozen.
+- `TIMED_OUT`: Automatically triggered when the countdown reaches 0 (`00:00`). Timer stops. Grid and hints are disabled. Board is preserved.
+
+### Drift-Free Deadline Timer Architecture
+
+- Rather than decrementing an integer accumulator with drift, the timer measures elapsed time against an authoritative deadline: $\text{deadline} = \text{startTime} + 60\,000\,\text{ms}$.
+- Periodic updates recalculate $\text{remaining} = \max(0, \text{deadline} - \text{Date.now()})$ and display whole seconds via $\lceil\text{remaining} / 1000\rceil$.
+- **Background Tabs**: Tab suspension is detected via the document `visibilitychange` event. When returning, remaining time is recalculated instantly from wall-clock time; backgrounding grants zero extra time.
+- **Urgency Tiers**:
+  - `normal`: > 20s remaining.
+  - `urgent`: 11–20s remaining (amber warning cue).
+  - `critical`: 1–10s remaining (coral alert with pulse animation, respecting `prefers-reduced-motion`).
+  - `expired`: 0s remaining (`00:00`).
+
+### Authoritative Deadline & Race-Condition Policy
+
+- An answer submission is valid **only if processed before the authoritative deadline**.
+- If a letter entry or hint request occurs at or after the deadline ($\text{Date.now()} \ge \text{deadline}$), the round transitions atomically to `TIMED_OUT`. A late letter event cannot award a win.
+- Both `WON` and `TIMED_OUT` are strictly terminal; once reached, no subsequent callback, user input, or timer event can alter the result.
+
+### Scoring Policy & Timeout Distinction
+
+- **Active / Winning Rounds**: Score updates dynamically every 5 elapsed seconds and upon hint usage:
+  $$\text{score} = \max(0, \min(100, 100 - \lfloor\text{elapsedSeconds} / 5\rfloor - (\text{hintsUsed} \times 5)))$$
+- **Timeout Policy**: Unsolved rounds that expire at 60 seconds do **not** award completion points (official score is **0**). To encourage player development, the timeout screen displays a clearly labeled **Potential Practice Score** (e.g., 88) alongside an explanation that unfinished rounds officially score 0.
+
+### Result Screens & Replay Mechanics
+
+- **Success Screen (`SuccessScreen`)**:
+  - Displays celebratory trophy badge, solved answer phrase, and full semantic transformation explanations.
+  - Summarizes final frozen score, elapsed seconds, and hints used.
+  - Offers "Play Again" button and "Home" link.
+- **Timeout Screen (`TimeoutScreen`)**:
+  - Displays encouraging time-expired header, reveals the correct canonical answer phrase, and explains both semantic transformations.
+  - Displays time limit reached (60s), hints used, and potential practice score.
+  - Offers "Play Again" button and "Home" link.
+- **Play Again Action**:
+  - Generates a fresh unique `roundId`.
+  - Resets state back to `READY`, clears player entries, restores initial clue letters, resets timer to `01:00`, resets hints to 0, score to 100, and clears all scheduled callbacks.

@@ -71,8 +71,10 @@ export interface AnswerCheckResult {
 export type RoundStatus = "READY" | "PLAYING" | "WON" | "TIMED_OUT";
 
 export interface TerminalResult {
+  readonly roundId?: string;
   readonly status: "WON" | "TIMED_OUT";
   readonly finalScore: number;
+  readonly practiceScore?: number;
   readonly elapsedSeconds: number;
   readonly hintsUsed: number;
   readonly completedAt: string;
@@ -80,6 +82,7 @@ export interface TerminalResult {
 }
 
 export interface ReadyRoundState {
+  readonly roundId: string;
   readonly status: "READY";
   readonly puzzle: Puzzle;
   readonly grid: LetterGrid;
@@ -91,6 +94,7 @@ export interface ReadyRoundState {
 }
 
 export interface PlayingRoundState {
+  readonly roundId: string;
   readonly status: "PLAYING";
   readonly puzzle: Puzzle;
   readonly grid: LetterGrid;
@@ -102,6 +106,7 @@ export interface PlayingRoundState {
 }
 
 export interface WonRoundState {
+  readonly roundId: string;
   readonly status: "WON";
   readonly puzzle: Puzzle;
   readonly grid: LetterGrid;
@@ -114,6 +119,7 @@ export interface WonRoundState {
 }
 
 export interface TimedOutRoundState {
+  readonly roundId: string;
   readonly status: "TIMED_OUT";
   readonly puzzle: Puzzle;
   readonly grid: LetterGrid;

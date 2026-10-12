@@ -167,3 +167,29 @@ This document records architectural decisions, their context, alternatives consi
 - **Rationale**:
   - Allows Server Components (such as `src/app/page.tsx`) to safely import static configuration and pure domain constants from `@/features/game` without encountering React Hook boundary errors during production compilation (`next build`).
   - Clear architectural separation between server-renderable shells and interactive client state trees.
+
+---
+
+## ADR-013: Deadline-Based Countdown Architecture with Tab Visibility Synchronization
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Countdown timers in browser JavaScript frequently drift if implemented via simple integer decrements (`count - 1`), especially when browsers throttle timers in background tabs or battery saver modes.
+- **Decision**: Calculate remaining time strictly from a target deadline timestamp ($\text{deadline} = \text{startTime} + 60\,000\,\text{ms}$). Subscribe to the `visibilitychange` event so returning to the tab immediately evaluates the real elapsed time from `Date.now()`.
+- **Rationale**:
+  - Eliminates tick drift entirely; UI updates at 100ms intervals display accurate whole seconds without accumulating fractional errors.
+  - Guarantees background tabs never receive extra time; returning after 60 seconds have passed triggers expiration immediately.
+
+---
+
+## ADR-014: Authoritative Deadline Evaluation and Timeout Score Practice Distinction
+
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Potential race conditions occur when a player enters the last letter or requests a hint at the exact moment the timer expires. Furthermore, scoring policy must decide how to treat players who run out of time without solving.
+- **Decision**:
+  1. Atomic deadline rule: letter inputs and hint requests are accepted only if processed before the authoritative deadline ($\text{Date.now()} < \text{deadline}$). Inputs at or after the deadline transition the round to `TIMED_OUT` rather than `WON`.
+  2. Scoring distinction: timed-out rounds score **0** officially, but the timeout screen presents their practice score ($\max(0, 100 - \lfloor\text{elapsed}/5\rfloor - 5\times\text{hints})$) as an encouraging practice metric.
+- **Rationale**:
+  - Prevents confusing edge cases where delayed UI renders might award a victory after deadline expiration.
+  - Encourages player learning without polluting official solve scoring with incomplete puzzles.

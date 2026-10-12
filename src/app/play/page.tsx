@@ -29,7 +29,7 @@ export default function PlayPage(): React.JSX.Element {
 
           <div className="inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
             <Terminal className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
-            <span>Stage 3 Dev Sandbox • Untimed</span>
+            <span>Stage 4 • 60-Second Timed Round</span>
           </div>
 
           <button
@@ -69,8 +69,9 @@ export default function PlayPage(): React.JSX.Element {
       {/* Footer Notice */}
       <footer className="border-t border-stone-200/80 pt-4 text-center text-xs text-stone-500">
         <p>
-          Untimed development sandbox • Production 60-second countdown and daily schedule will be
-          implemented in subsequent stages.
+          Stage 4 Timed Development Experience • 60-second countdown with auto-detection, hints, and
+          result summaries. Full Daily mode and LocalStorage persistence will be implemented in
+          subsequent stages.
         </p>
       </footer>
     </main>

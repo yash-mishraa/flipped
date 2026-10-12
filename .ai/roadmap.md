@@ -11,10 +11,10 @@ This document outlines the multi-stage implementation plan for the Flipped word 
 | **Part 1** | Foundation & Development Shell               | **Completed (Verified)** | None         |
 | **Part 2** | Pure Puzzle Engine & Letter Validation       | **Completed (Verified)** | Part 1       |
 | **Part 3** | Interactive Letter Grid & Gameplay UI        | **Completed (Verified)** | Part 2       |
-| **Part 4** | Game Modes & Client-Side State Persistence   | Planned                  | Part 3       |
-| **Part 5** | Player Statistics, Streaks & Share System    | Planned                  | Part 4       |
-| **Part 6** | Backend Architecture & Database (PostgreSQL) | Planned                  | Part 5       |
-| **Part 7** | Player Authentication & Global Leaderboards  | Planned                  | Part 6       |
+| **Part 4** | 60-Second Gameplay Loop, Timer & Results     | **Completed (Verified)** | Part 3       |
+| **Part 5** | Game Modes (Daily/Classic) & Persistence     | Planned                  | Part 4       |
+| **Part 6** | Player Statistics, Streaks & Share System    | Planned                  | Part 5       |
+| **Part 7** | Backend Architecture & Database (PostgreSQL) | Planned                  | Part 6       |
 | **Part 8** | Production Hardening, E2E Testing & Launch   | Planned                  | Part 7       |
 
 ---
@@ -76,10 +76,30 @@ This document outlines the multi-stage implementation plan for the Flipped word 
 
 ---
 
-### Part 4 — Game Modes & Client-Side State Persistence
+### Part 4 — 60-Second Gameplay Loop, Timer & Results
+
+- **Status**: **Completed (Verified)**
+- **Dependencies**: Part 3.
+- **Deliverables**:
+  - Precision countdown timer module (`useGameTimer`, `timer-utils`) measuring against deadline timestamp.
+  - Tab visibility synchronization (`visibilitychange`) preventing background-tab drift.
+  - Visual urgency tiers (`normal`, `urgent`, `critical` with pulse animation, `expired`).
+  - Initial `READY` state with prominent "Start Game (60s)" CTA and disabled grid input until active.
+  - Comprehensive gameplay HUD (`GameHUD`, `GameTimer`) showing status, timer, score, and hints.
+  - Atomic deadline evaluation preventing post-expiration wins.
+  - Celebratory victory screen (`SuccessScreen`) with transformation explanations, frozen score, elapsed time, hints, and Play Again.
+  - Encouraging timeout screen (`TimeoutScreen`) with solution reveal, transformation explanations, practice score metric, and Play Again.
+  - Clean replay lifecycle creating unique `roundId` and resetting all timers and callbacks.
+- **Completion Criteria**:
+  - 100% of unit and component tests pass (121/121 tests across 13 test suites).
+  - Clean ESLint, strict TypeScript, and Next.js production build with 0 warnings/errors.
+
+---
+
+### Part 5 — Game Modes (Daily/Classic), Scheduling & State Persistence
 
 - **Status**: Planned
-- **Dependencies**: Part 3.
+- **Dependencies**: Part 4.
 - **Deliverables**:
   - Daily mode scheduling with synchronized UTC midnight rollover.
   - Classic mode endless puzzle generator with selectable difficulty tiers.

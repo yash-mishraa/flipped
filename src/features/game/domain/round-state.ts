@@ -20,13 +20,24 @@ import { calculateScore } from "./scoring";
 import { applyHintToGrid, selectNextHint } from "./hints";
 
 /**
+ * Generates a unique identifier for a puzzle round.
+ */
+export function generateRoundId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `round-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
  * Creates the initial round state in READY lifecycle status.
  */
-export function createInitialRoundState(puzzle: Puzzle): ReadyRoundState {
+export function createInitialRoundState(puzzle: Puzzle, roundId?: string): ReadyRoundState {
   const grid = createInitialGrid(puzzle);
   const initialPosition = getFirstEditablePosition(grid);
 
   return {
+    roundId: roundId ?? generateRoundId(),
     status: "READY",
     puzzle,
     grid,
@@ -54,6 +65,7 @@ export function startRound(state: RoundState): PlayingRoundState {
   }
 
   return {
+    roundId: state.roundId,
     status: "PLAYING",
     puzzle: state.puzzle,
     grid: state.grid,
@@ -100,6 +112,7 @@ export function applyLetterInput(
     );
 
     const wonState: WonRoundState = {
+      roundId: activePlayingState.roundId,
       status: "WON",
       puzzle: activePlayingState.puzzle,
       grid: updatedGrid,
@@ -109,6 +122,7 @@ export function applyLetterInput(
       selectedTilePosition: null,
       lastValidationResult: validation,
       terminalResult: {
+        roundId: activePlayingState.roundId,
         status: "WON",
         finalScore,
         elapsedSeconds: activePlayingState.elapsedSeconds,
@@ -225,6 +239,7 @@ export function applyHintToRound(state: RoundState): RoundState {
 
   if (validation.isMatch) {
     const wonState: WonRoundState = {
+      roundId: activeState.roundId,
       status: "WON",
       puzzle: activeState.puzzle,
       grid: updatedGrid,
@@ -234,6 +249,7 @@ export function applyHintToRound(state: RoundState): RoundState {
       selectedTilePosition: null,
       lastValidationResult: validation,
       terminalResult: {
+        roundId: activeState.roundId,
         status: "WON",
         finalScore: updatedScore,
         elapsedSeconds: activeState.elapsedSeconds,
@@ -268,20 +284,23 @@ export function timeOutRound(state: RoundState): TimedOutRoundState {
     return state;
   }
 
-  const finalScore = calculateScore(state.elapsedSeconds, state.hintsUsed);
+  const practiceScore = calculateScore(state.elapsedSeconds, state.hintsUsed);
 
   return {
+    roundId: state.roundId,
     status: "TIMED_OUT",
     puzzle: state.puzzle,
     grid: state.grid,
     hintsUsed: state.hintsUsed,
     elapsedSeconds: state.elapsedSeconds,
-    score: finalScore,
+    score: practiceScore,
     selectedTilePosition: null,
     lastValidationResult: state.lastValidationResult,
     terminalResult: {
+      roundId: state.roundId,
       status: "TIMED_OUT",
-      finalScore,
+      finalScore: practiceScore,
+      practiceScore,
       elapsedSeconds: state.elapsedSeconds,
       hintsUsed: state.hintsUsed,
       completedAt: new Date().toISOString(),
@@ -292,6 +311,6 @@ export function timeOutRound(state: RoundState): TimedOutRoundState {
 /**
  * Resets the round state back to READY with a fresh grid and reset counters.
  */
-export function resetRound(puzzle: Puzzle): ReadyRoundState {
-  return createInitialRoundState(puzzle);
+export function resetRound(puzzle: Puzzle, newRoundId?: string): ReadyRoundState {
+  return createInitialRoundState(puzzle, newRoundId ?? generateRoundId());
 }

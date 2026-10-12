@@ -10,7 +10,7 @@ export default function HomePage(): React.JSX.Element {
       <header className="space-y-4 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-coral-200 bg-coral-50 px-3.5 py-1 text-xs font-semibold text-coral-600">
           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>Stage 3 Interactive Grid Active</span>
+          <span>Stage 4 Timed Gameplay Loop Active</span>
         </div>
 
         <h1 className="text-4xl font-extrabold tracking-tight text-stone-900 md:text-5xl">
@@ -25,7 +25,7 @@ export default function HomePage(): React.JSX.Element {
             className="inline-flex items-center gap-2 rounded-xl bg-coral-500 px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
           >
             <Play className="h-4 w-4 fill-white" aria-hidden="true" />
-            <span>Launch Interactive Grid Sandbox</span>
+            <span>Launch 60-Second Timed Round</span>
           </Link>
         </div>
       </header>
