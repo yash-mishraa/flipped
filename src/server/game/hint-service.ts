@@ -39,7 +39,8 @@ export function getHintablePositions(
  */
 export async function processAuthoritativeHint(
   attempt: StoredAttempt,
-  puzzle: Puzzle
+  puzzle: Puzzle,
+  enteredWords?: readonly [string, string]
 ): Promise<ServerHintResult> {
   if (attempt.status !== "ACTIVE") {
     return {
@@ -57,15 +58,19 @@ export async function processAuthoritativeHint(
     };
   }
 
-  const hintable = getHintablePositions(puzzle);
-  if (attempt.hintsUsed >= hintable.length) {
+  const hintable = getHintablePositions(puzzle).filter(({ wordIndex, letterIndex }) => {
+    const entered = enteredWords?.[wordIndex]?.[letterIndex]?.toUpperCase();
+    const answer = puzzle.answerWords[wordIndex].charAt(letterIndex).toUpperCase();
+    return entered !== answer;
+  });
+  if (hintable.length === 0) {
     return {
       success: false,
       message: "No further hints are available for this puzzle.",
     };
   }
 
-  const targetPosition = hintable[attempt.hintsUsed]!;
+  const targetPosition = hintable[0]!;
   const letter = puzzle.answerWords[targetPosition.wordIndex]
     .charAt(targetPosition.letterIndex)
     .toUpperCase();

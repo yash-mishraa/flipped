@@ -23,7 +23,21 @@ export async function POST(
     return NextResponse.json({ error: "Puzzle data missing." }, { status: 404 });
   }
 
-  const result = await processAuthoritativeHint(attempt, puzzle);
+  let enteredWords: readonly [string, string] | undefined;
+  try {
+    const body: unknown = await request.json();
+    if (
+      typeof body === "object" && body !== null && "enteredWords" in body &&
+      Array.isArray(body.enteredWords) && body.enteredWords.length === 2 &&
+      body.enteredWords.every((word) => typeof word === "string" && /^[a-z]*$/i.test(word))
+    ) {
+      enteredWords = body.enteredWords as [string, string];
+    }
+  } catch {
+    // Older clients may send no body; the server still returns a safe hint.
+  }
+
+  const result = await processAuthoritativeHint(attempt, puzzle, enteredWords);
 
   const status = result.success ? 200 : 400;
   const response = NextResponse.json(result, { status });

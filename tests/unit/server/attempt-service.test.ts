@@ -202,4 +202,27 @@ describe("Authoritative Attempt Lifecycle Service", () => {
       expect(updatedAttempt.hintsUsed).toBe(1);
     });
   });
+
+  describe("Authoritative hints", () => {
+    it("skips correctly guessed letters before choosing the next hint", async () => {
+      const started = await startClassicAttempt(guestA, "EASY");
+      expect(started.status).toBe("STARTED");
+      if (started.status !== "STARTED") return;
+
+      const puzzle = await getPrivilegedPuzzleById(started.payload.puzzleId);
+      expect(puzzle).toBeTruthy();
+      if (!puzzle) return;
+
+      const result = await processAuthoritativeHint(
+        inMemoryDb.getAttempt(started.payload.attemptId)!,
+        puzzle,
+        [puzzle.answerWords[0].slice(0, 2), puzzle.answerWords[1].charAt(0)]
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.wordIndex).toBe(0);
+      expect(result.letterIndex).toBe(2);
+      expect(result.letter).toBe(puzzle.answerWords[0][2]?.toUpperCase());
+    });
+  });
 });

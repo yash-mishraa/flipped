@@ -10,14 +10,135 @@
 }
 
 :root {
-  --bg-primary: #fcfbf9;
-  --text-charcoal: #24272c;
+  color-scheme: light;
+  --bg-primary: #f5f1e8;
+  --paper: #fbf9f3;
+  --ink: #24251f;
+  --muted: #716f66;
+  --rule: #d8d1c4;
+  --accent: #b64c38;
+  --correct: #416b52;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
 }
 
+* { box-sizing: border-box; }
+
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-charcoal);
+  background: var(--bg-primary);
+  color: var(--ink);
   min-height: 100vh;
+  font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection { background: #e8c5b6; color: var(--ink); }
+
+a, button { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; }
+:focus-visible { outline: 2px solid var(--accent) !important; outline-offset: 3px; }
+
+/* A quiet, print-led frame shared by every route. */
+body > div { min-height: 100vh; }
+header.sticky {
+  position: relative !important;
+  background: var(--bg-primary) !important;
+  border-color: var(--rule) !important;
+  backdrop-filter: none !important;
+}
+header.sticky > div { max-width: 1120px !important; min-height: 66px; }
+header.sticky a[href="/"] > div { display: none !important; }
+header.sticky a[href="/"] span {
+  font-family: var(--serif); font-size: 25px !important; font-weight: 700 !important;
+  letter-spacing: -.06em !important; color: var(--ink) !important;
+}
+header.sticky nav a, header.sticky nav button {
+  border: 0 !important; border-radius: 0 !important; background: transparent !important;
+  box-shadow: none !important; padding: 10px 11px !important; color: var(--muted) !important;
+  font-size: 13px !important;
+}
+header.sticky nav a[aria-current="page"], header.sticky nav a:hover,
+header.sticky nav button:hover { color: var(--accent) !important; }
+
+main { color: var(--ink); }
+main [class*="rounded-3xl"], main [class*="rounded-2xl"] {
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+main [class*="rounded-3xl"][class*="border"],
+main [class*="rounded-2xl"][class*="border"] {
+  border-color: var(--rule) !important;
+}
+main [class*="bg-white"][class*="shadow"] { box-shadow: none !important; }
+main h1, main h2, [data-testid="game-hud"] section span.text-2xl {
+  font-family: var(--serif); letter-spacing: -.045em !important;
+}
+main h1 { font-weight: 600 !important; }
+main p { color: var(--muted); }
+
+/* Home: two columns of editorial choices, with rules instead of nested cards. */
+main [data-testid="home-daily-card"], main [data-testid="home-classic-card"] {
+  border: 0 !important; border-top: 2px solid var(--ink) !important; border-radius: 0 !important;
+  background: transparent !important; box-shadow: none !important; padding: 24px 4px !important;
+}
+main [data-testid="home-daily-card"] a, main [data-testid="home-classic-card"] a {
+  border-radius: 2px !important; box-shadow: none !important; background: var(--accent) !important;
+}
+main [data-testid="home-daily-card"] a:hover, main [data-testid="home-classic-card"] a:hover { background: #963b2c !important; }
+main [aria-label="How Flipped Works"] { border: 0 !important; border-top: 1px solid var(--rule) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding-inline: 0 !important; }
+
+/* Puzzle: clue and answer space read as a single printed puzzle, not a form. */
+[data-testid="game-hud"] { gap: 20px !important; }
+[data-testid="game-hud"] > div:first-child {
+  border: 0 !important; border-block: 1px solid var(--rule) !important; border-radius: 0 !important;
+  box-shadow: none !important; background: transparent !important; padding: 12px 2px !important;
+}
+[data-testid="game-hud"] > section {
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+  backdrop-filter: none !important; background: transparent !important; padding: 24px 8px 14px !important;
+}
+[data-testid="game-hud"] > section > span:first-child {
+  color: var(--accent) !important; font-size: 11px !important; letter-spacing: .13em !important;
+}
+[data-testid="game-hud"] > section span.text-2xl {
+  color: var(--ink) !important; font-weight: 600 !important; font-size: clamp(27px, 4vw, 39px) !important;
+}
+[data-testid="game-hud"] > section span.rounded-full { background: transparent !important; color: var(--muted) !important; padding-inline: 0 !important; font-size: 11px !important; }
+[data-testid="start-game-button"] { border-radius: 2px !important; background: var(--accent) !important; box-shadow: none !important; }
+[data-testid="letter-grid"] { padding-block: 18px 28px !important; }
+[data-testid^="word-group-"] { gap: clamp(4px, 1vw, 9px) !important; }
+[data-testid^="tile-"] {
+  height: clamp(48px, 7vw, 70px) !important; width: clamp(34px, 5.4vw, 56px) !important;
+  border: 0 !important; border-bottom: 2px solid #a9a294 !important; border-radius: 0 !important;
+  background: transparent !important; box-shadow: none !important; color: var(--ink) !important;
+  font-family: var(--serif) !important; font-size: clamp(24px, 3vw, 34px) !important;
+}
+[data-testid^="tile-"][data-fixed="true"] { border-bottom-color: var(--accent) !important; color: var(--accent) !important; }
+[data-testid^="tile-"][data-feedback="CONFIRMED"] { border-bottom-color: var(--correct) !important; color: var(--correct) !important; }
+[data-testid^="tile-"][data-selected="true"] { border-bottom: 3px solid var(--accent) !important; transform: translateY(-2px); }
+[data-testid="success-screen"], [data-testid="timeout-screen"] {
+  border: 0 !important; border-block: 2px solid var(--ink) !important; border-radius: 0 !important;
+  background: transparent !important; box-shadow: none !important; backdrop-filter: none !important;
+}
+
+/* Lists, history, statistics and dialogs share the same paper, ink and rule. */
+main article, main [role="radiogroup"] button, main [role="region"] {
+  box-shadow: none !important;
+}
+main [role="radiogroup"] button { border-radius: 2px !important; }
+main [role="radiogroup"] button[aria-checked="true"] { border-color: var(--accent) !important; box-shadow: inset 3px 0 var(--accent) !important; }
+
+@media (max-width: 640px) {
+  header.sticky > div { min-height: 58px; }
+  main { padding-top: 24px !important; }
+  main [data-testid="home-daily-card"], main [data-testid="home-classic-card"] { padding-block: 20px !important; }
+  [data-testid="game-hud"] > div:first-child { align-items: flex-start; }
+  [data-testid="letter-grid"] { padding-inline: 0 !important; overflow-x: auto; width: 100%; }
+  [data-testid="letter-grid"] > div { flex-wrap: nowrap !important; gap: 16px !important; min-width: max-content; }
+  [data-testid^="word-group-"] { flex: 0 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

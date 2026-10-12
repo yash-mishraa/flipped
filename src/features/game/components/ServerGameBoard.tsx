@@ -335,6 +335,10 @@ export function ServerGameBoard({
     try {
       const res = await fetch(`/api/game/attempt/${payload.attemptId}/hint`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          enteredWords: grid.words.map((word) => word.map((tile) => tile.letter).join("")),
+        }),
       });
       const data = await res.json();
 
