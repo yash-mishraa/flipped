@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "corpus:build": "node --experimental-strip-types scripts/corpus/build.ts",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md}\""
   },

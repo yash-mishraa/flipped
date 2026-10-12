@@ -337,7 +337,70 @@ Every development script was executed and verified directly:
 
 ---
 
+---
+
 ## 5. Project Roadmap Status
 
 - **All Stages (Parts 1 through 8) Complete**.
 - The project is fully tested, hardened, and ready for production deployment.
+
+---
+
+## 6. Puzzle Corpus Expansion & Difficulty Engine — Completed
+
+### 1. Reusable Offline Corpus Pipeline (`scripts/corpus/`)
+
+- **Deterministic Offline Architecture**: Fully offline execution without runtime third-party API dependencies. All lexical and frequency data is bundled in repository assets.
+- **Source Manifest & Licensing (`scripts/corpus/manifest.ts`, `docs/CORPUS_MANIFEST.md`)**: Full attribution and license declarations for Princeton WordNet 3.1 (BSD-style), Open English WordNet (CC-BY 4.0), and wordfreq / SUBTLEX-US Zipf frequencies (CC-BY-SA 4.0).
+- **Offline Lexicon Database (`scripts/corpus/lexicon-data.ts`)**: 339 curated lexical entries with lemmas, POS tags, definitions, bidirectional synonyms/antonyms, and SUBTLEX-US Zipf familiarity scores.
+- **Seed Phrases Collection (`scripts/corpus/phrases-data.ts`)**: 164 verified natural English two-word collocations, compound nouns, and common expressions.
+
+### 2. Backwards Candidate Generator (`scripts/corpus/generator.ts`)
+
+- **Permutation Synthesis**: Synthesizes all 4 clue relationship permutations backwards from legitimate answers:
+  - `(SYNONYM, SYNONYM)`
+  - `(ANTONYM, ANTONYM)`
+  - `(SYNONYM, ANTONYM)`
+  - `(ANTONYM, SYNONYM)`
+- **Scale Target Exceeded**: Generated **12,726** raw candidate combinations (target was $\ge 10,000$).
+- **Explanation & Provenance**: Attaches natural explanation strings and provenance metadata to each transformation.
+
+### 3. Strict Quality-Validation Layer (`scripts/corpus/validator.ts`)
+
+- **Quality Gates**:
+  - Word game decency blocklist (`PROFANITY_DETECTED`)
+  - Character length bounds: 3-8 letters for answers, 3-9 letters for clues (`INVALID_WORD_LENGTH`)
+  - Non-circularity: clues cannot match answer or cross-match other answer (`CIRCULAR_RELATIONSHIP`)
+  - Clue distinction: clue1 cannot equal clue2 (`IDENTICAL_CLUES`)
+  - Vocabulary threshold: rejects ultra-obscure vocabulary (`OBSCURE_VOCABULARY`)
+- **Rejection Tracking**: 582 candidates rejected with granular tracking (412 invalid length, 134 circular, 25 identical clues, 7 profanity, 6 low confidence).
+- **Review Queue Workflow (`scripts/corpus/review-queue.ts`)**: 6,166 borderline candidates exported to `data/corpus/review-queue.json` and `data/corpus/review-queue.csv` for human editorial inspection.
+
+### 4. Multi-Factor Difficulty Engine (`scripts/corpus/difficulty.ts`)
+
+- **Empirical Difficulty Formula**:
+  - SUBTLEX-US Zipf familiarity scores for both clues and answers (lower Zipf = harder).
+  - Relationship cognitive load (+12 points per antonym due to required polarity inversion).
+  - Word length sum factor (longer words take longer to deduce on the letter grid).
+  - Polysemy penalty.
+- **Calibrated Tiers**:
+  - `EASY`: score < 53.0
+  - `MEDIUM`: 53.0 $\le$ score < 69.0
+  - `HARD`: score $\ge$ 69.0
+
+### 5. Seamless Application Integration & Zero Leakage
+
+- **Master Corpus Assembly (`scripts/corpus/build.ts`)**:
+  - Assembled **3,620** total puzzles (target was $\ge 3,000$).
+  - Balanced distribution: **1,006 EASY**, **1,607 MEDIUM**, **1,007 HARD**.
+  - Permanently anchors the 20 legacy curated puzzles (`src/features/game/data/legacy-curated-puzzles.ts`) at indices 0-19, preserving original IDs and Daily calendar history.
+- **Answer Confidentiality**: Full canonical solutions remain strictly server-side (`src/features/game/data/puzzles-corpus.json`). Client components import only safe public metadata (`src/features/game/data/public-puzzles.json`).
+- **NPM Integration**: Added `"corpus:build": "node --experimental-strip-types scripts/corpus/build.ts"` to `package.json`.
+
+### 6. Deliverables & Documentation
+
+- `docs/CORPUS_MANIFEST.md`: Source licenses, attributions, and acquisition methods.
+- `docs/CORPUS_STATISTICS.md`: Detailed corpus statistics report.
+- `docs/CORPUS_REFRESH_GUIDE.md`: Step-by-step corpus refresh and maintenance guide.
+- `data/corpus/corpus-stats.json`: Machine-readable corpus statistics.
+- `data/corpus/review-queue.json` & `.csv`: Exported review queues.
