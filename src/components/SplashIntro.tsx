@@ -1,10 +1,28 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
-// In-memory module flag to ensure intro only plays on fresh page loads/direct link visits,
+// In-memory module flag to ensure intro only plays once per fresh load/session,
 // not on client-side SPA navigation between internal tabs.
 let hasShownIntroThisPageLoad = false;
+
+const isIntroSeenInSession = (): boolean => {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage?.getItem("flipped_intro_seen") === "true";
+  } catch {
+    return false;
+  }
+};
+
+const markIntroSeenInSession = (): void => {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage?.setItem("flipped_intro_seen", "true");
+  } catch {
+    // Ignore storage errors in restricted private-browsing contexts
+  }
+};
 
 export interface SplashIntroProps {
   onComplete?: () => void;
@@ -15,52 +33,73 @@ export function SplashIntro({
   onComplete,
   forceShow = false,
 }: SplashIntroProps): React.JSX.Element | null {
-  const [stage, setStage] = useState<"enter" | "active" | "exit" | "done">("enter");
-  const [mounted, setMounted] = useState(false);
+  const isAlreadySeen = (hasShownIntroThisPageLoad || isIntroSeenInSession()) && !forceShow;
+
+  const [stage, setStage] = useState<"enter" | "active" | "exit" | "done">(() =>
+    isAlreadySeen ? "done" : "enter"
+  );
+  const [mounted, setMounted] = useState(() => !isAlreadySeen);
+
+  const dismissedRef = useRef(isAlreadySeen);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  const clearAllTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+  }, []);
 
   const handleDismiss = useCallback(() => {
-    if (stage === "exit" || stage === "done") return;
+    // Guard against duplicate dismiss triggers
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
+    hasShownIntroThisPageLoad = true;
+    markIntroSeenInSession();
+
+    // Cancel all pending timers immediately (prevents enterTimer or fadeTimer from resurfacing)
+    clearAllTimers();
+
+    // Start clean, smooth fade-out exit
     setStage("exit");
-    setTimeout(() => {
+
+    // After fade-out finishes, permanently unmount from DOM
+    const exitTimer = setTimeout(() => {
       setStage("done");
-      hasShownIntroThisPageLoad = true;
-      onComplete?.();
-    }, 700);
-  }, [stage, onComplete]);
+      setMounted(false);
+      onCompleteRef.current?.();
+    }, 400);
+
+    timersRef.current.push(exitTimer);
+  }, [clearAllTimers]);
 
   useEffect(() => {
-    // Check if running in automated test environment (Playwright / Vitest)
-    const isTestEnv =
-      typeof window !== "undefined" &&
-      (Boolean(window.navigator?.webdriver) || process.env.NODE_ENV === "test");
-
-    if (hasShownIntroThisPageLoad && !forceShow) {
-      setStage("done");
+    if (isAlreadySeen) {
       return;
     }
 
     setMounted(true);
 
-    // Initial smooth fade-in
-    const enterTimer = setTimeout(() => {
-      setStage("active");
-    }, 50);
+    const isTestEnv =
+      typeof window !== "undefined" &&
+      (Boolean(window.navigator?.webdriver) || process.env.NODE_ENV === "test");
 
-    // Stay for 4 to 5 seconds (or 100ms in test mode) then start smooth fade-out
+    // 1. Initial smooth fade-in
+    const enterTimer = setTimeout(() => {
+      if (!dismissedRef.current) {
+        setStage("active");
+      }
+    }, 50);
+    timersRef.current.push(enterTimer);
+
+    // 2. Hold for ~4.2s (or 100ms in test environment), then initiate smooth exit
     const holdDuration = isTestEnv ? 100 : 4200;
     const fadeTimer = setTimeout(() => {
-      setStage("exit");
+      handleDismiss();
     }, holdDuration);
+    timersRef.current.push(fadeTimer);
 
-    // Complete exit and unmount from DOM
-    const exitDuration = isTestEnv ? 200 : holdDuration + 700;
-    const doneTimer = setTimeout(() => {
-      setStage("done");
-      hasShownIntroThisPageLoad = true;
-      onComplete?.();
-    }, exitDuration);
-
-    // Allow user to dismiss with any key
+    // 3. Allow user to dismiss with any key
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
         handleDismiss();
@@ -70,12 +109,10 @@ export function SplashIntro({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      clearTimeout(enterTimer);
-      clearTimeout(fadeTimer);
-      clearTimeout(doneTimer);
+      clearAllTimers();
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [forceShow, handleDismiss, onComplete]);
+  }, [isAlreadySeen, handleDismiss, clearAllTimers]);
 
   if (!mounted || stage === "done") {
     return null;
@@ -90,7 +127,7 @@ export function SplashIntro({
       aria-label="Flipped Brand Introduction"
       data-testid="splash-intro"
       onClick={handleDismiss}
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#7B1E2B] transition-opacity duration-700 ease-in-out cursor-pointer select-none ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#7B1E2B] transition-opacity duration-400 ease-out cursor-pointer select-none ${
         isExiting
           ? "opacity-0 pointer-events-none"
           : isActive
@@ -99,9 +136,9 @@ export function SplashIntro({
       }`}
     >
       <div
-        className={`flex flex-col items-center text-center transition-all duration-700 ease-out ${
+        className={`flex flex-col items-center text-center transition-all duration-400 ease-out ${
           isExiting
-            ? "scale-105 opacity-0"
+            ? "scale-95 opacity-0"
             : isActive
               ? "scale-100 opacity-100"
               : "scale-90 opacity-0"

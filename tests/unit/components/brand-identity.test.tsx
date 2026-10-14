@@ -1,6 +1,6 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { FlippedSymbol, FlippedLogo } from "@/components/FlippedLogo";
 import { SplashIntro } from "@/components/SplashIntro";
 import fs from "fs";
@@ -78,5 +78,40 @@ describe("Brand Identity System — Specifications & Components", () => {
     // Brand wordmark
     expect(screen.getByText("FLIPPED")).toHaveClass("text-[#F7F0E5]");
     expect(screen.getByText("Word Deduction Puzzle")).toBeInTheDocument();
+  });
+
+  it("dismisses immediately on tap without re-entering", () => {
+    vi.useFakeTimers();
+    const onComplete = vi.fn();
+    render(<SplashIntro forceShow onComplete={onComplete} />);
+
+    const splash = screen.getByTestId("splash-intro");
+    expect(splash).toBeInTheDocument();
+
+    // Tap on splash intro
+    fireEvent.click(splash);
+
+    // Should immediately transition to exit (opacity-0, pointer-events-none)
+    expect(splash).toHaveClass("opacity-0");
+    expect(splash).toHaveClass("pointer-events-none");
+
+    // Advance 50ms (the previous bug would re-trigger 'active' stage here)
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // Verify it stayed in exit mode and did NOT bounce back to active
+    expect(splash).toHaveClass("opacity-0");
+
+    // Advance past the 400ms exit transition
+    act(() => {
+      vi.advanceTimersByTime(450);
+    });
+
+    // Unmounted permanently and onComplete called
+    expect(screen.queryByTestId("splash-intro")).toBeNull();
+    expect(onComplete).toHaveBeenCalledTimes(1);
+
+    vi.useRealTimers();
   });
 });
