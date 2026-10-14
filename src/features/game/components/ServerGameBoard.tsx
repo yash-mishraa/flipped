@@ -19,6 +19,7 @@ import { SuccessScreen } from "./SuccessScreen";
 import { TimeoutScreen } from "./TimeoutScreen";
 import { GameInstructions } from "./GameInstructions";
 import { formatTime, getTimerUrgency } from "../domain/timer-utils";
+import { getPreviousEditablePosition } from "../domain/letter-grid";
 
 export interface ServerGameBoardProps {
   readonly payload: SafeGameplayPayload;
@@ -344,7 +345,7 @@ export function ServerGameBoard({
     }
   };
 
-  // Clear tile
+  // Clear tile (Backspace / Delete)
   const handleClearTile = () => {
     if (!selectedPosition || roundStatus !== "PLAYING") return;
     const { wordIndex, letterIndex } = selectedPosition;
@@ -352,7 +353,7 @@ export function ServerGameBoard({
     if (!currentTile || currentTile.isFixed) return;
 
     if (currentTile.letter) {
-      // Clear current letter
+      // 1. Current tile has a letter -> clear this tile immediately
       const updatedWords = [...grid.words] as [readonly LetterTile[], readonly LetterTile[]];
       const newWordTiles = [...updatedWords[wordIndex]];
       newWordTiles[letterIndex] = {
@@ -363,12 +364,26 @@ export function ServerGameBoard({
       };
       updatedWords[wordIndex] = newWordTiles;
       setGrid({ words: updatedWords });
+      setErrorMessage(null);
     } else {
-      // Step back
-      if (letterIndex > 1) {
-        setSelectedPosition({ wordIndex, letterIndex: letterIndex - 1 });
-      } else if (wordIndex === 1) {
-        setSelectedPosition({ wordIndex: 0, letterIndex: grid.words[0].length - 1 });
+      // 2. Current tile is empty -> find previous editable tile, clear it, and move cursor to it
+      const prevPos = getPreviousEditablePosition(grid, selectedPosition);
+      if (prevPos) {
+        const prevTile = grid.words[prevPos.wordIndex][prevPos.letterIndex];
+        if (prevTile && !prevTile.isFixed) {
+          const updatedWords = [...grid.words] as [readonly LetterTile[], readonly LetterTile[]];
+          const targetWordTiles = [...updatedWords[prevPos.wordIndex]];
+          targetWordTiles[prevPos.letterIndex] = {
+            ...prevTile,
+            letter: "",
+            isEntered: false,
+            feedback: "NONE",
+          };
+          updatedWords[prevPos.wordIndex] = targetWordTiles;
+          setGrid({ words: updatedWords });
+          setSelectedPosition(prevPos);
+          setErrorMessage(null);
+        }
       }
     }
   };

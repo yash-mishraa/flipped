@@ -30,6 +30,8 @@ export function LetterGrid({
   onEnter,
 }: LetterGridProps): React.JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastKeyDownTimeRef = useRef<number>(0);
+  const lastKeyDownCharRef = useRef<string>("");
 
   // Keep hidden input focused when an editable tile is selected and round is active
   useEffect(() => {
@@ -48,12 +50,12 @@ export function LetterGrid({
         onEnter?.();
         return;
       case "Backspace":
-        e.preventDefault();
-        onClearTile();
-        return;
       case "Delete":
         e.preventDefault();
+        lastKeyDownTimeRef.current = Date.now();
+        lastKeyDownCharRef.current = "BACKSPACE";
         onClearTile();
+        if (inputRef.current) inputRef.current.value = "";
         return;
       case "ArrowLeft":
         e.preventDefault();
@@ -84,7 +86,11 @@ export function LetterGrid({
     // Direct single letter entry A-Z
     if (e.key.length === 1 && /^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
-      onInputLetter(e.key.toUpperCase());
+      const char = e.key.toUpperCase();
+      lastKeyDownTimeRef.current = Date.now();
+      lastKeyDownCharRef.current = char;
+      onInputLetter(char);
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
@@ -93,12 +99,30 @@ export function LetterGrid({
     if (isRoundOver) return;
 
     const val = e.target.value;
+    const now = Date.now();
+
     if (val) {
       const char = val.slice(-1).toUpperCase();
       if (/^[A-Z]$/.test(char)) {
+        // Drop if this exact character was ALREADY handled by onKeyDown less than 80ms ago
+        if (char === lastKeyDownCharRef.current && now - lastKeyDownTimeRef.current < 80) {
+          e.target.value = "";
+          return;
+        }
+        lastKeyDownTimeRef.current = now;
+        lastKeyDownCharRef.current = char;
         onInputLetter(char);
       }
+    } else {
+      // Empty string on input change may represent a virtual backspace
+      if (lastKeyDownCharRef.current === "BACKSPACE" && now - lastKeyDownTimeRef.current < 80) {
+        return;
+      }
+      lastKeyDownTimeRef.current = now;
+      lastKeyDownCharRef.current = "BACKSPACE";
+      onClearTile();
     }
+
     // Always keep the capture input clear
     e.target.value = "";
   };
@@ -112,6 +136,12 @@ export function LetterGrid({
     <div
       className="relative flex flex-col items-center justify-center p-2 sm:p-4 outline-none select-none"
       data-testid="letter-grid"
+      onClick={() => {
+        if (!selectedPosition && !isRoundOver) {
+          onNavigate("home");
+        }
+        inputRef.current?.focus({ preventScroll: true });
+      }}
     >
       {/* Hidden text capture input for mobile virtual keyboard and physical keyboard parity */}
       <input
@@ -126,7 +156,7 @@ export function LetterGrid({
         disabled={isRoundOver}
         onKeyDown={handleKeyDown}
         onChange={handleInputChange}
-        className="absolute h-0 w-0 opacity-0 pointer-events-none text-base"
+        className="absolute -top-10 left-0 h-1 w-1 opacity-0 pointer-events-none text-base"
         tabIndex={-1}
       />
 
