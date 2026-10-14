@@ -310,3 +310,29 @@ This document records architectural decisions, their context, alternatives consi
   - Eliminates 100% of answer leakage from client-side JavaScript bundles (`0 occurrences` verified via binary bundle search).
   - Guarantees seamless guest session continuity across all modern browsers and test runners.
   - Fixes cross-route in-memory state desynchronization in local and CI environments.
+
+---
+
+## ADR-022: Unified Editorial 4-Color Palette and Complete Removal of Dark/Light Theme Switching
+
+- **Date**: 2026-10-14
+- **Status**: Accepted
+- **Context**: The game previously supported a dark/light mode toggle with dynamic `data-theme` DOM attributes, localStorage listeners, mutation observers, and dual CSS variable overrides. The product direction required removing the theme switcher entirely and adopting a single, distinguished editorial palette across all views, HUD elements, modals, cards, and interactive letter tiles.
+- **Decision**:
+  1. **Strict 4-Color Palette**:
+     - **Crimson**: `#7B1E2B` (primary brand accent, active selection borders, CTA button backgrounds, win streak indicators)
+     - **Cream white**: `#F7F0E5` (canvas background, primary tile lettering, light card backgrounds)
+     - **Dark wine**: `#32171D` (primary headings, filled/confirmed letter tile surfaces, high-contrast dark accents)
+     - **Muted gold**: `#C49A6C` (tile borders, secondary borders, badges, trophy highlights, subtle dividers)
+  2. **Complete Removal of Theme Switcher Residue**:
+     - Removed `theme` state and `flipped-theme` localStorage synchronization in `Header.tsx`.
+     - Removed sun/moon toggle button from `breadcrumb.tsx`.
+     - Removed `MutationObserver` on `data-theme` from `TechText.jsx`.
+     - Removed dark mode checks and default color overrides in `AcidSquares.tsx`.
+     - Removed all `html[data-theme="dark"]` CSS selector overrides and `.theme-toggle` styles from `globals.css`.
+  3. **Tailwind v4 Theme Variable Alignment**:
+     - Reconfigured `@theme` color aliases in `globals.css` so that any legacy utility classes automatically map cleanly to the 4 colors.
+- **Rationale**:
+  - Establishes a bold, cohesive literary aesthetic tailored specifically to word deduction and editorial puzzles.
+  - Simplifies the codebase by eliminating theme switching state management, observer callbacks, and dual-theme style divergence.
+  - Guarantees 100% visual consistency across desktop and mobile devices.

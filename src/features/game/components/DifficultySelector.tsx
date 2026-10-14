@@ -19,21 +19,21 @@ export const DIFFICULTY_OPTIONS: readonly DifficultyOption[] = [
     label: "Easy",
     description: "Familiar everyday vocabulary with intuitive synonym and antonym pairings.",
     vocabulary: "Common phrases • Direct relationships",
-    badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    badgeClass: "bg-[#faeee0] text-[#32171D] border-[#C49A6C]",
   },
   {
     id: "MEDIUM",
     label: "Medium",
     description: "Moderately challenging word pairs requiring broader vocabulary deduction.",
     vocabulary: "Expanded lexicon • Nuanced meanings",
-    badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+    badgeClass: "bg-[#faeee0] text-[#32171D] border-[#C49A6C]",
   },
   {
     id: "HARD",
     label: "Hard",
     description: "Less predictable phrase transformations with abstract semantic connections.",
     vocabulary: "Advanced vocabulary • Complex relationships",
-    badgeClass: "bg-coral-100 text-coral-800 border-coral-200",
+    badgeClass: "bg-[#faeee0] text-[#7B1E2B] border-[#7B1E2B]",
   },
 ];
 
@@ -56,11 +56,11 @@ export function DifficultySelector({
   const getIcon = (difficulty: Difficulty) => {
     switch (difficulty) {
       case "EASY":
-        return <Sparkles className="h-4 w-4 text-emerald-600" aria-hidden="true" />;
+        return <Sparkles className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />;
       case "MEDIUM":
-        return <Zap className="h-4 w-4 text-amber-600" aria-hidden="true" />;
+        return <Zap className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />;
       case "HARD":
-        return <Flame className="h-4 w-4 text-coral-600" aria-hidden="true" />;
+        return <Flame className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />;
     }
   };
 
@@ -83,23 +83,23 @@ export function DifficultySelector({
             onClick={() => onSelectDifficulty(option.id)}
             data-testid={`difficulty-${option.id.toLowerCase()}`}
             className={cn(
-              "flex flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2",
+              "flex flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2",
               isSelected
-                ? "border-coral-500 bg-white shadow-md ring-1 ring-coral-500"
-                : "border-stone-200/90 bg-white/70 hover:border-stone-300 hover:bg-white",
+                ? "border-[#7B1E2B] bg-white shadow-md ring-1 ring-[#7B1E2B]"
+                : "border-[#C49A6C]/50 bg-white/70 hover:border-[#C49A6C] hover:bg-white",
               disabled && "opacity-60 cursor-not-allowed"
             )}
           >
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-stone-100">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#faeee0]">
                     {getIcon(option.id)}
                   </div>
                   <div>
-                    <span className="font-bold text-stone-900 text-base">{option.label}</span>
+                    <span className="font-bold text-[#32171D] text-base">{option.label}</span>
                     {puzzleCounts && (
-                      <span className="ml-2 rounded bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-500">
+                      <span className="ml-2 rounded border border-[#C49A6C]/30 bg-[#faeee0] px-1.5 py-0.5 text-[10px] font-semibold text-[#6B4E55]">
                         {puzzleCounts[option.id]}{" "}
                         {puzzleCounts[option.id] === 1 ? "puzzle" : "puzzles"}
                       </span>
@@ -110,18 +110,18 @@ export function DifficultySelector({
                 <div
                   className={cn(
                     "flex h-5 w-5 items-center justify-center rounded-full border transition-colors",
-                    isSelected ? "border-coral-500 bg-coral-500 text-white" : "border-stone-300"
+                    isSelected ? "border-[#7B1E2B] bg-[#7B1E2B] text-[#F7F0E5]" : "border-[#C49A6C]"
                   )}
                 >
                   {isSelected && <Check className="h-3 w-3 stroke-[3]" aria-hidden="true" />}
                 </div>
               </div>
 
-              <p className="mt-2.5 text-xs leading-relaxed text-stone-600">{option.description}</p>
+              <p className="mt-2.5 text-xs leading-relaxed text-[#6B4E55]">{option.description}</p>
             </div>
 
-            <div className="mt-3.5 border-t border-stone-100 pt-2.5">
-              <span className="text-[11px] font-semibold text-stone-500">{option.vocabulary}</span>
+            <div className="mt-3.5 border-t border-[#C49A6C]/20 pt-2.5">
+              <span className="text-[11px] font-semibold text-[#8C6870]">{option.vocabulary}</span>
             </div>
           </button>
         );

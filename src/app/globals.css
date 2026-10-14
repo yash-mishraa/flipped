@@ -1,36 +1,65 @@
 @import "tailwindcss";
 
 @theme {
-  --color-coral-50: #fff4f0;
-  --color-coral-100: #ffe4dc;
-  --color-coral-200: #fecabd;
-  --color-coral-500: #e26d5c;
-  --color-coral-600: #cc5442;
-  --color-coral-700: #ab3e2e;
+  --color-crimson: #7B1E2B;
+  --color-cream: #F7F0E5;
+  --color-wine: #32171D;
+  --color-gold: #C49A6C;
+
+  /* Semantic scale mappings to keep existing component classes strictly within the 4-color palette */
+  --color-coral-50: #faeee0;
+  --color-coral-100: #f4ddc5;
+  --color-coral-200: #e8c49e;
+  --color-coral-500: #7B1E2B;
+  --color-coral-600: #631722;
+  --color-coral-700: #4a111a;
+  --color-coral-800: #32171D;
+
+  --color-amber-50: #fbf5ec;
+  --color-amber-100: #f4e8d3;
+  --color-amber-200: #e4caa4;
+  --color-amber-300: #C49A6C;
+  --color-amber-400: #C49A6C;
+  --color-amber-500: #C49A6C;
+  --color-amber-600: #ab7f51;
+  --color-amber-700: #8d643a;
+  --color-amber-800: #583c20;
+  --color-amber-900: #32171D;
+  --color-amber-950: #32171D;
+
+  --color-emerald-50: #faeee0;
+  --color-emerald-100: #f4ddc5;
+  --color-emerald-200: #C49A6C;
+  --color-emerald-500: #7B1E2B;
+  --color-emerald-600: #7B1E2B;
+  --color-emerald-700: #631722;
+  --color-emerald-800: #32171D;
+  --color-emerald-950: #32171D;
+
+  --color-stone-50: #fbf9f3;
+  --color-stone-100: #f2ede1;
+  --color-stone-200: #e6dfce;
+  --color-stone-300: #C49A6C;
+  --color-stone-400: #8C6870;
+  --color-stone-500: #6B4E55;
+  --color-stone-600: #54373E;
+  --color-stone-700: #32171D;
+  --color-stone-800: #32171D;
+  --color-stone-900: #32171D;
 }
 
 :root {
   color-scheme: light;
-  --bg-primary: #f5f1e8;
-  --paper: #fbf9f3;
-  --ink: #24251f;
-  --muted: #716f66;
-  --rule: #d8d1c4;
-  --accent: #b64c38;
-  --correct: #416b52;
+  --bg-primary: #F7F0E5;
+  --paper: #F7F0E5;
+  --ink: #32171D;
+  --muted: #6B4E55;
+  --rule: #C49A6C;
+  --accent: #7B1E2B;
+  --gold: #C49A6C;
+  --correct: #7B1E2B;
   --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif;
-}
-
-html[data-theme="dark"] {
-  color-scheme: dark;
-  --bg-primary: #11130f;
-  --paper: #181b15;
-  --ink: #f3edb4;
-  --muted: #b7b69e;
-  --rule: #45483d;
-  --accent: #c6ff3d;
-  --correct: #9ce2b0;
 }
 
 * { box-sizing: border-box; }
@@ -46,7 +75,7 @@ body {
 
 body, body > div, div.min-h-screen { background-color: var(--bg-primary) !important; color: var(--ink); }
 
-::selection { background: #e8c5b6; color: var(--ink); }
+::selection { background: #C49A6C; color: #32171D; }
 
 a, button { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; }
@@ -93,15 +122,6 @@ header.sticky nav button:hover { color: var(--accent) !important; }
 .breadcrumb-utilities { margin-left: 5px; }
 .breadcrumb-utilities button { border: 0; background: transparent; cursor: pointer; padding: 0 8px; }
 
-.theme-toggle {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  border: 0; background: transparent; color: var(--muted); cursor: pointer;
-  padding: 8px 10px; font-size: 13px;
-}
-.theme-toggle svg { width: 16px; height: 16px; }
-.theme-toggle:hover { color: var(--accent) !important; }
-.mobile-theme-toggle { display: none; }
-
 .home-page { position: relative; isolation: isolate; }
 .home-page > header, .home-page > main, .home-page > footer { position: relative; z-index: 1; }
 .home-acid-background { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -118,7 +138,7 @@ header.sticky nav button:hover { color: var(--accent) !important; }
 
 main { color: var(--ink); }
 main [class*="rounded-3xl"], main [class*="rounded-2xl"] {
-  border-radius: 2px !important;
+  border-radius: 4px !important;
   box-shadow: none !important;
 }
 main [class*="rounded-3xl"][class*="border"],
@@ -142,9 +162,9 @@ main [data-testid="home-daily-card"], main [data-testid="home-classic-card"] {
   background: transparent !important; box-shadow: none !important; padding: 24px 4px !important;
 }
 main [data-testid="home-daily-card"] a, main [data-testid="home-classic-card"] a {
-  border-radius: 2px !important; box-shadow: none !important; background: var(--accent) !important;
+  border-radius: 4px !important; box-shadow: none !important; background: var(--accent) !important; color: #F7F0E5 !important;
 }
-main [data-testid="home-daily-card"] a:hover, main [data-testid="home-classic-card"] a:hover { background: #963b2c !important; }
+main [data-testid="home-daily-card"] a:hover, main [data-testid="home-classic-card"] a:hover { background: #631722 !important; }
 main [aria-label="How Flipped Works"] { border: 0 !important; border-top: 1px solid var(--rule) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding-inline: 0 !important; }
 
 /* Puzzle: clue and answer space read as a single printed puzzle, not a form. */
@@ -161,22 +181,23 @@ main [aria-label="How Flipped Works"] { border: 0 !important; border-top: 1px so
   color: var(--accent) !important; font-size: 11px !important; letter-spacing: .13em !important;
 }
 [data-testid="game-hud"] > section span.text-2xl {
-  color: var(--clue-word, #171812) !important; font-weight: 600 !important; font-size: clamp(27px, 4vw, 39px) !important;
+  color: var(--ink) !important; font-weight: 600 !important; font-size: clamp(27px, 4vw, 39px) !important;
 }
 [data-testid="game-hud"] > section span.rounded-full { background: transparent !important; color: var(--muted) !important; padding-inline: 0 !important; font-size: 11px !important; }
-[data-testid="start-game-button"] { border-radius: 2px !important; background: var(--accent) !important; box-shadow: none !important; }
+[data-testid="start-game-button"] { border-radius: 4px !important; background: var(--accent) !important; color: #F7F0E5 !important; box-shadow: none !important; }
+[data-testid="start-game-button"]:hover { background: #631722 !important; }
 [data-testid="letter-grid"] { padding-block: 18px 28px !important; }
 [data-testid^="word-group-"] { gap: clamp(4px, 1vw, 9px) !important; }
 [data-testid^="tile-"] {
   height: clamp(48px, 7vw, 70px) !important; width: clamp(34px, 5.4vw, 56px) !important;
-  border: 0 !important; border-bottom: 2px solid #a9a294 !important; border-radius: 0 !important;
+  border: 0 !important; border-bottom: 2px solid #C49A6C !important; border-radius: 2px !important;
   background: transparent !important; box-shadow: none !important; color: var(--ink) !important;
   font-family: var(--serif) !important; font-size: clamp(24px, 3vw, 34px) !important;
 }
-[data-testid^="tile-"][data-has-letter="true"] { background: #111 !important; color: #e7493f !important; border: 0 !important; }
-[data-testid^="tile-"][data-fixed="true"] { background: #111 !important; color: #e7493f !important; border: 0 !important; }
-[data-testid^="tile-"][data-feedback="CONFIRMED"] { background: #111 !important; border: 0 !important; color: #e7493f !important; }
-[data-testid^="tile-"][data-selected="true"] { border-bottom: 3px solid var(--accent) !important; transform: translateY(-2px); }
+[data-testid^="tile-"][data-has-letter="true"] { background: #32171D !important; color: #F7F0E5 !important; border: 0 !important; }
+[data-testid^="tile-"][data-fixed="true"] { background: #32171D !important; color: #C49A6C !important; border: 0 !important; }
+[data-testid^="tile-"][data-feedback="CONFIRMED"] { background: #32171D !important; border: 0 !important; color: #F7F0E5 !important; }
+[data-testid^="tile-"][data-selected="true"] { border-bottom: 3px solid #7B1E2B !important; transform: translateY(-2px); }
 [data-testid="success-screen"], [data-testid="timeout-screen"] {
   border: 0 !important; border-block: 2px solid var(--ink) !important; border-radius: 0 !important;
   background: transparent !important; box-shadow: none !important; backdrop-filter: none !important;
@@ -186,38 +207,8 @@ main [aria-label="How Flipped Works"] { border: 0 !important; border-top: 1px so
 main article, main [role="radiogroup"] button, main [role="region"] {
   box-shadow: none !important;
 }
-main [role="radiogroup"] button { border-radius: 2px !important; }
+main [role="radiogroup"] button { border-radius: 4px !important; }
 main [role="radiogroup"] button[aria-checked="true"] { border-color: var(--accent) !important; box-shadow: inset 3px 0 var(--accent) !important; }
-
-html[data-theme="dark"] body,
-html[data-theme="dark"] body > div,
-html[data-theme="dark"] div.min-h-screen,
-html[data-theme="dark"] header.sticky,
-html[data-theme="dark"] header.sticky > div,
-html[data-theme="dark"] header.sticky > div + div { background-color: var(--bg-primary) !important; color: var(--ink); }
-html[data-theme="dark"] header.sticky { background: transparent !important; }
-html[data-theme="dark"] main [class*="text-stone-900"],
-html[data-theme="dark"] main [class*="text-stone-800"],
-html[data-theme="dark"] main [class*="text-stone-700"],
-html[data-theme="dark"] main [class*="text-stone-600"],
-html[data-theme="dark"] main [class*="text-stone-500"],
-html[data-theme="dark"] main [class*="text-stone-400"] { color: var(--muted) !important; }
-html[data-theme="dark"] main [class*="text-stone-900"],
-html[data-theme="dark"] main h1, html[data-theme="dark"] main h2 { color: var(--ink) !important; }
-html[data-theme="dark"] main [class*="text-coral-"] { color: var(--accent) !important; }
-html[data-theme="dark"] main [class*="bg-white"],
-html[data-theme="dark"] main [class*="bg-stone-"] { background-color: transparent !important; }
-html[data-theme="dark"] main [class*="border-stone-"] { border-color: var(--rule) !important; }
-html[data-theme="dark"] main [data-testid="game-hud"] > section span.text-2xl { color: #f2df45 !important; }
-html[data-theme="dark"] [data-testid^="tile-"][data-has-letter="true"],
-html[data-theme="dark"] [data-testid^="tile-"][data-fixed="true"] {
-  background: #b9e8a8 !important; color: #1856c6 !important; border: 0 !important;
-}
-html[data-theme="dark"] [data-testid^="tile-"][data-feedback="CONFIRMED"] {
-  background: #b9e8a8 !important; color: #1856c6 !important;
-}
-html[data-theme="dark"] [data-testid="success-screen"] h2,
-html[data-theme="dark"] [data-testid="timeout-screen"] h2 { color: var(--ink) !important; }
 
 @media (max-width: 640px) {
   header.sticky > div { min-height: 58px; }

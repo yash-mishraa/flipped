@@ -106,13 +106,17 @@ describe("API Route Handlers", () => {
     const cookie = startRes.headers.get("Set-Cookie")!;
     const attemptId = startData.payload.attemptId;
 
+    const attempt = inMemoryDb.getAttempt(attemptId)!;
+    const puzzle = inMemoryDb.getPuzzle(attempt.puzzleId)!;
+    const answerPhrase = puzzle.answerWords.join(" ");
+
     const submitReq = new Request(`http://localhost:3000/api/game/attempt/${attemptId}/submit`, {
       method: "POST",
       headers: {
         cookie,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ phrase: "BITTER TRUTH" }),
+      body: JSON.stringify({ phrase: answerPhrase }),
     });
 
     const submitRes = await submitHandler(submitReq, {
@@ -123,7 +127,7 @@ describe("API Route Handlers", () => {
     const submitData = await submitRes.json();
     expect(submitData.status).toBe("WON");
     expect(submitData.result.isWon).toBe(true);
-    expect(submitData.result.canonicalPhrase).toBe("BITTER TRUTH");
+    expect(submitData.result.canonicalPhrase).toBe(answerPhrase);
   });
 
   it("POST /api/game/attempt/[id]/timeout finalizes timeout", async () => {

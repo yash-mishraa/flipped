@@ -102,11 +102,11 @@ export default function DailyPage(): React.JSX.Element {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+      <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
         <Header />
         <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col items-center justify-center p-6">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
-          <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-stone-400">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#7B1E2B] border-t-transparent" />
+          <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#6B4E55]">
             Loading Today&apos;s Authoritative Challenge...
           </p>
         </main>
@@ -118,33 +118,33 @@ export default function DailyPage(): React.JSX.Element {
   // Handle unavailable or unpublished daily challenge
   if (errorMsg) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+      <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
         <Header />
         <main className="mx-auto flex flex-1 w-full max-w-xl flex-col justify-center px-6 py-12 text-center">
-          <div className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-600">
+          <div className="rounded-3xl border border-[#C49A6C]/40 bg-[#FDFBF7] p-8 shadow-sm">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#faeee0] text-[#7B1E2B]">
               <AlertCircle className="h-6 w-6" aria-hidden="true" />
             </div>
-            <h1 className="text-2xl font-bold text-stone-900">Daily Challenge Notice</h1>
-            <p className="mt-2 text-sm text-stone-600">{errorMsg}</p>
+            <h1 className="text-2xl font-bold text-[#32171D]">Daily Challenge Notice</h1>
+            <p className="mt-2 text-sm text-[#6B4E55]">{errorMsg}</p>
             <div className="mt-6 flex justify-center gap-3">
               <button
                 type="button"
                 onClick={fetchDailyChallenge}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#C49A6C] px-4 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] transition"
               >
                 <RotateCcw className="h-4 w-4" />
                 <span>Retry</span>
               </button>
               <Link
                 href="/"
-                className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
+                className="rounded-xl border border-[#C49A6C] px-4 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] transition"
               >
                 Home
               </Link>
               <Link
                 href="/classic"
-                className="rounded-xl bg-coral-500 px-4 py-2 text-sm font-bold text-white hover:bg-coral-600"
+                className="rounded-xl bg-[#7B1E2B] px-4 py-2 text-sm font-bold text-[#F7F0E5] hover:opacity-90 transition"
               >
                 Play Classic
               </Link>
@@ -159,38 +159,38 @@ export default function DailyPage(): React.JSX.Element {
   const currentDateDisplay = payload?.date || completedResult?.date || "Today";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+    <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col justify-between px-4 py-8 sm:px-8 sm:py-12">
         {/* Navigation and Top Bar */}
         <header className="flex flex-col items-center gap-4 text-center">
-          <div className="flex w-full items-center justify-between border-b border-stone-200/80 pb-4">
+          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/40 pb-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Home</span>
             </Link>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
-              <Calendar className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-semibold text-[#7B1E2B]">
+              <Calendar className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
               <span>Daily Challenge • {currentDateDisplay}</span>
             </div>
 
             <Link
               href="/archive"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
             >
               <span>Archive</span>
             </Link>
           </div>
 
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
               Daily Flipped
             </h1>
-            <p className="mt-1 text-xs text-stone-500 sm:text-sm">
+            <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
               One official challenge every day. 60 seconds to deduce the phrase.
             </p>
           </div>
@@ -220,7 +220,7 @@ export default function DailyPage(): React.JSX.Element {
         </section>
 
         {/* Footer Notice */}
-        <footer className="border-t border-stone-200/80 pt-4 text-center text-xs text-stone-500">
+        <footer className="border-t border-[#C49A6C]/40 pt-4 text-center text-xs text-[#6B4E55]">
           <p>
             Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day
           </p>

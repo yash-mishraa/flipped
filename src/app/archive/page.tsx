@@ -47,11 +47,11 @@ export default function ArchivePage(): React.JSX.Element {
 
   if (!mounted) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+      <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
         <Header />
         <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col items-center justify-center p-6">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
-          <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-stone-400">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#7B1E2B] border-t-transparent" />
+          <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#6B4E55]">
             Loading Archive...
           </p>
         </main>
@@ -61,38 +61,38 @@ export default function ArchivePage(): React.JSX.Element {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+    <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col justify-between px-4 py-8 sm:px-8 sm:py-12">
         {/* Header */}
         <header className="flex flex-col items-center gap-4 text-center">
-          <div className="flex w-full items-center justify-between border-b border-stone-200/80 pb-4">
+          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/40 pb-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Home</span>
             </Link>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
-              <Calendar className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-semibold text-[#7B1E2B]">
+              <Calendar className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
               <span>Daily Archive</span>
             </div>
 
             <Link
               href="/daily"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-coral-200 bg-coral-50 px-3 py-1.5 text-xs font-semibold text-coral-700 shadow-sm transition hover:bg-coral-100 active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#7B1E2B] px-3 py-1.5 text-xs font-bold text-[#F7F0E5] shadow-sm transition hover:opacity-90 active:scale-95"
             >
               <span>Today&apos;s Challenge</span>
             </Link>
           </div>
 
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
               Challenge Archive
             </h1>
-            <p className="mt-1 text-xs text-stone-500 sm:text-sm">
+            <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
               Review past calendar challenges and track your daily solving history.
             </p>
           </div>
@@ -110,36 +110,36 @@ export default function ArchivePage(): React.JSX.Element {
                 <div
                   key={assignment.date}
                   data-testid={`archive-item-${assignment.date}`}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-stone-200/90 bg-white/80 p-5 shadow-xs transition hover:border-stone-300 hover:bg-white"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-[#C49A6C]/40 bg-white/80 p-5 shadow-xs transition hover:border-[#7B1E2B] hover:bg-white"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100 font-bold text-stone-700">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#faeee0] font-bold text-[#32171D]">
                       {assignment.date.slice(8, 10)}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-stone-500">
+                        <span className="text-xs font-semibold text-[#6B4E55]">
                           {formatFriendlyDate(assignment.date)}
                         </span>
                         {isToday && (
-                          <span className="rounded-full bg-coral-100 px-2 py-0.5 text-[10px] font-bold text-coral-800">
+                          <span className="rounded-full bg-[#7B1E2B] px-2 py-0.5 text-[10px] font-bold text-[#F7F0E5]">
                             TODAY
                           </span>
                         )}
                         {assignment.note && (
-                          <span className="text-xs text-stone-400">• {assignment.note}</span>
+                          <span className="text-xs text-[#8C6D68]">• {assignment.note}</span>
                         )}
                       </div>
 
                       <div className="mt-1 flex items-center gap-2">
-                        <span className="font-extrabold text-stone-900 text-base">
+                        <span className="font-extrabold text-[#32171D] text-base">
                           {puzzle
                             ? `${puzzle.clueWords[0]} + ${puzzle.clueWords[1]}`
                             : assignment.puzzleId}
                         </span>
                         {puzzle && (
-                          <span className="rounded bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-600">
+                          <span className="rounded bg-[#faeee0] border border-[#C49A6C]/40 px-1.5 py-0.5 text-[10px] font-bold text-[#7B1E2B]">
                             {puzzle.difficulty}
                           </span>
                         )}
@@ -151,25 +151,25 @@ export default function ArchivePage(): React.JSX.Element {
                     {attempt ? (
                       <div className="flex items-center gap-2">
                         {attempt.status === "WON" ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-800">
-                            <Trophy className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#faeee0] border border-[#C49A6C] px-2.5 py-1 text-xs font-bold text-[#32171D]">
+                            <Trophy className="h-3.5 w-3.5 text-[#C49A6C]" aria-hidden="true" />
                             <span>Solved ({attempt.finalScore} pts)</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 border border-stone-200 px-2.5 py-1 text-xs font-semibold text-stone-700">
-                            <Hourglass className="h-3.5 w-3.5 text-stone-500" aria-hidden="true" />
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#faeee0]/50 border border-[#C49A6C]/40 px-2.5 py-1 text-xs font-semibold text-[#6B4E55]">
+                            <Hourglass className="h-3.5 w-3.5 text-[#C49A6C]" aria-hidden="true" />
                             <span>Timed Out</span>
                           </span>
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs font-medium text-stone-400">Unplayed</span>
+                      <span className="text-xs font-medium text-[#8C6D68]">Unplayed</span>
                     )}
 
                     {isToday ? (
                       <Link
                         href="/daily"
-                        className="inline-flex items-center gap-1 rounded-xl bg-coral-500 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-coral-600 active:scale-95"
+                        className="inline-flex items-center gap-1 rounded-xl bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition hover:opacity-90 active:scale-95"
                       >
                         <span>{attempt ? "View Today" : "Play"}</span>
                         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -183,7 +183,7 @@ export default function ArchivePage(): React.JSX.Element {
         </section>
 
         {/* Footer Notice */}
-        <footer className="border-t border-stone-200/80 pt-4 text-center text-xs text-stone-500">
+        <footer className="border-t border-[#C49A6C]/40 pt-4 text-center text-xs text-[#6B4E55]">
           <p>Flipped Daily Archive • Calendar days reset according to Asia/Kolkata timezone</p>
         </footer>
       </main>

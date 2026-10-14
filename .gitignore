@@ -18,10 +18,12 @@ blob-report/
 
 # Environment files
 .env
+.env*.local
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.neon
 
 # Logs
 npm-debug.log*

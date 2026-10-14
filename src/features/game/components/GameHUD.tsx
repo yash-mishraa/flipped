@@ -45,25 +45,25 @@ export function GameHUD({
     switch (roundStatus) {
       case "READY":
         return (
-          <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-stone-600">
+          <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-2.5 py-0.5 text-xs font-semibold text-[#32171D]">
             Ready to Play
           </span>
         );
       case "PLAYING":
         return (
-          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+          <span className="rounded-full bg-[#7B1E2B] px-2.5 py-0.5 text-xs font-semibold text-[#F7F0E5]">
             Round Active
           </span>
         );
       case "WON":
         return (
-          <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
+          <span className="rounded-full bg-[#C49A6C] px-2.5 py-0.5 text-xs font-bold text-[#32171D]">
             Solved
           </span>
         );
       case "TIMED_OUT":
         return (
-          <span className="rounded-full bg-stone-200 px-2.5 py-0.5 text-xs font-semibold text-stone-700">
+          <span className="rounded-full bg-[#32171D] px-2.5 py-0.5 text-xs font-semibold text-[#F7F0E5]">
             Time Expired
           </span>
         );
@@ -73,20 +73,20 @@ export function GameHUD({
   return (
     <div className="flex w-full flex-col gap-4" data-testid="game-hud">
       {/* Top Status & Metrics Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-stone-200/80 bg-white/70 p-3.5 shadow-sm backdrop-blur-sm sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#C49A6C]/50 bg-white/70 p-3.5 shadow-sm backdrop-blur-sm sm:px-5">
         <div className="flex items-center gap-2">
           {getStatusBadge()}
-          <span className="hidden sm:inline text-xs text-stone-400">•</span>
-          <div className="flex items-center gap-1 text-xs text-stone-600">
-            <Sparkles className="h-3.5 w-3.5 text-coral-500" aria-hidden="true" />
+          <span className="hidden sm:inline text-xs text-[#8C6870]">•</span>
+          <div className="flex items-center gap-1 text-xs text-[#6B4E55]">
+            <Sparkles className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
             <span>Score:</span>
-            <strong className="text-stone-900 font-bold">{score}</strong>
+            <strong className="text-[#32171D] font-bold">{score}</strong>
           </div>
-          <span className="hidden sm:inline text-xs text-stone-400">•</span>
-          <div className="flex items-center gap-1 text-xs text-stone-600">
-            <Lightbulb className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
+          <span className="hidden sm:inline text-xs text-[#8C6870]">•</span>
+          <div className="flex items-center gap-1 text-xs text-[#6B4E55]">
+            <Lightbulb className="h-3.5 w-3.5 text-[#C49A6C]" aria-hidden="true" />
             <span>Hints:</span>
-            <strong className="text-stone-900 font-bold">{hintsUsed}</strong>
+            <strong className="text-[#32171D] font-bold">{hintsUsed}</strong>
           </div>
         </div>
 
@@ -104,9 +104,9 @@ export function GameHUD({
               onClick={onRestart}
               title="Restart round from scratch"
               aria-label="Restart round"
-              className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-stone-600 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#C49A6C] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
             >
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              <RotateCcw className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
               <span className="hidden sm:inline">Reset</span>
             </button>
           )}
@@ -115,20 +115,20 @@ export function GameHUD({
 
       {/* Clues Transformation Surface */}
       <section
-        className="flex w-full flex-col items-center gap-3 rounded-2xl border border-stone-200/90 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm"
+        className="flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C49A6C]/60 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm"
         aria-label="Puzzle Clues"
       >
-        <span className="text-[11px] font-bold uppercase tracking-widest text-coral-600">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-[#7B1E2B]">
           Transform the Clues
         </span>
 
         <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
           {puzzle.transformations.map((trans, idx) => (
             <div key={`hud-clue-${idx}`} className="flex flex-col items-center">
-              <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900">
+              <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#32171D]">
                 {trans.clueWord}
               </span>
-              <span className="mt-1 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-stone-600">
+              <span className="mt-1 rounded-full border border-[#C49A6C]/40 bg-[#faeee0] px-2.5 py-0.5 text-xs font-semibold text-[#32171D]">
                 {trans.relationship}
               </span>
             </div>
@@ -137,17 +137,17 @@ export function GameHUD({
 
         {/* Start Game Prominent Call-to-Action in READY state */}
         {isReady && (
-          <div className="mt-3 flex flex-col items-center gap-2 border-t border-stone-100 pt-4 w-full max-w-sm">
+          <div className="mt-3 flex flex-col items-center gap-2 border-t border-[#C49A6C]/30 pt-4 w-full max-w-sm">
             <button
               type="button"
               onClick={onStartGame}
               data-testid="start-game-button"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-coral-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-6 py-3 text-base font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
             >
-              <Play className="h-5 w-5 fill-white" aria-hidden="true" />
+              <Play className="h-5 w-5 fill-[#F7F0E5]" aria-hidden="true" />
               <span>Start Game (60s)</span>
             </button>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-[#6B4E55]">
               You have 60 seconds. Editable tiles unlock immediately upon starting.
             </p>
           </div>

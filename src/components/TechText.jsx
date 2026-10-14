@@ -102,15 +102,6 @@ const TechText = ({
     if (!container || !canvas || !ctx || !scratchCtx) return undefined;
 
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const themeObserver = new MutationObserver(() => {
-      if (settingsRef.current && (color === 'currentColor' || accentColor === 'currentColor')) {
-        const computed = getComputedStyle(container).color;
-        if (color === 'currentColor') settingsRef.current.color = computed;
-        if (accentColor === 'currentColor') settingsRef.current.accentColor = computed;
-        wakeRef.current();
-      }
-    });
-    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     let width = 1;
     let height = 1;
     let dpr = 1;
@@ -663,7 +654,6 @@ const TechText = ({
       wakeRef.current = () => {};
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
-      themeObserver.disconnect();
       container.removeEventListener('pointermove', onMove);
       container.removeEventListener('pointerenter', onMove);
       container.removeEventListener('pointerdown', onDown);

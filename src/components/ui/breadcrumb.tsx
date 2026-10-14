@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Archive, BarChart2, BookOpen, Calendar, ChevronRight, Compass, House, Moon, Sun } from "lucide-react";
+import { Archive, BarChart2, BookOpen, Calendar, ChevronRight, Compass, House } from "lucide-react";
 
 export interface BreadcrumbNavigationProps {
   readonly pathname: string;
-  readonly theme: "light" | "dark";
-  readonly onToggleTheme: () => void;
   readonly onOpenInstructions: () => void;
 }
 
@@ -23,8 +21,6 @@ function Separator(): React.JSX.Element {
 
 export default function BreadcrumbNavigation({
   pathname,
-  theme,
-  onToggleTheme,
   onOpenInstructions,
 }: BreadcrumbNavigationProps): React.JSX.Element {
   return (
@@ -48,15 +44,6 @@ export default function BreadcrumbNavigation({
         <button type="button" onClick={onOpenInstructions}>
           <BookOpen aria-hidden="true" />
           <span>How to Play</span>
-        </button>
-        <button
-          type="button"
-          onClick={onToggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-        >
-          {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
-          <span>{theme === "dark" ? "Light" : "Dark"}</span>
         </button>
       </span>
     </nav>

@@ -48,19 +48,19 @@ export function HintControl({
         disabled={isRoundOver || isProcessing}
         aria-label={`Use a hint. Cost is 5 points deduction. ${hintsUsed} used so far.`}
         className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50/90 px-4 py-2 text-xs font-semibold text-amber-900 shadow-sm transition-all duration-150 select-none",
-          "hover:bg-amber-100 hover:border-amber-300 active:scale-95",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2",
+          "inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-2 text-xs font-semibold text-[#32171D] shadow-sm transition-all duration-150 select-none",
+          "hover:bg-[#f4ddc5] hover:border-[#C49A6C] active:scale-95",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2",
           (isRoundOver || isProcessing) && "cursor-not-allowed opacity-50"
         )}
       >
-        <Lightbulb className="h-4 w-4 text-amber-600" aria-hidden="true" />
+        <Lightbulb className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />
         <span>Use Hint</span>
-        <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+        <span className="rounded-full bg-[#C49A6C] px-2 py-0.5 text-[10px] font-bold text-[#32171D]">
           -5 pts
         </span>
         {hintsUsed > 0 && (
-          <span className="text-[10px] font-medium text-amber-800">({hintsUsed} used)</span>
+          <span className="text-[10px] font-medium text-[#6B4E55]">({hintsUsed} used)</span>
         )}
       </button>
 
@@ -68,7 +68,7 @@ export function HintControl({
         <p
           role="status"
           aria-live="polite"
-          className="text-xs font-medium text-amber-800 transition-opacity"
+          className="text-xs font-medium text-[#7B1E2B] transition-opacity"
         >
           {feedbackNotice}
         </p>

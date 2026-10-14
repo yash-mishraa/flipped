@@ -15,7 +15,7 @@ export default function RootLayout({
 }>): React.JSX.Element {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-[#fcfbf9] text-[#24272c] antialiased">{children}</body>
+      <body className="min-h-screen bg-[#F7F0E5] text-[#32171D] antialiased">{children}</body>
     </html>
   );
 }

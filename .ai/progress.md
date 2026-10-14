@@ -404,3 +404,17 @@ Every development script was executed and verified directly:
 - `docs/CORPUS_REFRESH_GUIDE.md`: Step-by-step corpus refresh and maintenance guide.
 - `data/corpus/corpus-stats.json`: Machine-readable corpus statistics.
 - `data/corpus/review-queue.json` & `.csv`: Exported review queues.
+
+---
+
+## 5. Visual System Modernization & Dark/Light Mode Removal (2026-10-14)
+
+### 1. Unified 4-Color Editorial Palette
+- **Palette**:
+  - Crimson: `#7B1E2B` (accent, selections, primary CTAs, streak flames)
+  - Cream white: `#F7F0E5` (canvas background, tile text, primary surfaces)
+  - Dark wine: `#32171D` (primary typography, confirmed/filled letter tiles)
+  - Muted gold: `#C49A6C` (borders, badges, icons, divider lines)
+- **Eliminated**: Dark/light mode switcher, `flipped-theme` localStorage hooks, `MutationObserver` on `data-theme`, `html[data-theme="dark"]` CSS rules.
+- **Coverage**: Updated `layout.tsx`, `globals.css`, `Header`, `Footer`, `page.tsx` (Hero, Cards, How It Works, Archive, Stats), `daily`, `classic`, `archive`, `stats`, `LetterTile`, `GameHUD`, `GameTimer`, `HintControl`, `DifficultySelector`, `TutorialModal`, `SuccessScreen`, `TimeoutScreen`, `DailyCompletionCard`, `ShareButton`.
+- **Verification**: Zero theme-switch remnants, 100% test pass rate (224 unit tests, 12 Playwright E2E tests, clean TypeScript typecheck, clean ESLint, Next.js production build succeeded).

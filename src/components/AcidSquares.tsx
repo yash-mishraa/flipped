@@ -15,8 +15,8 @@ export interface AcidSquaresProps {
 
 /** A lightweight canvas corridor of quietly pulsing squares for the home masthead. */
 export function AcidSquares({
-  color = "#f5f1e8",
-  accentColor = "#b64c38",
+  color = "#F7F0E5",
+  accentColor = "#C49A6C",
   speed = 0.7,
   depth = 10,
   zoom = 1.3,
@@ -55,9 +55,8 @@ export function AcidSquares({
       const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
       last = now;
       if (!reduced) phase += dt * speed;
-      const dark = document.documentElement.dataset.theme === "dark";
-      const bg = dark ? "#11130f" : color;
-      const accent = dark ? "#c6ff3d" : accentColor;
+      const bg = color;
+      const accent = accentColor;
       context.clearRect(0, 0, width, height);
       const horizonX = width * (mouseInteraction ? 0.5 + (pointer.x - 0.5) * 0.025 : 0.5);
       const horizonY = height * (mouseInteraction ? 0.48 + (pointer.y - 0.5) * 0.02 : 0.48);

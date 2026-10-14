@@ -81,18 +81,18 @@ export default function HomePage(): React.JSX.Element {
 
   return (
     <div className="home-page flex min-h-screen flex-col">
-      <AcidSquares className="home-acid-background" color="#f5f1e8" accentColor="#b64c38" />
+      <AcidSquares className="home-acid-background" color="#F7F0E5" accentColor="#C49A6C" />
       <Header />
 
       <main className="mx-auto flex flex-1 w-full max-w-5xl flex-col px-4 py-8 sm:px-6 sm:py-12">
         {/* Hero Section */}
         <section className="text-center space-y-4 my-4 sm:my-8" aria-label="Game Introduction">
-          <div className="inline-flex items-center gap-2 rounded-full border border-coral-200 bg-coral-50 px-3.5 py-1 text-xs font-semibold text-coral-700">
-            <Sparkles className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-semibold text-[#7B1E2B]">
+            <Sparkles className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
             <span>The Daily Mental Deduction Challenge</span>
           </div>
 
-          <h1 aria-label="FLIPPED" className="home-wordmark text-4xl font-black tracking-tight text-stone-900 sm:text-5xl md:text-6xl">
+          <h1 aria-label="FLIPPED" className="home-wordmark text-4xl font-black tracking-tight text-[#32171D] sm:text-5xl md:text-6xl">
             <DecryptedText
               text="FLIPPED"
               animateOn="view"
@@ -105,7 +105,7 @@ export default function HomePage(): React.JSX.Element {
             />
           </h1>
 
-          <p className="mx-auto max-w-xl text-base sm:text-lg text-stone-600 leading-relaxed">
+          <p className="mx-auto max-w-xl text-base sm:text-lg text-[#6B4E55] leading-relaxed">
             Flip the meanings of two clue words to uncover a familiar phrase. Fill the letter grid
             before your 60-second timer runs out.
           </p>
@@ -113,7 +113,7 @@ export default function HomePage(): React.JSX.Element {
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               href="/daily"
-              className="inline-flex items-center gap-2 rounded-2xl bg-coral-500 px-6 py-3.5 text-sm font-bold text-white shadow-md hover:bg-coral-600 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[#7B1E2B] px-6 py-3.5 text-sm font-bold text-[#F7F0E5] shadow-md hover:bg-[#631722] transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B]"
             >
               <Calendar className="h-4 w-4" aria-hidden="true" />
               <span>{todayAttempt ? "View Today's Result" : "Play Daily Challenge"}</span>
@@ -121,18 +121,18 @@ export default function HomePage(): React.JSX.Element {
 
             <Link
               href="/classic"
-              className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-6 py-3.5 text-sm font-bold text-stone-700 shadow-xs hover:bg-stone-50 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#C49A6C] bg-white px-6 py-3.5 text-sm font-bold text-[#32171D] shadow-xs hover:bg-[#faeee0] transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B]"
             >
-              <Compass className="h-4 w-4 text-stone-500" aria-hidden="true" />
+              <Compass className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />
               <span>Classic Practice</span>
             </Link>
 
             <button
               type="button"
               onClick={() => setTutorialOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-2xl border border-stone-200 bg-white/60 px-4 py-3.5 text-sm font-semibold text-stone-600 hover:bg-white hover:text-stone-900 transition active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-2xl border border-[#C49A6C]/60 bg-white/60 px-4 py-3.5 text-sm font-semibold text-[#32171D] hover:bg-white hover:text-[#7B1E2B] transition active:scale-95"
             >
-              <BookOpen className="h-4 w-4 text-coral-500" aria-hidden="true" />
+              <BookOpen className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />
               <span>How to Play</span>
             </button>
           </div>
@@ -143,19 +143,19 @@ export default function HomePage(): React.JSX.Element {
           {/* Daily Challenge Card */}
           <article
             data-testid="home-daily-card"
-            className="flex flex-col justify-between rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 shadow-xs hover:border-coral-200 transition"
+            className="flex flex-col justify-between rounded-3xl border border-[#C49A6C]/60 bg-white p-6 sm:p-8 shadow-xs hover:border-[#7B1E2B]/50 transition"
           >
             <div>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-coral-50 text-coral-600">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#faeee0] text-[#7B1E2B]">
                     <Calendar className="h-6 w-6" aria-hidden="true" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-coral-600">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#7B1E2B]">
                       Synchronized Challenge
                     </span>
-                    <h2 className="text-2xl font-black text-stone-900">Daily Mode</h2>
+                    <h2 className="text-2xl font-black text-[#32171D]">Daily Mode</h2>
                   </div>
                 </div>
 
@@ -163,22 +163,22 @@ export default function HomePage(): React.JSX.Element {
                   <div>
                     {todayAttempt ? (
                       todayAttempt.status === "WON" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
-                          <Trophy className="h-3.5 w-3.5 text-emerald-600" />
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#C49A6C] px-3 py-1 text-xs font-bold text-[#32171D]">
+                          <Trophy className="h-3.5 w-3.5 text-[#32171D]" />
                           <span>Solved ({todayAttempt.finalScore} pts)</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 border border-stone-200 px-3 py-1 text-xs font-semibold text-stone-700">
-                          <Hourglass className="h-3.5 w-3.5 text-stone-500" />
+                        <span className="inline-flex items-center gap-1 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-semibold text-[#32171D]">
+                          <Hourglass className="h-3.5 w-3.5 text-[#8C6870]" />
                           <span>Timed Out</span>
                         </span>
                       )
                     ) : isDailyAvailable ? (
-                      <span className="rounded-full bg-coral-50 border border-coral-200 px-3 py-1 text-xs font-bold text-coral-700">
+                      <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-bold text-[#7B1E2B]">
                         Available Today
                       </span>
                     ) : (
-                      <span className="rounded-full bg-stone-100 border border-stone-200 px-3 py-1 text-xs font-medium text-stone-500">
+                      <span className="rounded-full border border-[#C49A6C]/40 bg-[#faeee0] px-3 py-1 text-xs font-medium text-[#8C6870]">
                         Unavailable
                       </span>
                     )}
@@ -186,21 +186,21 @@ export default function HomePage(): React.JSX.Element {
                 )}
               </div>
 
-              <p className="mt-4 text-sm text-stone-600 leading-relaxed">
+              <p className="mt-4 text-sm text-[#6B4E55] leading-relaxed">
                 One canonical challenge per day for all players globally. Solved against a strict
                 60-second clock with a single official scored attempt.
               </p>
 
               {/* Daily Highlights */}
-              <div className="mt-6 grid grid-cols-2 gap-3 border-t border-stone-100 pt-4 text-xs">
-                <div className="rounded-xl border border-stone-100 bg-stone-50/80 p-3">
-                  <span className="font-semibold text-stone-500 text-[11px] uppercase">
+              <div className="mt-6 grid grid-cols-2 gap-3 border-t border-[#C49A6C]/20 pt-4 text-xs">
+                <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-3">
+                  <span className="font-semibold text-[#8C6870] text-[11px] uppercase">
                     Current Streak
                   </span>
-                  <div className="mt-1 flex items-center gap-1.5 font-black text-stone-900 text-lg">
+                  <div className="mt-1 flex items-center gap-1.5 font-black text-[#32171D] text-lg">
                     <Flame
                       className={`h-4 w-4 ${
-                        currentStreak > 0 ? "text-coral-500" : "text-stone-300"
+                        currentStreak > 0 ? "text-[#7B1E2B]" : "text-[#C49A6C]/40"
                       }`}
                     />
                     <span>
@@ -209,22 +209,22 @@ export default function HomePage(): React.JSX.Element {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-stone-100 bg-stone-50/80 p-3">
-                  <span className="font-semibold text-stone-500 text-[11px] uppercase">
+                <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-3">
+                  <span className="font-semibold text-[#8C6870] text-[11px] uppercase">
                     Next Challenge
                   </span>
-                  <div className="mt-1 flex items-center gap-1.5 font-black text-stone-900 text-lg">
-                    <Clock className="h-4 w-4 text-stone-400" />
+                  <div className="mt-1 flex items-center gap-1.5 font-black text-[#32171D] text-lg">
+                    <Clock className="h-4 w-4 text-[#C49A6C]" />
                     <span>{timeUntilNext || "Midnight IST"}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-stone-100">
+            <div className="mt-6 pt-4 border-t border-[#C49A6C]/20">
               <Link
                 href="/daily"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-coral-500 px-5 py-3.5 text-sm font-bold text-white shadow-xs hover:bg-coral-600 transition active:scale-95"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-5 py-3.5 text-sm font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] transition active:scale-95"
               >
                 <span>{todayAttempt ? "View Today's Result" : "Play Daily Challenge"}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -235,63 +235,63 @@ export default function HomePage(): React.JSX.Element {
           {/* Classic Practice Card */}
           <article
             data-testid="home-classic-card"
-            className="flex flex-col justify-between rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 shadow-xs hover:border-coral-200 transition"
+            className="flex flex-col justify-between rounded-3xl border border-[#C49A6C]/60 bg-white p-6 sm:p-8 shadow-xs hover:border-[#7B1E2B]/50 transition"
           >
             <div>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-700">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#faeee0] text-[#C49A6C]">
                     <Compass className="h-6 w-6" aria-hidden="true" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#8C6870]">
                       Unlimited Practice
                     </span>
-                    <h2 className="text-2xl font-black text-stone-900">Classic Mode</h2>
+                    <h2 className="text-2xl font-black text-[#32171D]">Classic Mode</h2>
                   </div>
                 </div>
 
-                <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
+                <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-bold text-[#32171D]">
                   Unlimited
                 </span>
               </div>
 
-              <p className="mt-4 text-sm text-stone-600 leading-relaxed">
+              <p className="mt-4 text-sm text-[#6B4E55] leading-relaxed">
                 Hone your word deduction skills without time locks. Play across Easy, Medium, and
                 Hard tiers with automatic repetition prevention.
               </p>
 
               {/* Available Tiers Breakdown */}
-              <div className="mt-6 border-t border-stone-100 pt-4">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
+              <div className="mt-6 border-t border-[#C49A6C]/20 pt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6870]">
                   Available Tiers
                 </span>
                 <div className="mt-2.5 grid grid-cols-3 gap-2">
-                  <div className="rounded-xl border border-stone-100 bg-stone-50/80 p-2.5 text-center">
-                    <span className="font-bold text-emerald-800 text-xs">Easy</span>
-                    <p className="text-[10px] text-stone-500 mt-0.5">{puzzleCounts.EASY} puzzles</p>
+                  <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-2.5 text-center">
+                    <span className="font-bold text-[#32171D] text-xs">Easy</span>
+                    <p className="text-[10px] text-[#6B4E55] mt-0.5">{puzzleCounts.EASY} puzzles</p>
                   </div>
-                  <div className="rounded-xl border border-stone-100 bg-stone-50/80 p-2.5 text-center">
-                    <span className="font-bold text-amber-800 text-xs">Medium</span>
-                    <p className="text-[10px] text-stone-500 mt-0.5">
+                  <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-2.5 text-center">
+                    <span className="font-bold text-[#32171D] text-xs">Medium</span>
+                    <p className="text-[10px] text-[#6B4E55] mt-0.5">
                       {puzzleCounts.MEDIUM} puzzles
                     </p>
                   </div>
-                  <div className="rounded-xl border border-stone-100 bg-stone-50/80 p-2.5 text-center">
-                    <span className="font-bold text-coral-700 text-xs">Hard</span>
-                    <p className="text-[10px] text-stone-500 mt-0.5">{puzzleCounts.HARD} puzzles</p>
+                  <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-2.5 text-center">
+                    <span className="font-bold text-[#7B1E2B] text-xs">Hard</span>
+                    <p className="text-[10px] text-[#6B4E55] mt-0.5">{puzzleCounts.HARD} puzzles</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-stone-100">
+            <div className="mt-6 pt-4 border-t border-[#C49A6C]/20">
               <Link
                 href="/classic"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-3.5 text-sm font-bold text-stone-700 shadow-2xs hover:bg-stone-50 transition active:scale-95"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#C49A6C] bg-white px-5 py-3.5 text-sm font-bold text-[#32171D] shadow-2xs hover:bg-[#faeee0] transition active:scale-95"
               >
                 <span>Start Classic Practice</span>
-                <ArrowRight className="h-4 w-4 text-stone-400" />
+                <ArrowRight className="h-4 w-4 text-[#C49A6C]" />
               </Link>
             </div>
           </article>
@@ -299,65 +299,65 @@ export default function HomePage(): React.JSX.Element {
 
         {/* How It Works Section */}
         <section
-          className="my-6 rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 shadow-xs"
+          className="my-6 rounded-3xl border border-[#C49A6C]/60 bg-white p-6 sm:p-8 shadow-xs"
           aria-label="How Flipped Works"
         >
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-100 pb-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#C49A6C]/20 pb-5">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-coral-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1E2B]">
                 Core Game Mechanics
               </span>
-              <h2 className="text-2xl font-black text-stone-900 mt-0.5">How Flipped Works</h2>
+              <h2 className="text-2xl font-black text-[#32171D] mt-0.5">How Flipped Works</h2>
             </div>
 
             <button
               type="button"
               onClick={() => setTutorialOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-3.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#C49A6C] px-3.5 py-1.5 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] transition"
             >
-              <BookOpen className="h-3.5 w-3.5 text-coral-500" />
+              <BookOpen className="h-3.5 w-3.5 text-[#7B1E2B]" />
               <span>Interactive Tutorial</span>
             </button>
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-stone-100 bg-stone-50/70 p-4">
-              <span className="text-xs font-bold text-coral-600">1. Two Clue Words</span>
-              <p className="mt-1.5 text-xs text-stone-600 leading-relaxed">
+            <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B]">1. Two Clue Words</span>
+              <p className="mt-1.5 text-xs text-[#6B4E55] leading-relaxed">
                 You receive two starting clues hinting at an everyday two-word phrase.
               </p>
-              <div className="mt-3 rounded-lg border border-stone-200/80 bg-white p-2.5 text-center font-black text-sm text-stone-800">
+              <div className="mt-3 rounded-lg border border-[#C49A6C]/40 bg-white p-2.5 text-center font-black text-sm text-[#32171D]">
                 SLOW + MEAL
               </div>
             </div>
 
-            <div className="rounded-2xl border border-stone-100 bg-stone-50/70 p-4">
-              <span className="text-xs font-bold text-coral-600">2. Semantic Transformations</span>
-              <p className="mt-1.5 text-xs text-stone-600 leading-relaxed">
+            <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B]">2. Semantic Transformations</span>
+              <p className="mt-1.5 text-xs text-[#6B4E55] leading-relaxed">
                 Each clue word transforms into its <strong>ANTONYM</strong> (opposite) or{" "}
                 <strong>SYNONYM</strong> (similar).
               </p>
-              <div className="mt-3 space-y-1 text-[11px] font-bold text-stone-700">
-                <div className="flex justify-between rounded bg-white p-1 px-2 border border-stone-200/60">
+              <div className="mt-3 space-y-1 text-[11px] font-bold text-[#32171D]">
+                <div className="flex justify-between rounded bg-white p-1 px-2 border border-[#C49A6C]/30">
                   <span>SLOW → FAST</span>
-                  <span className="text-coral-600">Antonym</span>
+                  <span className="text-[#7B1E2B]">Antonym</span>
                 </div>
-                <div className="flex justify-between rounded bg-white p-1 px-2 border border-stone-200/60">
+                <div className="flex justify-between rounded bg-white p-1 px-2 border border-[#C49A6C]/30">
                   <span>MEAL → FOOD</span>
-                  <span className="text-stone-500">Synonym</span>
+                  <span className="text-[#8C6870]">Synonym</span>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-stone-100 bg-stone-50/70 p-4">
-              <span className="text-xs font-bold text-coral-600">
+            <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B]">
                 3. Automatic Answer Detection
               </span>
-              <p className="mt-1.5 text-xs text-stone-600 leading-relaxed">
+              <p className="mt-1.5 text-xs text-[#6B4E55] leading-relaxed">
                 The first letter of each answer is revealed. Fill the remaining tiles—answers
                 auto-detect the moment they are complete!
               </p>
-              <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50/80 p-2.5 text-center font-black text-sm text-emerald-800">
+              <div className="mt-3 rounded-lg border border-[#C49A6C] bg-[#faeee0] p-2.5 text-center font-black text-sm text-[#32171D]">
                 FAST FOOD
               </div>
             </div>
@@ -368,34 +368,34 @@ export default function HomePage(): React.JSX.Element {
         <section className="my-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link
             href="/archive"
-            className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white/70 p-5 shadow-2xs hover:border-stone-300 hover:bg-white transition group"
+            className="flex items-center justify-between rounded-2xl border border-[#C49A6C]/40 bg-white/70 p-5 shadow-2xs hover:border-[#7B1E2B] hover:bg-white transition group"
           >
             <div className="flex items-center gap-3.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-stone-600 group-hover:bg-coral-50 group-hover:text-coral-600 transition">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#faeee0] text-[#7B1E2B] group-hover:bg-[#7B1E2B] group-hover:text-[#F7F0E5] transition">
                 <Archive className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-sm">Challenge Archive</h3>
-                <p className="text-xs text-stone-500">Review past daily assignments</p>
+                <h3 className="font-bold text-[#32171D] text-sm">Challenge Archive</h3>
+                <p className="text-xs text-[#6B4E55]">Review past daily assignments</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-stone-400 group-hover:translate-x-0.5 transition" />
+            <ArrowRight className="h-4 w-4 text-[#C49A6C] group-hover:text-[#7B1E2B] group-hover:translate-x-0.5 transition" />
           </Link>
 
           <Link
             href="/stats"
-            className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white/70 p-5 shadow-2xs hover:border-stone-300 hover:bg-white transition group"
+            className="flex items-center justify-between rounded-2xl border border-[#C49A6C]/40 bg-white/70 p-5 shadow-2xs hover:border-[#7B1E2B] hover:bg-white transition group"
           >
             <div className="flex items-center gap-3.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-stone-600 group-hover:bg-coral-50 group-hover:text-coral-600 transition">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#faeee0] text-[#7B1E2B] group-hover:bg-[#7B1E2B] group-hover:text-[#F7F0E5] transition">
                 <BarChart2 className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-sm">Player Statistics</h3>
-                <p className="text-xs text-stone-500">Track streaks, win rate, and solve times</p>
+                <h3 className="font-bold text-[#32171D] text-sm">Player Statistics</h3>
+                <p className="text-xs text-[#6B4E55]">Track streaks, win rate, and solve times</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-stone-400 group-hover:translate-x-0.5 transition" />
+            <ArrowRight className="h-4 w-4 text-[#C49A6C] group-hover:text-[#7B1E2B] group-hover:translate-x-0.5 transition" />
           </Link>
         </section>
       </main>

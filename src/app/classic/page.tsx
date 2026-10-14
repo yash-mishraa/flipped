@@ -98,22 +98,22 @@ export default function ClassicPage(): React.JSX.Element {
     stats.totalPlayed > 0 ? Math.round((stats.totalWins / stats.totalPlayed) * 100) : 0;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfbf9]">
+    <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col justify-between px-4 py-8 sm:px-8 sm:py-12">
         {/* Navigation and Top Bar */}
         <header className="flex flex-col items-center gap-4 text-center">
-          <div className="flex w-full items-center justify-between border-b border-stone-200/80 pb-4">
+          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/40 pb-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Home</span>
             </Link>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
-              <Compass className="h-3.5 w-3.5 text-coral-600" aria-hidden="true" />
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-semibold text-[#7B1E2B]">
+              <Compass className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
               <span>Classic Mode • Server Authoritative</span>
             </div>
 
@@ -121,35 +121,35 @@ export default function ClassicPage(): React.JSX.Element {
               type="button"
               onClick={handleNextPuzzle}
               title="Load another puzzle in this tier"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
             >
-              <RotateCcw className="h-3.5 w-3.5 text-coral-500" aria-hidden="true" />
+              <RotateCcw className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
               <span>Skip / Next</span>
             </button>
           </div>
 
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
               Classic Practice
             </h1>
-            <p className="mt-1 text-xs text-stone-500 sm:text-sm">
+            <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
               Select your challenge tier and play unlimited repetition-free rounds.
             </p>
           </div>
 
           {/* Stats Summary Bar */}
-          <div className="flex items-center gap-4 rounded-full border border-stone-200/80 bg-white/80 px-4 py-1.5 text-xs text-stone-600 shadow-xs">
+          <div className="flex items-center gap-4 rounded-full border border-[#C49A6C]/40 bg-[#faeee0]/70 px-4 py-1.5 text-xs text-[#6B4E55] shadow-xs">
             <div className="flex items-center gap-1">
-              <Trophy className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
-              <span className="font-semibold text-stone-900">{stats.totalWins}</span> Wins
+              <Trophy className="h-3.5 w-3.5 text-[#C49A6C]" aria-hidden="true" />
+              <span className="font-semibold text-[#32171D]">{stats.totalWins}</span> Wins
             </div>
-            <span className="text-stone-300">•</span>
+            <span className="text-[#C49A6C]">•</span>
             <div>
-              <span className="font-semibold text-stone-900">{stats.totalPlayed}</span> Played
+              <span className="font-semibold text-[#32171D]">{stats.totalPlayed}</span> Played
             </div>
-            <span className="text-stone-300">•</span>
+            <span className="text-[#C49A6C]">•</span>
             <div>
-              <span className="font-semibold text-stone-900">{winRate}%</span> Win Rate
+              <span className="font-semibold text-[#32171D]">{winRate}%</span> Win Rate
             </div>
           </div>
 
@@ -167,18 +167,18 @@ export default function ClassicPage(): React.JSX.Element {
         <section className="my-8 w-full flex-1 flex flex-col justify-center">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
-              <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-stone-400">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#7B1E2B] border-t-transparent" />
+              <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#6B4E55]">
                 Loading Classic Puzzle...
               </p>
             </div>
           ) : errorMsg ? (
-            <div className="rounded-2xl border border-coral-200 bg-white p-6 text-center shadow-xs">
-              <p className="text-sm font-semibold text-coral-800">{errorMsg}</p>
+            <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#FDFBF7] p-6 text-center shadow-xs">
+              <p className="text-sm font-semibold text-[#7B1E2B]">{errorMsg}</p>
               <button
                 type="button"
                 onClick={handleNextPuzzle}
-                className="mt-4 rounded-xl bg-coral-500 px-4 py-2 text-xs font-bold text-white hover:bg-coral-600"
+                className="mt-4 rounded-xl bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] hover:opacity-90 transition"
               >
                 Try Next Puzzle
               </button>
@@ -195,7 +195,7 @@ export default function ClassicPage(): React.JSX.Element {
         </section>
 
         {/* Footer Notice */}
-        <footer className="border-t border-stone-200/80 pt-4 text-center text-xs text-stone-500">
+        <footer className="border-t border-[#C49A6C]/40 pt-4 text-center text-xs text-[#6B4E55]">
           <p>Classic Mode • Server-verified rounds across Easy, Medium, and Hard tiers</p>
         </footer>
       </main>

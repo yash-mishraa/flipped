@@ -28,29 +28,30 @@ export function GameTimer({
   const getUrgencyStyles = () => {
     switch (urgency) {
       case "critical":
-        return "border-coral-500 bg-coral-50 text-coral-600 shadow-coral-100 motion-safe:animate-pulse";
+        return "border-[#7B1E2B] bg-[#faeee0] text-[#7B1E2B] motion-safe:animate-pulse";
       case "urgent":
-        return "border-amber-400 bg-amber-50 text-amber-800 shadow-amber-50";
+        return "border-[#C49A6C] bg-[#fbf5ec] text-[#32171D]";
       case "expired":
-        return "border-stone-300 bg-stone-100 text-stone-500";
+        return "border-[#C49A6C]/50 bg-[#F7F0E5] text-[#8C6870]";
       case "normal":
       default:
         return isRunning
-          ? "border-stone-300 bg-white text-stone-900 shadow-sm"
-          : "border-stone-200 bg-stone-50 text-stone-600";
+          ? "border-[#C49A6C] bg-white text-[#32171D] shadow-sm"
+          : "border-[#C49A6C]/40 bg-[#F7F0E5] text-[#6B4E55]";
     }
   };
 
   const renderIcon = () => {
     switch (urgency) {
       case "critical":
-        return <AlertTriangle className="h-4 w-4 text-coral-600 shrink-0" aria-hidden="true" />;
+        return <AlertTriangle className="h-4 w-4 text-[#7B1E2B] shrink-0" aria-hidden="true" />;
       case "urgent":
-        return <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" aria-hidden="true" />;
+        return <AlertCircle className="h-4 w-4 text-[#C49A6C] shrink-0" aria-hidden="true" />;
       case "expired":
+        return <Clock className="h-4 w-4 text-[#8C6870] shrink-0" aria-hidden="true" />;
       case "normal":
       default:
-        return <Clock className="h-4 w-4 text-stone-500 shrink-0" aria-hidden="true" />;
+        return <Clock className="h-4 w-4 text-[#C49A6C] shrink-0" aria-hidden="true" />;
     }
   };
 

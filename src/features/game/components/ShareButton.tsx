@@ -43,17 +43,17 @@ export function ShareButton({ options, className }: ShareButtonProps): React.JSX
         aria-label={copied ? "Copied results to clipboard" : "Share results"}
         className={
           className ||
-          "inline-flex items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
+          "inline-flex items-center justify-center gap-2 rounded-xl border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
         }
       >
         {copied ? (
           <>
-            <Check className="h-4 w-4 text-emerald-600" aria-hidden="true" />
-            <span className="text-emerald-700 font-bold">Copied to Clipboard!</span>
+            <Check className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />
+            <span className="text-[#7B1E2B] font-bold">Copied to Clipboard!</span>
           </>
         ) : (
           <>
-            <Share2 className="h-4 w-4 text-coral-500" aria-hidden="true" />
+            <Share2 className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />
             <span>Share Result</span>
           </>
         )}
@@ -62,7 +62,7 @@ export function ShareButton({ options, className }: ShareButtonProps): React.JSX
       {errorMsg && (
         <span
           role="status"
-          className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-coral-600 flex items-center gap-1"
+          className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-[#7B1E2B] flex items-center gap-1"
         >
           <AlertCircle className="h-3 w-3" />
           {errorMsg}

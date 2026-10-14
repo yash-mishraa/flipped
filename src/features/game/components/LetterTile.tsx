@@ -38,26 +38,26 @@ export function LetterTile({
   // Determine styling classes based on feedback and selection
   const feedbackClasses = React.useMemo(() => {
     if (isFixed) {
-      return "bg-stone-100 border-stone-300 text-stone-900 font-extrabold shadow-sm";
+      return "bg-[#32171D] border-[#C49A6C] text-[#C49A6C] font-extrabold shadow-sm";
     }
 
     switch (feedback) {
       case "CONFIRMED":
-        return "bg-emerald-50/90 border-emerald-500 text-emerald-950 font-bold shadow-sm";
+        return "bg-[#32171D] border-[#C49A6C] text-[#F7F0E5] font-bold shadow-sm";
       case "ELIMINATED":
-        return "bg-stone-100/60 border-stone-300/80 border-dashed text-stone-400 line-through decoration-stone-400";
+        return "bg-[#F7F0E5] border-[#C49A6C]/40 border-dashed text-[#8C6870] line-through decoration-[#8C6870]";
       case "PENDING":
-        return "bg-amber-50/80 border-amber-300 text-amber-950 font-semibold shadow-sm";
+        return "bg-[#faeee0] border-[#C49A6C] text-[#32171D] font-semibold shadow-sm";
       case "NONE":
       default:
-        return "bg-white border-stone-200/90 text-stone-900";
+        return "bg-[#F7F0E5] border-[#C49A6C] text-[#32171D]";
     }
   }, [isFixed, feedback]);
 
   const selectionClasses =
     isSelected && !isRoundOver
-      ? "ring-2 ring-coral-500 ring-offset-2 border-coral-500 z-10 scale-[1.02]"
-      : "hover:border-stone-300";
+      ? "ring-2 ring-[#7B1E2B] ring-offset-2 border-[#7B1E2B] z-10 scale-[1.02]"
+      : "hover:border-[#7B1E2B]/60";
 
   return (
     <button
@@ -106,7 +106,7 @@ export function LetterTile({
       {/* Non-color visual indicator badges */}
       {isFixed && (
         <span
-          className="absolute top-1 right-1 text-stone-400"
+          className="absolute top-1 right-1 text-[#C49A6C]"
           title="Fixed clue letter"
           aria-hidden="true"
         >
@@ -116,7 +116,7 @@ export function LetterTile({
 
       {!isFixed && feedback === "CONFIRMED" && (
         <span
-          className="absolute top-1 right-1 text-emerald-600"
+          className="absolute top-1 right-1 text-[#C49A6C]"
           title="Confirmed in correct position"
           aria-hidden="true"
         >
@@ -126,7 +126,7 @@ export function LetterTile({
 
       {!isFixed && feedback === "ELIMINATED" && (
         <span
-          className="absolute top-1 right-1 text-stone-400"
+          className="absolute top-1 right-1 text-[#8C6870]"
           title="Ruled out"
           aria-hidden="true"
         >
@@ -136,7 +136,7 @@ export function LetterTile({
 
       {!isFixed && feedback === "PENDING" && (
         <span
-          className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-amber-400"
+          className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-[#C49A6C]"
           title="In puzzle, but in different position"
           aria-hidden="true"
         />
