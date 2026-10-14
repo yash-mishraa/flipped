@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import type { LetterGrid as GridModel, TilePosition } from "../domain/types";
 import { LetterTile } from "./LetterTile";
 
@@ -30,15 +30,58 @@ export function LetterGrid({
   onEnter,
 }: LetterGridProps): React.JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
-  const lastKeyDownTimeRef = useRef<number>(0);
-  const lastKeyDownCharRef = useRef<string>("");
+  const lastActionTimeRef = useRef<number>(0);
+  const lastActionTypeRef = useRef<string>("");
 
-  // Keep hidden input focused when an editable tile is selected and round is active
-  useEffect(() => {
-    if (selectedPosition && !isRoundOver) {
-      inputRef.current?.focus({ preventScroll: true });
+  const resetInputValue = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.value = " ";
+      try {
+        inputRef.current.setSelectionRange(1, 1);
+      } catch {
+        // Safe fallback in environments without selection support
+      }
     }
-  }, [selectedPosition, isRoundOver]);
+  }, []);
+
+  // Keep hidden input focused and primed with sentinel space when an editable tile is selected
+  useEffect(() => {
+    if (selectedPosition && !isRoundOver && inputRef.current) {
+      if (inputRef.current.value !== " ") {
+        resetInputValue();
+      }
+      inputRef.current.focus({ preventScroll: true });
+    }
+  }, [selectedPosition, isRoundOver, resetInputValue]);
+
+  const executeVirtualClear = useCallback(() => {
+    const now = Date.now();
+    // Drop duplicate clear calls fired within 60ms from the same physical tap across keydown/beforeinput/input
+    if (lastActionTypeRef.current === "BACKSPACE" && now - lastActionTimeRef.current < 60) {
+      resetInputValue();
+      return;
+    }
+    lastActionTimeRef.current = now;
+    lastActionTypeRef.current = "BACKSPACE";
+    onClearTile();
+    resetInputValue();
+  }, [onClearTile, resetInputValue]);
+
+  const executeVirtualInput = useCallback(
+    (char: string) => {
+      const now = Date.now();
+      // Drop duplicate input calls fired within 60ms from the same physical tap for the same character
+      if (lastActionTypeRef.current === char && now - lastActionTimeRef.current < 60) {
+        resetInputValue();
+        return;
+      }
+      lastActionTimeRef.current = now;
+      lastActionTypeRef.current = char;
+      onInputLetter(char);
+      resetInputValue();
+    },
+    [onInputLetter, resetInputValue]
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (isRoundOver) return;
@@ -52,10 +95,10 @@ export function LetterGrid({
       case "Backspace":
       case "Delete":
         e.preventDefault();
-        lastKeyDownTimeRef.current = Date.now();
-        lastKeyDownCharRef.current = "BACKSPACE";
+        lastActionTimeRef.current = Date.now();
+        lastActionTypeRef.current = "BACKSPACE";
         onClearTile();
-        if (inputRef.current) inputRef.current.value = "";
+        resetInputValue();
         return;
       case "ArrowLeft":
         e.preventDefault();
@@ -87,49 +130,73 @@ export function LetterGrid({
     if (e.key.length === 1 && /^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
       const char = e.key.toUpperCase();
-      lastKeyDownTimeRef.current = Date.now();
-      lastKeyDownCharRef.current = char;
+      lastActionTimeRef.current = Date.now();
+      lastActionTypeRef.current = char;
       onInputLetter(char);
-      if (inputRef.current) inputRef.current.value = "";
+      resetInputValue();
     }
   };
 
-  // Fallback for mobile virtual keyboards that emit character inputs via input change
+  // Modern input event handler for mobile virtual keyboards (Android Chrome / iOS Safari)
+  const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
+    if (isRoundOver) return;
+
+    const native = e.nativeEvent as InputEvent;
+    const inputType = native.inputType;
+
+    if (inputType && inputType.startsWith("delete")) {
+      e.preventDefault();
+      executeVirtualClear();
+      return;
+    }
+
+    if (inputType && (inputType === "insertText" || inputType === "insertCompositionText")) {
+      const data = native.data;
+      if (data) {
+        const char = data.slice(-1).toUpperCase();
+        if (/^[A-Z]$/.test(char)) {
+          e.preventDefault();
+          executeVirtualInput(char);
+          return;
+        }
+      }
+    }
+  };
+
+  // Resilient fallback for virtual keyboards that do not prevent default on beforeinput
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isRoundOver) return;
 
     const val = e.target.value;
-    const now = Date.now();
 
-    if (val) {
-      const char = val.slice(-1).toUpperCase();
-      if (/^[A-Z]$/.test(char)) {
-        // Drop if this exact character was ALREADY handled by onKeyDown less than 80ms ago
-        if (char === lastKeyDownCharRef.current && now - lastKeyDownTimeRef.current < 80) {
-          e.target.value = "";
-          return;
-        }
-        lastKeyDownTimeRef.current = now;
-        lastKeyDownCharRef.current = char;
-        onInputLetter(char);
-      }
-    } else {
-      // Empty string on input change may represent a virtual backspace
-      if (lastKeyDownCharRef.current === "BACKSPACE" && now - lastKeyDownTimeRef.current < 80) {
-        return;
-      }
-      lastKeyDownTimeRef.current = now;
-      lastKeyDownCharRef.current = "BACKSPACE";
-      onClearTile();
+    // If the sentinel space was removed (or input is empty), it represents a deletion / Backspace
+    if (val === "" || val.length === 0) {
+      executeVirtualClear();
+      return;
     }
 
-    // Always keep the capture input clear
-    e.target.value = "";
+    // Extract any newly entered alphabetical character
+    const cleaned = val.replace(/\s/g, "");
+    if (cleaned.length > 0) {
+      const char = cleaned.slice(-1).toUpperCase();
+      if (/^[A-Z]$/.test(char)) {
+        executeVirtualInput(char);
+        return;
+      }
+    }
+
+    // Always restore sentinel space
+    resetInputValue();
   };
 
   const handleTileClick = (pos: TilePosition) => {
     onSelectTile(pos);
-    inputRef.current?.focus({ preventScroll: true });
+    if (inputRef.current) {
+      if (inputRef.current.value !== " ") {
+        resetInputValue();
+      }
+      inputRef.current.focus({ preventScroll: true });
+    }
   };
 
   return (
@@ -140,7 +207,12 @@ export function LetterGrid({
         if (!selectedPosition && !isRoundOver) {
           onNavigate("home");
         }
-        inputRef.current?.focus({ preventScroll: true });
+        if (inputRef.current) {
+          if (inputRef.current.value !== " ") {
+            resetInputValue();
+          }
+          inputRef.current.focus({ preventScroll: true });
+        }
       }}
     >
       {/* Hidden text capture input for mobile virtual keyboard and physical keyboard parity */}
@@ -148,6 +220,7 @@ export function LetterGrid({
         ref={inputRef}
         type="text"
         inputMode="text"
+        defaultValue=" "
         autoCapitalize="characters"
         autoComplete="off"
         autoCorrect="off"
@@ -155,6 +228,7 @@ export function LetterGrid({
         aria-label="Letter input for active tile"
         disabled={isRoundOver}
         onKeyDown={handleKeyDown}
+        onBeforeInput={handleBeforeInput}
         onChange={handleInputChange}
         className="absolute -top-10 left-0 h-1 w-1 opacity-0 pointer-events-none text-base"
         tabIndex={-1}

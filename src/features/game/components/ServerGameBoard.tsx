@@ -19,7 +19,7 @@ import { SuccessScreen } from "./SuccessScreen";
 import { TimeoutScreen } from "./TimeoutScreen";
 import { GameInstructions } from "./GameInstructions";
 import { formatTime, getTimerUrgency } from "../domain/timer-utils";
-import { getPreviousEditablePosition } from "../domain/letter-grid";
+import { getNextEditablePosition, getPreviousEditablePosition } from "../domain/letter-grid";
 
 export interface ServerGameBoardProps {
   readonly payload: SafeGameplayPayload;
@@ -326,11 +326,10 @@ export function ServerGameBoard({
     const newGrid: LetterGridType = { words: updatedWords };
     setGrid(newGrid);
 
-    // Advance cursor to next slot
-    if (letterIndex < grid.words[wordIndex].length - 1) {
-      setSelectedPosition({ wordIndex, letterIndex: letterIndex + 1 });
-    } else if (wordIndex === 0) {
-      setSelectedPosition({ wordIndex: 1, letterIndex: 1 });
+    // Advance cursor to next editable slot
+    const nextPos = getNextEditablePosition(newGrid, selectedPosition);
+    if (nextPos) {
+      setSelectedPosition(nextPos);
     }
 
     // Check if entire grid is now filled
@@ -350,9 +349,9 @@ export function ServerGameBoard({
     if (!selectedPosition || roundStatus !== "PLAYING") return;
     const { wordIndex, letterIndex } = selectedPosition;
     const currentTile = grid.words[wordIndex][letterIndex];
-    if (!currentTile || currentTile.isFixed) return;
+    if (!currentTile) return;
 
-    if (currentTile.letter) {
+    if (!currentTile.isFixed && currentTile.letter) {
       // 1. Current tile has a letter -> clear this tile immediately
       const updatedWords = [...grid.words] as [readonly LetterTile[], readonly LetterTile[]];
       const newWordTiles = [...updatedWords[wordIndex]];
@@ -366,7 +365,7 @@ export function ServerGameBoard({
       setGrid({ words: updatedWords });
       setErrorMessage(null);
     } else {
-      // 2. Current tile is empty -> find previous editable tile, clear it, and move cursor to it
+      // 2. Current tile is empty OR is fixed -> find previous editable tile, clear it, and move cursor to it
       const prevPos = getPreviousEditablePosition(grid, selectedPosition);
       if (prevPos) {
         const prevTile = grid.words[prevPos.wordIndex][prevPos.letterIndex];

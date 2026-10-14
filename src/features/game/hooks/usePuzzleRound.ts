@@ -185,7 +185,7 @@ export function usePuzzleRound(
 
     const currentTile = currentState.grid.words[pos.wordIndex][pos.letterIndex];
 
-    if (currentTile && currentTile.letter) {
+    if (currentTile && !currentTile.isFixed && currentTile.letter) {
       // Tile has a letter: clear current tile
       setState((prev) => {
         const activePos = prev.selectedTilePosition;
@@ -193,7 +193,7 @@ export function usePuzzleRound(
         return applyTileClear(prev, activePos);
       });
     } else {
-      // Tile is already empty: move to previous editable tile and clear it
+      // Tile is already empty or fixed: move to previous editable tile and clear it
       const prevPos = getPreviousEditablePosition(currentState.grid, pos);
       if (prevPos) {
         setState((prev) => {
