@@ -19,6 +19,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md}\""
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.15",
     "@prisma/client": "^6.19.3",
     "lucide-react": "^1.16.0",
     "next": "^15.2.1",

@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import "./globals.css";
@@ -20,20 +21,20 @@ export const metadata: Metadata = {
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
     ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "FLIPPED — Word Deduction Puzzle",
-    description: "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
+    description:
+      "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
     type: "website",
     siteName: "FLIPPED",
   },
   twitter: {
     card: "summary",
     title: "FLIPPED — Word Deduction Puzzle",
-    description: "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
+    description:
+      "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
   },
 };
 
@@ -45,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#F7F0E5] text-[#32171D] antialiased selection:bg-[#7B1E2B] selection:text-[#F7F0E5]">
-        {children}
+        <ClerkProvider>{children}</ClerkProvider>
       </body>
     </html>
   );

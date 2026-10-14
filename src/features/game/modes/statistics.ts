@@ -70,14 +70,14 @@ export function calculateDailyStreaks(
     return { currentStreak: 0, longestStreak: 0 };
   }
 
-  // 1. Calculate longest streak across all history
+  // 1. Calculate longest streak across all history (excluding archive-completed challenges)
   let longestStreak = 0;
   let runningStreak = 0;
   let previousWonDate: string | null = null;
 
   for (const date of sortedDates) {
     const attempt = dailyAttempts[date];
-    if (attempt?.status === "WON") {
+    if (attempt?.status === "WON" && !attempt.isArchive) {
       if (previousWonDate === null) {
         runningStreak = 1;
       } else {
@@ -93,7 +93,7 @@ export function calculateDailyStreaks(
         longestStreak = runningStreak;
       }
     } else {
-      // Timeout or incomplete resets streak
+      // Timeout, incomplete, or archive round resets streak
       runningStreak = 0;
       previousWonDate = null;
     }
@@ -107,7 +107,7 @@ export function calculateDailyStreaks(
   let checkDate: string | null = null;
 
   if (todayAttempt) {
-    if (todayAttempt.status === "WON") {
+    if (todayAttempt.status === "WON" && !todayAttempt.isArchive) {
       checkDate = todayDateStr;
     } else {
       // Today was played and timed out -> streak is 0
@@ -116,15 +116,15 @@ export function calculateDailyStreaks(
   } else {
     // Today not yet played -> streak is alive if yesterday was WON
     const yesterdayAttempt = dailyAttempts[yesterdayDateStr];
-    if (yesterdayAttempt?.status === "WON") {
+    if (yesterdayAttempt?.status === "WON" && !yesterdayAttempt.isArchive) {
       checkDate = yesterdayDateStr;
     } else {
       return { currentStreak: 0, longestStreak };
     }
   }
 
-  // Walk backwards counting consecutive won days
-  while (checkDate && dailyAttempts[checkDate]?.status === "WON") {
+  // Walk backwards counting consecutive won days (ignoring archive solves)
+  while (checkDate && dailyAttempts[checkDate]?.status === "WON" && !dailyAttempts[checkDate]?.isArchive) {
     currentStreak += 1;
     checkDate = getPreviousDateString(checkDate);
   }

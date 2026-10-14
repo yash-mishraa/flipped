@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 const classicStartSchema = z.object({
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"]).default("MEDIUM"),
   recentPuzzleIds: z.array(z.string()).default([]),
+  durationSeconds: z.number().min(30).max(600).optional(),
 });
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -41,8 +42,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { difficulty, recentPuzzleIds } = parseResult.data;
-  const result = await startClassicAttempt(session.guestId, difficulty, recentPuzzleIds);
+  const { difficulty, recentPuzzleIds, durationSeconds } = parseResult.data;
+  const durationMs = durationSeconds ? durationSeconds * 1000 : 360_000;
+  const result = await startClassicAttempt(session.guestId, difficulty, recentPuzzleIds, durationMs);
 
   const response = NextResponse.json(result, {
     status: result.status === "EMPTY_POOL" ? 404 : 200,

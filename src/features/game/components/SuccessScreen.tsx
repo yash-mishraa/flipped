@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { Trophy, RotateCcw, Home, Clock, Sparkles, Lightbulb } from "lucide-react";
+import { Trophy, RotateCcw, Home, Clock, Sparkles, Lightbulb, UserCheck } from "lucide-react";
+import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
 import type { Puzzle, TerminalResult } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
 
@@ -123,6 +124,44 @@ export function SuccessScreen({
             }}
           />
         </div>
+
+        {/* Clerk Account Sync Banner for Guest Players */}
+        <Show when="signed-out">
+          <div className="mt-5 w-full rounded-xl border border-[#C49A6C] bg-[#faeee0]/70 p-4 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
+              <UserCheck className="h-4 w-4" />
+              <span>Save &amp; Sync Your Progress</span>
+            </div>
+            <p className="mt-1 text-xs text-[#6B4E55]">
+              Playing as guest. Create a free account to track your daily streak and stats across devices!
+            </p>
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <SignUpButton mode="modal">
+                <button
+                  type="button"
+                  className="rounded-lg bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
+                >
+                  Create Free Account
+                </button>
+              </SignUpButton>
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="rounded-lg border border-[#C49A6C] bg-white px-3 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95"
+                >
+                  Log In
+                </button>
+              </SignInButton>
+            </div>
+          </div>
+        </Show>
+
+        <Show when="signed-in">
+          <div className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#7B1E2B]">
+            <UserCheck className="h-3.5 w-3.5" />
+            <span>Progress synced to your account</span>
+          </div>
+        </Show>
 
         {/* Mode-Aware Action Buttons */}
         <div className="mt-5 flex w-full flex-col gap-2.5 sm:flex-row">

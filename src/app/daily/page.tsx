@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Calendar, AlertCircle, RotateCcw } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
 import { DailyCompletionCard } from "@/features/game/components/DailyCompletionCard";
 import { saveDailyAttempt } from "@/features/game/persistence/local-progress";
+import { getDailyDateString } from "@/features/game/modes/daily-scheduler";
 import type {
   SafeGameplayPayload,
   FinalizedResultPayload,
@@ -57,11 +59,17 @@ function convertFinalizedToCardProps(finalized: FinalizedResultPayload): {
   return { puzzle, attempt };
 }
 
-export default function DailyPage(): React.JSX.Element {
+function DailyPageContent(): React.JSX.Element {
+  const searchParams = useSearchParams();
+  const queryDate = searchParams?.get("date") || undefined;
+
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [payload, setPayload] = useState<SafeGameplayPayload | null>(null);
   const [completedResult, setCompletedResult] = useState<FinalizedResultPayload | null>(null);
+
+  const todayStr = getDailyDateString();
+  const isArchiveChallenge = Boolean(queryDate && queryDate !== todayStr);
 
   const fetchDailyChallenge = useCallback(async () => {
     setLoading(true);
@@ -70,6 +78,8 @@ export default function DailyPage(): React.JSX.Element {
     try {
       const res = await fetch("/api/game/daily/start", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetDate: queryDate }),
       });
 
       const data = await res.json();
@@ -77,13 +87,16 @@ export default function DailyPage(): React.JSX.Element {
       if (data.status === "ALREADY_COMPLETED") {
         setCompletedResult(data.result);
         const { attempt } = convertFinalizedToCardProps(data.result);
-        saveDailyAttempt(attempt);
+        saveDailyAttempt({
+          ...attempt,
+          isArchive: Boolean(queryDate && queryDate !== todayStr),
+        });
         setPayload(null);
       } else if (data.status === "STARTED" || data.status === "IN_PROGRESS") {
         setPayload(data.payload);
         setCompletedResult(null);
       } else if (data.status === "UNAVAILABLE") {
-        setErrorMsg(data.message || "No daily challenge is available today.");
+        setErrorMsg(data.message || (queryDate ? `Challenge for ${queryDate} is unavailable.` : "No daily challenge is available today."));
       } else if (data.error) {
         setErrorMsg(data.error);
       } else {
@@ -94,7 +107,7 @@ export default function DailyPage(): React.JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [queryDate, todayStr]);
 
   useEffect(() => {
     fetchDailyChallenge();
@@ -175,7 +188,9 @@ export default function DailyPage(): React.JSX.Element {
 
             <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-semibold text-[#7B1E2B]">
               <Calendar className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
-              <span>Daily Challenge • {currentDateDisplay}</span>
+              <span>
+                {isArchiveChallenge ? `Archive Challenge • ${currentDateDisplay}` : `Daily Challenge • ${currentDateDisplay}`}
+              </span>
             </div>
 
             <Link
@@ -188,10 +203,12 @@ export default function DailyPage(): React.JSX.Element {
 
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
-              Daily Flipped
+              {isArchiveChallenge ? `Archive Challenge` : "Daily Flipped"}
             </h1>
             <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
-              One official challenge every day. 60 seconds to deduce the phrase.
+              {isArchiveChallenge
+                ? `Playing previous daily challenge for ${currentDateDisplay}. Does not affect your daily streak.`
+                : "One official challenge every day. 60 seconds to deduce the phrase."}
             </p>
           </div>
         </header>
@@ -213,7 +230,10 @@ export default function DailyPage(): React.JSX.Element {
               onFinalized={(result) => {
                 setCompletedResult(result);
                 const { attempt } = convertFinalizedToCardProps(result);
-                saveDailyAttempt(attempt);
+                saveDailyAttempt({
+                  ...attempt,
+                  isArchive: isArchiveChallenge,
+                });
               }}
             />
           ) : null}
@@ -222,11 +242,34 @@ export default function DailyPage(): React.JSX.Element {
         {/* Footer Notice */}
         <footer className="border-t border-[#C49A6C]/40 pt-4 text-center text-xs text-[#6B4E55]">
           <p>
-            Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day
+            {isArchiveChallenge
+              ? "Flipped Daily Archive • Past Challenge Practice • Streak unaffected"
+              : "Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day"}
           </p>
         </footer>
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function DailyPage(): React.JSX.Element {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
+          <Header />
+          <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col items-center justify-center p-6">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#7B1E2B] border-t-transparent" />
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#6B4E55]">
+              Loading Challenge...
+            </p>
+          </main>
+          <Footer />
+        </div>
+      }
+    >
+      <DailyPageContent />
+    </Suspense>
   );
 }

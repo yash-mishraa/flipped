@@ -13,18 +13,20 @@ import { PUBLIC_PUZZLES_BY_ID } from "@/features/game/data/public-puzzles";
 import { loadProgress } from "@/features/game/persistence/local-progress";
 import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
 
-function formatFriendlyDate(dateStr: string): string {
+function formatFriendlyDateWithDay(dateStr: string): { dayName: string; formattedDate: string } {
   try {
     const [year, month, day] = dateStr.split("-").map(Number);
-    if (!year || !month || !day) return dateStr;
+    if (!year || !month || !day) return { dayName: "", formattedDate: dateStr };
     const date = new Date(year, month - 1, day);
-    return new Intl.DateTimeFormat("en-US", {
+    const dayName = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     }).format(date);
+    return { dayName, formattedDate };
   } catch {
-    return dateStr;
+    return { dayName: "", formattedDate: dateStr };
   }
 }
 
@@ -42,6 +44,10 @@ export default function ArchivePage(): React.JSX.Element {
   }, []);
 
   const published = getPublishedDailySchedule();
+  // Map date to chronological challenge number (Challenge #1 = earliest date)
+  const challengeNumberMap = new Map<string, number>();
+  published.forEach((a, idx) => challengeNumberMap.set(a.date, idx + 1));
+
   // Sort descending: newest date first
   const sortedSchedule = [...published].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -93,7 +99,7 @@ export default function ArchivePage(): React.JSX.Element {
               Challenge Archive
             </h1>
             <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
-              Review past calendar challenges and track your daily solving history.
+              Play past daily challenges and track your history. Completing past puzzles does not affect your daily streak.
             </p>
           </div>
         </header>
@@ -105,6 +111,8 @@ export default function ArchivePage(): React.JSX.Element {
               const puzzle = PUBLIC_PUZZLES_BY_ID.get(assignment.puzzleId);
               const attempt = dailyAttempts[assignment.date];
               const isToday = assignment.date === todayStr;
+              const challengeNum = challengeNumberMap.get(assignment.date) ?? 1;
+              const { dayName, formattedDate } = formatFriendlyDateWithDay(assignment.date);
 
               return (
                 <div
@@ -120,7 +128,7 @@ export default function ArchivePage(): React.JSX.Element {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-[#6B4E55]">
-                          {formatFriendlyDate(assignment.date)}
+                          {dayName} • {formattedDate}
                         </span>
                         {isToday && (
                           <span className="rounded-full bg-[#7B1E2B] px-2 py-0.5 text-[10px] font-bold text-[#F7F0E5]">
@@ -134,9 +142,7 @@ export default function ArchivePage(): React.JSX.Element {
 
                       <div className="mt-1 flex items-center gap-2">
                         <span className="font-extrabold text-[#32171D] text-base">
-                          {puzzle
-                            ? `${puzzle.clueWords[0]} + ${puzzle.clueWords[1]}`
-                            : assignment.puzzleId}
+                          Challenge #{challengeNum}
                         </span>
                         {puzzle && (
                           <span className="rounded bg-[#faeee0] border border-[#C49A6C]/40 px-1.5 py-0.5 text-[10px] font-bold text-[#7B1E2B]">
@@ -166,15 +172,13 @@ export default function ArchivePage(): React.JSX.Element {
                       <span className="text-xs font-medium text-[#8C6D68]">Unplayed</span>
                     )}
 
-                    {isToday ? (
-                      <Link
-                        href="/daily"
-                        className="inline-flex items-center gap-1 rounded-xl bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition hover:opacity-90 active:scale-95"
-                      >
-                        <span>{attempt ? "View Today" : "Play"}</span>
-                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Link>
-                    ) : null}
+                    <Link
+                      href={isToday ? "/daily" : `/daily?date=${assignment.date}`}
+                      className="inline-flex items-center gap-1 rounded-xl bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition hover:bg-[#631722] active:scale-95"
+                    >
+                      <span>{attempt ? (attempt.status === "WON" ? "View" : "Replay") : "Play"}</span>
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </Link>
                   </div>
                 </div>
               );

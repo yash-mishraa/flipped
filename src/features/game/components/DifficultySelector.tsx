@@ -41,7 +41,6 @@ export interface DifficultySelectorProps {
   readonly selectedDifficulty: Difficulty;
   readonly onSelectDifficulty: (difficulty: Difficulty) => void;
   readonly disabled?: boolean;
-  readonly puzzleCounts?: Record<Difficulty, number>;
 }
 
 /**
@@ -51,7 +50,6 @@ export function DifficultySelector({
   selectedDifficulty,
   onSelectDifficulty,
   disabled = false,
-  puzzleCounts,
 }: DifficultySelectorProps): React.JSX.Element {
   const getIcon = (difficulty: Difficulty) => {
     switch (difficulty) {
@@ -98,12 +96,6 @@ export function DifficultySelector({
                   </div>
                   <div>
                     <span className="font-bold text-[#32171D] text-base">{option.label}</span>
-                    {puzzleCounts && (
-                      <span className="ml-2 rounded border border-[#C49A6C]/30 bg-[#faeee0] px-1.5 py-0.5 text-[10px] font-semibold text-[#6B4E55]">
-                        {puzzleCounts[option.id]}{" "}
-                        {puzzleCounts[option.id] === 1 ? "puzzle" : "puzzles"}
-                      </span>
-                    )}
                   </div>
                 </div>
 

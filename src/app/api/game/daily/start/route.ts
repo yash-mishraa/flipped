@@ -18,7 +18,30 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const result = await startDailyAttempt(session.guestId, undefined, request);
+  let targetDate: string | undefined = undefined;
+
+  // 1. Check URL query params: ?date=YYYY-MM-DD
+  try {
+    const url = new URL(request.url);
+    const qDate = url.searchParams.get("date");
+    if (qDate && /^\d{4}-\d{2}-\d{2}$/.test(qDate)) {
+      targetDate = qDate;
+    }
+  } catch {
+    // Ignore URL parse error
+  }
+
+  // 2. Check JSON request body if present
+  try {
+    const body = await request.clone().json();
+    if (body?.targetDate && /^\d{4}-\d{2}-\d{2}$/.test(body.targetDate)) {
+      targetDate = body.targetDate;
+    }
+  } catch {
+    // Body is empty or non-JSON
+  }
+
+  const result = await startDailyAttempt(session.guestId, targetDate, request);
 
   const response = NextResponse.json(result, {
     status: result.status === "UNAVAILABLE" ? 503 : 200,

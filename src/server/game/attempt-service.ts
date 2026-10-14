@@ -213,7 +213,8 @@ export async function startDailyAttempt(
 export async function startClassicAttempt(
   guestId: string,
   difficulty: Difficulty,
-  recentPuzzleIds: readonly string[] = []
+  recentPuzzleIds: readonly string[] = [],
+  durationMs: number = 360_000
 ): Promise<StartClassicAttemptResult> {
   const puzzle = await selectServerClassicPuzzle(difficulty, recentPuzzleIds);
 
@@ -225,7 +226,7 @@ export async function startClassicAttempt(
   }
 
   const startedAt = new Date();
-  const deadline = new Date(startedAt.getTime() + ROUND_DURATION_MS);
+  const deadline = new Date(startedAt.getTime() + Math.max(60_000, durationMs));
   const randSuffix = crypto.randomBytes(4).toString("hex");
 
   const newAttempt: StoredAttempt = {
@@ -369,13 +370,21 @@ export async function submitAuthoritativeAttempt(
   // Update guest streaks/stats
   const profile = inMemoryDb.getGuestProfile(guestId);
   if (attempt.mode === "DAILY") {
-    const newStreak = profile.currentDailyStreak + 1;
-    inMemoryDb.saveGuestProfile({
-      ...profile,
-      currentDailyStreak: newStreak,
-      longestDailyStreak: Math.max(profile.longestDailyStreak, newStreak),
-      lastDailyDate: attempt.dailyDate,
-    });
+    const isToday = attempt.dailyDate === getServerDailyDateString();
+    if (isToday) {
+      const newStreak = profile.currentDailyStreak + 1;
+      inMemoryDb.saveGuestProfile({
+        ...profile,
+        currentDailyStreak: newStreak,
+        longestDailyStreak: Math.max(profile.longestDailyStreak, newStreak),
+        lastDailyDate: attempt.dailyDate,
+      });
+    } else {
+      // Past daily challenge: do NOT increase daily streak
+      inMemoryDb.saveGuestProfile({
+        ...profile,
+      });
+    }
   } else {
     inMemoryDb.saveGuestProfile({
       ...profile,

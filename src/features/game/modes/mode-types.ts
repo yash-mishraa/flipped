@@ -22,6 +22,7 @@ export interface DailyAttemptRecord {
   readonly hintsUsed: number;
   readonly solvedPhrase?: string;
   readonly completedAt: string;
+  readonly isArchive?: boolean;
 }
 
 export interface ClassicHistoryRecord {

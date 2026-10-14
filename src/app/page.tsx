@@ -12,6 +12,7 @@ import {
   Hourglass,
   X,
 } from "lucide-react";
+import { Show, SignInButton } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { AcidSquares } from "@/components/AcidSquares";
 import DecryptedText from "@/components/DecryptedText";
@@ -124,6 +125,18 @@ export default function HomePage(): React.JSX.Element {
               <span>How to Play</span>
             </button>
           </div>
+
+          <Show when="signed-out">
+            <div className="flex items-center justify-center gap-1.5 text-xs text-[#8C6870] pt-1">
+              <span>Play without logging in, or</span>
+              <SignInButton mode="modal">
+                <button type="button" className="font-bold text-[#7B1E2B] hover:underline cursor-pointer">
+                  Log in / Create account
+                </button>
+              </SignInButton>
+              <span>to sync your streak</span>
+            </div>
+          </Show>
         </section>
 
         {/* Daily Challenge Primary Card */}
@@ -208,7 +221,7 @@ export default function HomePage(): React.JSX.Element {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-[#C49A6C]/20">
+            <div className="mt-6 pt-4 border-t border-[#C49A6C]/20 flex flex-col items-center gap-2.5">
               <Link
                 href="/daily"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-5 py-3.5 text-sm font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] transition active:scale-95"
@@ -216,6 +229,23 @@ export default function HomePage(): React.JSX.Element {
                 <span>{todayAttempt ? "View Today's Result" : "Play Daily Challenge"}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
+
+              <Show when="signed-out">
+                <div className="flex items-center gap-1.5 text-xs text-[#8C6870]">
+                  <span>Playing as guest •</span>
+                  <SignInButton mode="modal">
+                    <button type="button" className="font-bold text-[#7B1E2B] hover:underline cursor-pointer">
+                      Log in / Create account to sync your streak
+                    </button>
+                  </SignInButton>
+                </div>
+              </Show>
+              <Show when="signed-in">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  <span>Logged in • Streaks and stats sync automatically</span>
+                </div>
+              </Show>
             </div>
           </article>
         </section>
