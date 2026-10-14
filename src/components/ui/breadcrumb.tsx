@@ -6,7 +6,7 @@ import { FlippedSymbol } from "@/components/FlippedLogo";
 
 export interface BreadcrumbNavigationProps {
   readonly pathname: string;
-  readonly onOpenInstructions: () => void;
+  readonly onOpenInstructions?: () => void;
 }
 
 const links = [
@@ -22,7 +22,6 @@ function Separator(): React.JSX.Element {
 
 export default function BreadcrumbNavigation({
   pathname,
-  onOpenInstructions,
 }: BreadcrumbNavigationProps): React.JSX.Element {
   return (
     <nav className="breadcrumb-navigation" aria-label="Main Navigation">
@@ -42,10 +41,10 @@ export default function BreadcrumbNavigation({
       ))}
       <span className="breadcrumb-item breadcrumb-utilities">
         <Separator />
-        <button type="button" onClick={onOpenInstructions}>
+        <Link href="/#how-to-play" className="inline-flex items-center gap-1">
           <BookOpen aria-hidden="true" />
           <span>How to Play</span>
-        </button>
+        </Link>
       </span>
     </nav>
   );

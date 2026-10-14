@@ -7,22 +7,19 @@ test.describe("Journey A & B — First-Time Player & Classic Mode", () => {
     await page.evaluate(() => localStorage.clear());
   });
 
-  test("Journey A: First-time player sees tutorial, skips to Classic, and plays a round", async ({
+  test("Journey A: Player reviews How to Play rules, navigates to Classic, and plays a round", async ({
     page,
   }) => {
     await page.goto("/");
 
-    // 1. First-time visitor sees TutorialModal
-    const tutorialDialog = page.getByRole("dialog", { name: /How to Play Flipped/i });
-    await expect(tutorialDialog).toBeVisible();
+    // 1. Verify How to Play button is visible and works
+    const howToPlayButton = page.getByRole("button", { name: /How to Play/i });
+    await expect(howToPlayButton).toBeVisible();
+    await howToPlayButton.click();
+    await expect(page.getByRole("heading", { name: "How Flipped Works", level: 2 })).toBeVisible();
 
-    // 2. Skip or complete tutorial
-    const skipButton = page.getByRole("button", { name: /Skip Tutorial/i });
-    await skipButton.click();
-    await expect(tutorialDialog).not.toBeVisible();
-
-    // 3. Navigate to Classic Mode
-    const classicLink = page.getByRole("link", { name: /Classic Practice/i }).first();
+    // 2. Navigate to Classic Mode via top navigation
+    const classicLink = page.getByRole("link", { name: /Classic/i }).first();
     await classicLink.click();
     await expect(page).toHaveURL(/\/classic/);
 

@@ -29,7 +29,7 @@ export async function POST(
     if (
       typeof body === "object" && body !== null && "enteredWords" in body &&
       Array.isArray(body.enteredWords) && body.enteredWords.length === 2 &&
-      body.enteredWords.every((word) => typeof word === "string" && /^[a-z]*$/i.test(word))
+      body.enteredWords.every((word) => typeof word === "string" && /^[a-z\s]*$/i.test(word))
     ) {
       enteredWords = body.enteredWords as [string, string];
     }

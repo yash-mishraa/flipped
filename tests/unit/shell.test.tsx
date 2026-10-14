@@ -17,12 +17,11 @@ describe("Production Home Screen (HomePage)", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders both Daily and Classic mode challenge sections", () => {
+  it("renders Daily Challenge card and navigation to classic and game modes", () => {
     render(<HomePage />);
     expect(screen.getByTestId("home-daily-card")).toBeInTheDocument();
-    expect(screen.getByTestId("home-classic-card")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Daily Mode", level: 2 })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Classic Mode", level: 2 })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Classic/i })[0]).toBeInTheDocument();
   });
 
   it("renders How Flipped Works section with semantic examples", () => {

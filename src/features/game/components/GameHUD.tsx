@@ -122,15 +122,17 @@ export function GameHUD({
           Transform the Clues
         </span>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           {puzzle.transformations.map((trans, idx) => (
-            <div key={`hud-clue-${idx}`} className="flex flex-col items-center">
-              <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#32171D]">
+            <div key={`hud-clue-${idx}`} className="flex items-center gap-4 sm:gap-6">
+              <span className="rounded-2xl border border-[#C49A6C]/50 bg-[#faeee0] px-5 py-2.5 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#32171D] shadow-xs">
                 {trans.clueWord}
               </span>
-              <span className="mt-1 rounded-full border border-[#C49A6C]/40 bg-[#faeee0] px-2.5 py-0.5 text-xs font-semibold text-[#32171D]">
-                {trans.relationship}
-              </span>
+              {idx < puzzle.transformations.length - 1 && (
+                <span className="text-2xl font-black text-[#C49A6C]" aria-hidden="true">
+                  +
+                </span>
+              )}
             </div>
           ))}
         </div>

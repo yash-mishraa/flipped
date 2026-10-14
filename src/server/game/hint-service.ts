@@ -59,9 +59,10 @@ export async function processAuthoritativeHint(
   }
 
   const hintable = getHintablePositions(puzzle).filter(({ wordIndex, letterIndex }) => {
-    const entered = enteredWords?.[wordIndex]?.[letterIndex]?.toUpperCase();
+    const rawChar = enteredWords?.[wordIndex]?.[letterIndex];
+    const entered = rawChar ? rawChar.trim().toUpperCase() : "";
     const answer = puzzle.answerWords[wordIndex].charAt(letterIndex).toUpperCase();
-    return entered !== answer;
+    return !entered || entered !== answer;
   });
   if (hintable.length === 0) {
     return {

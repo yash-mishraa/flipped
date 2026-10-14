@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { Check, Lock, Slash } from "lucide-react";
+import { Check, Lock, X } from "lucide-react";
 import type { LetterTile as TileModel } from "../domain/types";
 import { cn } from "@/lib/utils";
-import TechText from "@/components/TechText";
 
 export interface LetterTileProps {
   readonly tile: TileModel;
@@ -32,7 +31,7 @@ export function LetterTile({
   if (isFixed) {
     statusLabel = `Fixed clue letter ${letter}`;
   } else if (letter) {
-    statusLabel = `Letter ${letter}, ${feedback.toLowerCase()}`;
+    statusLabel = `Letter ${letter}, ${feedback === "ELIMINATED" ? "wrong" : feedback.toLowerCase()}`;
   }
 
   // Determine styling classes based on feedback and selection
@@ -45,7 +44,7 @@ export function LetterTile({
       case "CONFIRMED":
         return "bg-[#32171D] border-[#C49A6C] text-[#F7F0E5] font-bold shadow-sm";
       case "ELIMINATED":
-        return "bg-[#F7F0E5] border-[#C49A6C]/40 border-dashed text-[#8C6870] line-through decoration-[#8C6870]";
+        return "bg-[#7B1E2B]/10 border-[#7B1E2B] border-dashed text-[#7B1E2B] line-through decoration-[#7B1E2B] font-bold";
       case "PENDING":
         return "bg-[#faeee0] border-[#C49A6C] text-[#32171D] font-semibold shadow-sm";
       case "NONE":
@@ -80,27 +79,12 @@ export function LetterTile({
         !isFixed && !isRoundOver && "cursor-pointer active:scale-95"
       )}
     >
-      {/* Canvas glyph follows the controlled tile value exactly, including clears and hints. */}
-      <span aria-hidden="true" className="tile-tech-glyph">
-        <span className="sr-only">{letter}</span>
-        <TechText
-          text={letter || " "}
-          fontFamily="Georgia, serif"
-          fontWeight={700}
-          fontSize={58}
-          letterSpacing={0}
-          color="currentColor"
-          accentColor="currentColor"
-          reveal="off"
-          specks={0}
-          selection={false}
-          labels={false}
-          draggable={false}
-          sweep={false}
-          className="tile-tech-text"
-          style={{}}
-          aria-hidden="true"
-        />
+      {/* Direct, instantaneous, crisp typography without canvas animation glitches */}
+      <span
+        aria-hidden="true"
+        className="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-none select-none"
+      >
+        {letter}
       </span>
 
       {/* Non-color visual indicator badges */}
@@ -126,11 +110,11 @@ export function LetterTile({
 
       {!isFixed && feedback === "ELIMINATED" && (
         <span
-          className="absolute top-1 right-1 text-[#8C6870]"
-          title="Ruled out"
+          className="absolute top-1 right-1 text-[#7B1E2B]"
+          title="Incorrect letter"
           aria-hidden="true"
         >
-          <Slash className="h-2.5 w-2.5" />
+          <X className="h-3 w-3 stroke-[3]" />
         </span>
       )}
 

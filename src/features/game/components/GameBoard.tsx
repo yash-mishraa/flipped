@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { X } from "lucide-react";
 import type { Puzzle } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
 import { saveDailyAttempt, recordClassicGame } from "../persistence/local-progress";
@@ -52,10 +53,12 @@ export function GameBoard({
   } = usePuzzleRound(puzzle, { autoStart, durationSeconds });
 
   const hasRecordedProgressRef = useRef<boolean>(false);
+  const [showWinModal, setShowWinModal] = useState<boolean>(true);
 
   // Reset recording ref if puzzle changes
   useEffect(() => {
     hasRecordedProgressRef.current = false;
+    setShowWinModal(true);
   }, [puzzle.id]);
 
   const isPlaying = state.status === "PLAYING";
@@ -133,9 +136,48 @@ export function GameBoard({
         </section>
       )}
 
+      {/* Winning Pop-up Modal Dialog */}
+      {showWinModal && state.status === "WON" && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Victory Summary"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
+        >
+          <div className="relative w-full max-w-lg my-8">
+            <button
+              type="button"
+              onClick={() => setShowWinModal(false)}
+              aria-label="Close victory popup"
+              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <SuccessScreen
+              puzzle={puzzle}
+              terminalResult={state.terminalResult}
+              onPlayAgain={() => {
+                setShowWinModal(false);
+                onPlayAgain();
+              }}
+              mode={mode}
+              onNextPuzzle={
+                onNextPuzzle
+                  ? () => {
+                      setShowWinModal(false);
+                      onNextPuzzle();
+                    }
+                  : undefined
+              }
+              nextPuzzleLabel={nextPuzzleLabel}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Result Screens or Live Status */}
       <section className="w-full" aria-label="Round Status & Results">
-        {state.status === "WON" && (
+        {state.status === "WON" && !showWinModal && (
           <SuccessScreen
             puzzle={puzzle}
             terminalResult={state.terminalResult}

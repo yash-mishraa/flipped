@@ -15,7 +15,7 @@ import {
 import { calculateScore } from "@/features/game/domain/scoring";
 import { checkAnswer } from "@/features/game/domain/check-answer";
 import { splitNormalizedPhrase } from "@/features/game/domain/normalize-answer";
-import type { Difficulty } from "@/features/game/domain/types";
+import type { Difficulty, TileFeedback } from "@/features/game/domain/types";
 
 export const ROUND_DURATION_MS = 60_000;
 
@@ -51,6 +51,7 @@ export type SubmitAttemptResult =
   | {
       readonly status: "WON";
       readonly result: FinalizedResultPayload;
+      readonly tileFeedback?: readonly [readonly TileFeedback[], readonly TileFeedback[]];
     }
   | {
       readonly status: "TIMED_OUT";
@@ -60,6 +61,7 @@ export type SubmitAttemptResult =
       readonly status: "INCORRECT";
       readonly isMatch: false;
       readonly hintsUsed: number;
+      readonly tileFeedback?: readonly [readonly TileFeedback[], readonly TileFeedback[]];
     }
   | {
       readonly status: "ALREADY_FINALIZED";
@@ -277,11 +279,31 @@ export async function submitAuthoritativeAttempt(
   const words = splitNormalizedPhrase(candidatePhrase);
   const checkResult = words ? checkAnswer(puzzle, words[0], words[1]) : { isMatch: false };
 
+  const target0 = puzzle.answerWords[0] || "";
+  const target1 = puzzle.answerWords[1] || "";
+  const cand0 = words?.[0] || "";
+  const cand1 = words?.[1] || "";
+
+  const feedback0: TileFeedback[] = Array.from({ length: target0.length }, (_, i) => {
+    if (i === 0) return "CONFIRMED";
+    const char = cand0[i]?.toUpperCase();
+    if (!char || char === " ") return "NONE";
+    return char === target0[i]?.toUpperCase() ? "CONFIRMED" : "ELIMINATED";
+  });
+
+  const feedback1: TileFeedback[] = Array.from({ length: target1.length }, (_, i) => {
+    if (i === 0) return "CONFIRMED";
+    const char = cand1[i]?.toUpperCase();
+    if (!char || char === " ") return "NONE";
+    return char === target1[i]?.toUpperCase() ? "CONFIRMED" : "ELIMINATED";
+  });
+
   if (!checkResult.isMatch) {
     return {
       status: "INCORRECT",
       isMatch: false,
       hintsUsed: attempt.hintsUsed,
+      tileFeedback: [feedback0, feedback1],
     };
   }
 
@@ -321,9 +343,13 @@ export async function submitAuthoritativeAttempt(
     });
   }
 
+  const wonFeedback0: TileFeedback[] = Array.from({ length: target0.length }, () => "CONFIRMED");
+  const wonFeedback1: TileFeedback[] = Array.from({ length: target1.length }, () => "CONFIRMED");
+
   return {
     status: "WON",
     result: createFinalizedResultPayload(puzzle, wonAttempt),
+    tileFeedback: [wonFeedback0, wonFeedback1],
   };
 }
 

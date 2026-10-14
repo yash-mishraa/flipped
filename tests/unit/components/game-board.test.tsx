@@ -19,9 +19,9 @@ describe("GameBoard Integration Component", () => {
     render(<GameBoard puzzle={fastFoodPuzzle} />);
 
     expect(screen.getByText("SLOW")).toBeInTheDocument();
-    expect(screen.getByText("ANTONYM")).toBeInTheDocument();
     expect(screen.getByText("MEAL")).toBeInTheDocument();
-    expect(screen.getByText("SYNONYM")).toBeInTheDocument();
+    expect(within(screen.getByLabelText("Puzzle Clues")).queryByText("ANTONYM")).not.toBeInTheDocument();
+    expect(within(screen.getByLabelText("Puzzle Clues")).queryByText("SYNONYM")).not.toBeInTheDocument();
 
     // Prominent Start Game button and 01:00 countdown timer
     expect(screen.getByTestId("start-game-button")).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe("GameBoard Integration Component", () => {
     fireEvent.keyDown(input, { key: "d" });
 
     // Automatic win triggered immediately!
-    const successScreen = screen.getByTestId("success-screen");
+    const successScreen = screen.getAllByTestId("success-screen")[0]!;
     expect(successScreen).toBeInTheDocument();
     expect(within(successScreen).getByText("Puzzle Solved!")).toBeInTheDocument();
     expect(within(successScreen).getByText("FAST FOOD")).toBeInTheDocument();

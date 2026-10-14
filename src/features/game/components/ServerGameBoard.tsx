@@ -19,6 +19,7 @@ import { SuccessScreen } from "./SuccessScreen";
 import { TimeoutScreen } from "./TimeoutScreen";
 import { GameInstructions } from "./GameInstructions";
 import { formatTime, getTimerUrgency } from "../domain/timer-utils";
+import { X } from "lucide-react";
 
 export interface ServerGameBoardProps {
   readonly payload: SafeGameplayPayload;
@@ -90,6 +91,7 @@ export function ServerGameBoard({
   const [finalizedResult, setFinalizedResult] = useState<FinalizedResultPayload | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showWinModal, setShowWinModal] = useState<boolean>(true);
 
   // Authoritative server deadline
   const deadlineMs = useRef<number>(new Date(payload.deadline).getTime());
@@ -230,8 +232,15 @@ export function ServerGameBoard({
         const data = await res.json();
 
         if (data.status === "WON") {
+          setGrid((prevGrid) => ({
+            words: [
+              prevGrid.words[0].map((tile) => ({ ...tile, feedback: "CONFIRMED" as const })),
+              prevGrid.words[1].map((tile) => ({ ...tile, feedback: "CONFIRMED" as const })),
+            ],
+          }));
           setFinalizedResult(data.result);
           setRoundStatus("WON");
+          setShowWinModal(true);
           if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
           onFinalized?.(data.result);
         } else if (data.status === "TIMED_OUT") {
@@ -240,7 +249,24 @@ export function ServerGameBoard({
           if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
           onFinalized?.(data.result);
         } else if (data.status === "INCORRECT") {
-          setErrorMessage("That phrase doesn't match the clues. Keep searching!");
+          if (data.tileFeedback) {
+            setGrid((prevGrid) => {
+              const [fb0, fb1] = data.tileFeedback as [LetterTile["feedback"][], LetterTile["feedback"][]];
+              return {
+                words: [
+                  prevGrid.words[0].map((tile, i) => ({
+                    ...tile,
+                    feedback: fb0?.[i] ?? tile.feedback,
+                  })),
+                  prevGrid.words[1].map((tile, i) => ({
+                    ...tile,
+                    feedback: fb1?.[i] ?? tile.feedback,
+                  })),
+                ],
+              };
+            });
+          }
+          setErrorMessage("Some letters are incorrect. Incorrect letters are marked on the board.");
         } else if (data.error) {
           setErrorMessage(data.error);
         }
@@ -328,8 +354,12 @@ export function ServerGameBoard({
 
   // Use hint
   const handleUseHint = async (): Promise<{ success: boolean; message: string }> => {
-    if (roundStatus !== "PLAYING") {
-      return { success: false, message: "Start the round to use hints." };
+    if (roundStatus === "WON" || roundStatus === "TIMED_OUT") {
+      return { success: false, message: "Round is already finished." };
+    }
+
+    if (roundStatus === "READY") {
+      handleStartRound();
     }
 
     try {
@@ -337,7 +367,9 @@ export function ServerGameBoard({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          enteredWords: grid.words.map((word) => word.map((tile) => tile.letter).join("")),
+          enteredWords: grid.words.map((word) =>
+            word.map((tile) => (tile.letter ? tile.letter : " ")).join("")
+          ),
         }),
       });
       const data = await res.json();
@@ -367,6 +399,25 @@ export function ServerGameBoard({
         updatedWords[wordIdx] = newWordTiles;
         setGrid({ words: updatedWords });
         setHintsUsed(newHintsCount);
+
+        // Advance cursor if current tile was revealed
+        if (selectedPosition?.wordIndex === wordIdx && selectedPosition?.letterIndex === letterIdx) {
+          if (letterIdx < grid.words[wordIdx].length - 1) {
+            setSelectedPosition({ wordIndex: wordIdx, letterIndex: letterIdx + 1 });
+          } else if (wordIdx === 0) {
+            setSelectedPosition({ wordIndex: 1, letterIndex: 1 });
+          }
+        }
+
+        // Check if all tiles are filled after hint
+        const word0Filled = updatedWords[0].every((t) => Boolean(t.letter));
+        const word1Filled = updatedWords[1].every((t) => Boolean(t.letter));
+        if (word0Filled && word1Filled) {
+          const phrase = `${updatedWords[0].map((t) => t.letter).join("")} ${updatedWords[1]
+            .map((t) => t.letter)
+            .join("")}`;
+          submitCandidatePhrase(phrase);
+        }
 
         return {
           success: true,
@@ -481,15 +532,47 @@ export function ServerGameBoard({
       )}
 
       {/* Hint Controls */}
-      {roundStatus === "PLAYING" && (
+      {!isRoundOver && (
         <section aria-label="Hint Actions">
           <HintControl hintsUsed={hintsUsed} isRoundOver={isRoundOver} onUseHint={handleUseHint} />
         </section>
       )}
 
+      {/* Winning Pop-up Modal Dialog */}
+      {showWinModal && roundStatus === "WON" && finalizedResult && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Victory Summary"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
+        >
+          <div className="relative w-full max-w-lg my-8">
+            <button
+              type="button"
+              onClick={() => setShowWinModal(false)}
+              aria-label="Close victory popup"
+              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <SuccessScreen
+              puzzle={safePuzzleView}
+              terminalResult={terminalResultView}
+              mode={mode}
+              date={payload.date}
+              onNextPuzzle={() => {
+                setShowWinModal(false);
+                onNextClassic?.();
+              }}
+              nextPuzzleLabel="Next Classic Puzzle"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Result Screens */}
       <section className="w-full" aria-label="Round Status & Results">
-        {roundStatus === "WON" && finalizedResult && (
+        {roundStatus === "WON" && finalizedResult && !showWinModal && (
           <SuccessScreen
             puzzle={safePuzzleView}
             terminalResult={terminalResultView}
