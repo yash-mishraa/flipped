@@ -13,7 +13,7 @@ vi.mock("@clerk/nextjs", () => ({
   SignInButton: ({ children }: { children: React.ReactNode }) => children,
   SignUpButton: ({ children }: { children: React.ReactNode }) => children,
   UserButton: () => React.createElement("div", { "data-testid": "user-button" }),
-  useUser: () => ({ isSignedIn: false, user: null }),
-  useAuth: () => ({ isSignedIn: false, userId: null }),
+  useUser: () => ({ isSignedIn: false, user: null, isLoaded: true }),
+  useAuth: () => ({ isSignedIn: false, userId: null, isLoaded: true }),
   clerkMiddleware: () => () => {},
 }));

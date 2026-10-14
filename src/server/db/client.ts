@@ -61,6 +61,8 @@ export interface StoredGuestProfile {
   updatedAt: Date;
 }
 
+import type { StoredProgressSchema } from "@/features/game/persistence/local-progress";
+
 class InMemoryDatabase {
   private puzzles: Map<string, Puzzle> = new Map();
   private dailyAssignments: Map<
@@ -69,6 +71,7 @@ class InMemoryDatabase {
   > = new Map();
   private attempts: Map<string, StoredAttempt> = new Map();
   private guestProfiles: Map<string, StoredGuestProfile> = new Map();
+  private userProgress: Map<string, StoredProgressSchema> = new Map();
 
   constructor() {
     this.seedDefaultData();
@@ -94,6 +97,16 @@ class InMemoryDatabase {
   public clearAttempts(): void {
     this.attempts.clear();
     this.guestProfiles.clear();
+    this.userProgress.clear();
+  }
+
+  public getUserProgress(userId: string): StoredProgressSchema | null {
+    return this.userProgress.get(userId) ?? null;
+  }
+
+  public saveUserProgress(userId: string, progress: StoredProgressSchema): StoredProgressSchema {
+    this.userProgress.set(userId, progress);
+    return progress;
   }
 
   public getPuzzle(id: string): Puzzle | null {

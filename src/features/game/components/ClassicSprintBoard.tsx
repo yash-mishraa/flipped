@@ -12,7 +12,8 @@ import {
   UserCheck,
   Home,
 } from "lucide-react";
-import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { Show, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
+import { syncUserProgress } from "../persistence/user-sync";
 import type {
   Difficulty,
   LetterGrid as LetterGridType,
@@ -91,6 +92,8 @@ function createSafeInitialGrid(payload: SafeGameplayPayload): LetterGridType {
 }
 
 export function ClassicSprintBoard(): React.JSX.Element {
+  const { isSignedIn, user } = useUser();
+
   // Config state
   const [difficulty, setDifficulty] = useState<Difficulty>("MEDIUM");
   const [durationSeconds, setDurationSeconds] = useState<number>(180); // Default: 3 minutes
@@ -99,6 +102,12 @@ export function ClassicSprintBoard(): React.JSX.Element {
   const [gameState, setGameState] = useState<"LOBBY" | "PLAYING" | "FINISHED">("LOBBY");
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (gameState === "FINISHED" && isSignedIn && user?.id) {
+      syncUserProgress(user.id);
+    }
+  }, [gameState, isSignedIn, user?.id]);
 
   // Sprint Progress
   const [sprintTimeRemaining, setSprintTimeRemaining] = useState<number>(180);

@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Trophy, RotateCcw, Home, Clock, Sparkles, Lightbulb, UserCheck } from "lucide-react";
-import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { Show, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import type { Puzzle, TerminalResult } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
+import { syncUserProgress } from "../persistence/user-sync";
 
 import { ShareButton } from "./ShareButton";
 
@@ -35,10 +36,17 @@ export function SuccessScreen({
   nextPuzzleLabel = "Next Puzzle",
   date,
 }: SuccessScreenProps): React.JSX.Element {
+  const { isSignedIn, user } = useUser();
   const { finalScore, elapsedSeconds, hintsUsed, solvedPhrase } = terminalResult;
   const canonicalPhrase = puzzle.answerWords.join(" ");
   const isDaily = mode === "DAILY";
   const handleReplayAction = onNextPuzzle ?? onPlayAgain;
+
+  useEffect(() => {
+    if (isSignedIn && user?.id) {
+      syncUserProgress(user.id);
+    }
+  }, [isSignedIn, user?.id]);
 
   return (
     <div
