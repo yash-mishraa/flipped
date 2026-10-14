@@ -1,45 +1,70 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { FlippedSymbol } from "@/components/FlippedLogo";
+import { TutorialModal } from "@/features/game/components/TutorialModal";
 
 export function Footer(): React.JSX.Element {
-  return (
-    <footer className="mt-auto border-t border-[#C49A6C]/30 bg-[#F7F0E5]/90 py-3.5 text-[#6B4E55] text-xs">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="space-y-1 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <FlippedSymbol size={18} variant="crimson" />
-              <span className="font-extrabold text-sm tracking-tight text-[#32171D]">
-                FLIPPED
-              </span>
-            </div>
-            <p className="text-[11px] text-[#8C6D68]">
-              Inspired by the Times of India &ldquo;Flipped It&rdquo; puzzle &bull; 100% Free to play with timed sprints, daily archive, and cloud sync.
-            </p>
-          </div>
+  const [showTutorial, setShowTutorial] = useState(false);
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
-            <Link href="/#how-to-play" className="text-[#6B4E55] hover:text-[#7B1E2B] transition">
-              How to Play
-            </Link>
-            <Link href="/daily" className="text-[#6B4E55] hover:text-[#7B1E2B] transition">
-              Daily Challenge
-            </Link>
-            <Link href="/classic" className="text-[#6B4E55] hover:text-[#7B1E2B] transition">
-              Classic Practice
-            </Link>
-            <Link href="/archive" className="text-[#6B4E55] hover:text-[#7B1E2B] transition">
-              Archive
-            </Link>
-            <Link href="/stats" className="text-[#6B4E55] hover:text-[#7B1E2B] transition">
-              Statistics
-            </Link>
+  return (
+    <>
+      <footer className="mt-auto border-t border-[#C49A6C]/30 bg-[#F7F0E5]/90 py-4 text-[#6B4E55] text-xs">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            {/* Brand Lockup & Attribution */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <FlippedSymbol size={18} variant="crimson" />
+                <span className="font-extrabold text-sm tracking-tight text-[#32171D]">
+                  FLIPPED
+                </span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-[#8C6D68] max-w-sm sm:max-w-md mx-auto sm:mx-0">
+                Inspired by the Times of India &ldquo;Flipped It&rdquo; puzzle &bull; 100% Free &bull; Sprints, Archive &amp; Cloud Sync
+              </p>
+            </div>
+
+            {/* Balanced Navigation Links */}
+            <nav
+              aria-label="Footer Navigation"
+              className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#6B4E55]"
+            >
+              <Link href="/daily" className="hover:text-[#7B1E2B] transition">
+                Daily
+              </Link>
+              <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
+              <Link href="/classic" className="hover:text-[#7B1E2B] transition">
+                Classic
+              </Link>
+              <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
+              <Link href="/archive" className="hover:text-[#7B1E2B] transition">
+                Archive
+              </Link>
+              <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
+              <Link href="/stats" className="hover:text-[#7B1E2B] transition">
+                Statistics
+              </Link>
+              <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
+              <Link
+                href="/#how-to-play"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowTutorial(true);
+                }}
+                className="hover:text-[#7B1E2B] transition cursor-pointer"
+              >
+                How to Play
+              </Link>
+            </nav>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+
+      {/* Tutorial / How to Play Modal */}
+      <TutorialModal isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
+    </>
   );
 }
+
