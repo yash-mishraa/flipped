@@ -1,27 +1,15 @@
-import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-const isClerkConfigured = Boolean(
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY
-);
-
-export default async function middleware(request: NextRequest, event: NextFetchEvent) {
-  if (!isClerkConfigured) {
-    return NextResponse.next();
-  }
-
-  try {
-    return await clerkMiddleware()(request, event);
-  } catch (error) {
-    console.error("Clerk middleware invocation failed, falling back to next():", error);
-    return NextResponse.next();
-  }
-}
+export default clerkMiddleware();
 
 export const config = {
   matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
     "/(api|trpc)(.*)",
+    // Always run for Clerk auto-proxy on *.vercel.app
     "/__clerk/:path*",
   ],
 };
+
