@@ -34,7 +34,7 @@ export function LetterGrid({
   // Keep hidden input focused when an editable tile is selected and round is active
   useEffect(() => {
     if (selectedPosition && !isRoundOver) {
-      inputRef.current?.focus();
+      inputRef.current?.focus({ preventScroll: true });
     }
   }, [selectedPosition, isRoundOver]);
 
@@ -105,7 +105,7 @@ export function LetterGrid({
 
   const handleTileClick = (pos: TilePosition) => {
     onSelectTile(pos);
-    inputRef.current?.focus();
+    inputRef.current?.focus({ preventScroll: true });
   };
 
   return (

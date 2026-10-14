@@ -17,7 +17,7 @@ export function Footer(): React.JSX.Element {
               </span>
             </div>
             <p className="text-[11px] text-[#8C6D68]">
-              Flip two clue words into a familiar phrase before the 60-second timer runs out.
+              Inspired by the Times of India &ldquo;Flipped It&rdquo; puzzle &bull; 100% Free to play with timed sprints, daily archive, and cloud sync.
             </p>
           </div>
 

@@ -2,10 +2,10 @@
 
 ## 1. Current Project Status
 
-- **Current Stage**: Part 8 (Final QA, Security Audit, End-to-End Testing, and Deployment Readiness)
+- **Current Stage**: Final Release & Brand Complete (Clerk Sync, TOI Tribute, Timed Sprints, Responsive Hardening)
 - **Status**: **Completed & Fully Verified**
-- **Date**: 2026-10-12
-- **Repository State**: Clean git repository, zero answer leaks in client bundles, zero lint warnings/errors, 199/199 unit and integration tests passing across 28 test suites, 12/12 Playwright E2E tests passing across 5 test suites.
+- **Date**: 2026-10-14
+- **Repository State**: Clean git repository, zero answer leaks in client bundles, zero lint warnings/errors, 241/241 unit and integration tests passing across 34 test suites, 12/12 Playwright E2E tests passing.
 
 ---
 
@@ -434,3 +434,36 @@ Every development script was executed and verified directly:
 - **Navigation & Layout**: Integrated `FlippedSymbol` into `breadcrumb.tsx`, `Header.tsx`, `Footer.tsx`, and `page.tsx`.
 - **Metadata**: Configured `layout.tsx` icons, OpenGraph, Twitter cards, and `manifest.ts` PWA metadata.
 - **Verification**: 228 / 228 unit tests passing (including `brand-identity.test.tsx`), 12 / 12 Playwright E2E tests passing, Next.js production build passing with 10 static routes.
+
+---
+
+## 7. Classic Timed Sprints, Daily Archive & Clerk Auth Sync (2026-10-14)
+
+### 1. Classic Timed Sprints
+- Introduced customizable sprint durations: 1, 2, 3, or 5 minutes in `ClassicSprintBoard.tsx`.
+- Continuous sequential puzzle delivery with live score accumulation, hints deduction, and skip options.
+- End-of-sprint summary detailing total puzzles solved, cumulative score, and review list.
+
+### 2. Daily Archive Date Guardrails
+- Chronological archive view strictly filtered by `item.date <= todayStr` in `daily-scheduler.ts` and `src/app/archive/page.tsx`.
+- Future dates (Oct 15–19) blocked from resolution via `resolveServerDailyAssignment`.
+- Streak protection ensures completing past daily puzzles does not inflate current daily streak.
+
+### 3. Clerk Authentication & Cloud Sync
+- Integrated Clerk Core 3 auth (`@clerk/nextjs` v7) with resilient fallbacks for missing environment keys in `middleware.ts` and `layout.tsx`.
+- `/api/user/sync` endpoint merges local client progress with server account records under the user's Clerk user ID.
+- Protected `/stats` route requiring sign-in to view statistics with prominent modal CTA buttons and cloud sync status.
+
+---
+
+## 8. Times of India Tribute & Brand Intro Animation (2026-10-14)
+
+### 1. Times of India Tribute & Free-to-Play Origins
+- Added dedicated "Origins & Community Spirit" section on the home page and footer tribute.
+- Formally documents the game's inspiration from the Times of India *Flipped It* puzzle, highlighting that while the original requires a paid newspaper subscription, **FLIPPED** is 100% free with sprint modes, full archives, and cross-device sync.
+
+### 2. Smooth 4-to-5-Second Brand Splash Intro
+- Created `SplashIntro.tsx` featuring the split-F symbol and `FLIPPED` wordmark in Cream White (`#F7F0E5`) on Crimson Red (`#7B1E2B`).
+- Smooth 700ms fade-in, ~4.2s hold duration, and 700ms ease-out fade to the home screen (total ~4.9s).
+- Click-to-skip support and automated test acceleration (100ms in Playwright/Vitest).
+- Added `preventScroll: true` to LetterGrid tile focus calls to prevent mobile and desktop scroll jumps.

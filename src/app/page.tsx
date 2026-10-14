@@ -349,6 +349,66 @@ export default function HomePage(): React.JSX.Element {
             </div>
           </div>
         </section>
+
+        {/* Origins & Tribute Section */}
+        <section
+          className="my-6 rounded-3xl border border-[#C49A6C]/60 bg-white p-6 sm:p-8 shadow-xs"
+          aria-label="Inspiration and Origins"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#C49A6C]/20 pb-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1E2B]">
+                Origins &amp; Community Spirit
+              </span>
+              <h2 className="text-2xl font-black text-[#32171D] mt-0.5">
+                Inspired by the Times of India &bull; Free for Everyone
+              </h2>
+            </div>
+            <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-bold text-[#7B1E2B] shrink-0">
+              100% Free to Play
+            </span>
+          </div>
+
+          <p className="mt-4 text-sm text-[#6B4E55] leading-relaxed">
+            <strong>FLIPPED</strong> was inspired by the beloved <em>Times of India (TOI)</em> &ldquo;Flipped It&rdquo; word deduction puzzle. 
+            Because the original print and digital puzzle is accessible only through a paid newspaper subscription, we built this platform 
+            to bring the thrill of semantic word deduction to every puzzle enthusiast completely free of charge.
+          </p>
+
+          <p className="mt-2 text-sm text-[#6B4E55] leading-relaxed">
+            Beyond offering open and unrestricted access, <strong>FLIPPED</strong> enhances the experience with exclusive features not found in the original:
+          </p>
+
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-left">
+            <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B] block">Timed Classic Sprints</span>
+              <p className="mt-1 text-xs text-[#6B4E55]">
+                Choose 1, 2, 3, or 5-minute timed challenges where new words keep arriving as you solve.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B] block">Complete Daily Archive</span>
+              <p className="mt-1 text-xs text-[#6B4E55]">
+                Replay past daily puzzles anytime without affecting your active streak.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B] block">Cloud Account Sync</span>
+              <p className="mt-1 text-xs text-[#6B4E55]">
+                Sign in with Clerk to sync your daily streaks, solve times, and high scores across all devices.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-4">
+              <span className="text-xs font-bold text-[#7B1E2B] block">Instant Letter Feedback</span>
+              <p className="mt-1 text-xs text-[#6B4E55]">
+                Real-time incorrect letter indicators, smooth keyboard navigation, and seamless mobile responsiveness.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

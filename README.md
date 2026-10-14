@@ -1,8 +1,22 @@
 # Flipped — The Editorial Word Deduction Puzzle
 
-A production-quality word puzzle game built with Next.js 15 App Router, React 19, TypeScript strict mode, Tailwind CSS v4, and Prisma ORM.
+A production-quality word puzzle game built with Next.js 15 App Router, React 19, TypeScript strict mode, Tailwind CSS v4, Clerk Core 3 Authentication, and Prisma ORM.
 
-In **Flipped**, players decode two transformed clue words (via antonyms or synonyms) to reveal a familiar compound word or two-word phrase within a 60-second countdown.
+In **Flipped**, players decode two transformed clue words (via antonyms or synonyms) to reveal a familiar compound word or two-word phrase within a countdown timer.
+
+---
+
+## Origins & Inspiration
+
+**FLIPPED** was inspired by the popular *Times of India (TOI)* &ldquo;Flipped It&rdquo; word deduction puzzle. Because the original print and digital puzzle is restricted exclusively behind a paid newspaper subscription, **FLIPPED** was created as a 100% free, open-access web experience for puzzle enthusiasts worldwide.
+
+In addition to open access, **FLIPPED** introduces numerous advanced features not available in the original newspaper edition:
+- **Timed Classic Sprints**: Choose between 1, 2, 3, or 5-minute continuous solving sprints where new puzzles keep coming as you solve.
+- **Complete Daily Archive**: Replay past daily challenges anytime with calendar navigation and protected streak tracking.
+- **Clerk Authentication & Cloud Sync**: Seamlessly sync streaks, solve times, and high scores across all your devices.
+- **Real-Time Visual Feedback**: Immediate dashed crimson indicators for incorrect letters with smart backspace editing.
+- **Smooth 4-5s Brand Intro**: A polished crimson-and-cream intro animation on initial launch.
+- **4-Color Editorial Palette**: Pure Crimson (`#7B1E2B`), Cream White (`#F7F0E5`), Dark Wine (`#32171D`), and Muted Gold (`#C49A6C`).
 
 ---
 
@@ -14,12 +28,12 @@ In **Flipped**, players decode two transformed clue words (via antonyms or synon
   $$\text{Score} = \max(0, \min(100, 100 - \lfloor\text{elapsedSeconds} / 5\rfloor - (\text{hintsUsed} \times 5)))$$
 - **Game Modes**:
   - **Daily Challenge**: One authoritative daily puzzle released at midnight `Asia/Kolkata` (IST). Strictly enforced single-attempt lock per player with persistent result review.
-  - **Classic Practice**: Unlimited practice across `Easy`, `Medium`, and `Hard` difficulty tiers with repetition-free selection.
+  - **Classic Practice**: Unlimited practice across `Easy`, `Medium`, and `Hard` difficulty tiers with 1m, 2m, 3m, or 5m timed sprints.
 - **Player Hub**:
-  - **First-Time Onboarding**: Guided 3-step walkthrough with an interactive 4x4 practice sandbox (`SLOW` + `MEAL` → `FAST FOOD`).
+  - **First-Time Onboarding**: Guided walkthrough with interactive practice sandbox (`SLOW` + `MEAL` → `FAST FOOD`).
   - **Spoiler-Free Sharing**: Native Web Share API with clipboard fallback emitting masked emoji block grids (`🟩🟩🟩🟩 🟩🟩🟩🟩`).
-  - **Player Statistics**: Real-time streak tracking, win rates, and solve times across `Asia/Kolkata` calendar days.
-  - **Archive**: Historical view of past published daily challenges.
+  - **Player Statistics**: Real-time streak tracking, win rates, and solve times synced to Clerk accounts.
+  - **Archive**: Historical view of past published daily challenges up to today.
 
 ---
 

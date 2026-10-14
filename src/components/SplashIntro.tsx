@@ -46,8 +46,8 @@ export function SplashIntro({
       setStage("active");
     }, 50);
 
-    // Stay for 2.2 - 2.5 seconds (or 100ms in test mode) then start smooth fade-out
-    const holdDuration = isTestEnv ? 100 : 2300;
+    // Stay for 4 to 5 seconds (or 100ms in test mode) then start smooth fade-out
+    const holdDuration = isTestEnv ? 100 : 4200;
     const fadeTimer = setTimeout(() => {
       setStage("exit");
     }, holdDuration);
