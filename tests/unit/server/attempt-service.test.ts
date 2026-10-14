@@ -225,4 +225,69 @@ describe("Authoritative Attempt Lifecycle Service", () => {
       expect(result.letter).toBe(puzzle.answerWords[0][2]?.toUpperCase());
     });
   });
+
+  describe("Serverless Cold Start Resilience & Tile Feedback", () => {
+    it("recovers and submits successfully even if in-memory DB is cleared (cold start simulation)", async () => {
+      const start = await startDailyAttempt(guestA, "2026-10-14");
+      expect(start.status).toBe("STARTED");
+      if (start.status !== "STARTED") return;
+
+      const attemptId = start.payload.attemptId;
+
+      // Simulate Lambda container recycle / cold start
+      inMemoryDb.clearAttempts();
+      expect(inMemoryDb.getAttempt(attemptId)).toBeNull();
+
+      // Submit valid answer across cold start
+      const submit = await submitAuthoritativeAttempt(
+        attemptId,
+        guestA,
+        "WILD LIFE"
+      );
+
+      expect(submit.status).toBe("WON");
+      if (submit.status === "WON") {
+        expect(submit.result.isWon).toBe(true);
+        expect(submit.tileFeedback).toBeDefined();
+        // All tiles should be CONFIRMED
+        expect(submit.tileFeedback![0].every((fb) => fb === "CONFIRMED")).toBe(true);
+        expect(submit.tileFeedback![1].every((fb) => fb === "CONFIRMED")).toBe(true);
+      }
+    });
+
+    it("marks wrong letters as ELIMINATED when submitted candidate is incorrect", async () => {
+      const start = await startDailyAttempt(guestA, "2026-10-14");
+      expect(start.status).toBe("STARTED");
+      if (start.status !== "STARTED") return;
+
+      const attemptId = start.payload.attemptId;
+
+      // Submit an answer with some wrong letters: "WIND LIME" instead of "WILD LIFE"
+      const submit = await submitAuthoritativeAttempt(
+        attemptId,
+        guestA,
+        "WIND LIME"
+      );
+
+      expect(submit.status).toBe("INCORRECT");
+      if (submit.status === "INCORRECT") {
+        expect(submit.isMatch).toBe(false);
+        expect(submit.tileFeedback).toBeDefined();
+
+        const [fb0, fb1] = submit.tileFeedback!;
+        // Word 0: W (CONFIRMED), I (CONFIRMED), N vs L (ELIMINATED), D (CONFIRMED)
+        expect(fb0[0]).toBe("CONFIRMED"); // W
+        expect(fb0[1]).toBe("CONFIRMED"); // I
+        expect(fb0[2]).toBe("ELIMINATED"); // N (wrong, should be L)
+        expect(fb0[3]).toBe("CONFIRMED"); // D
+
+        // Word 1: L (CONFIRMED), I (CONFIRMED), M vs F (ELIMINATED), E (CONFIRMED)
+        expect(fb1[0]).toBe("CONFIRMED"); // L
+        expect(fb1[1]).toBe("CONFIRMED"); // I
+        expect(fb1[2]).toBe("ELIMINATED"); // M (wrong, should be F)
+        expect(fb1[3]).toBe("CONFIRMED"); // E
+      }
+    });
+  });
 });
+

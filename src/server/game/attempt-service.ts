@@ -1,6 +1,13 @@
 import crypto from "crypto";
 import { inMemoryDb, type StoredAttempt } from "../db/client";
 import {
+  persistAttempt,
+  resolveAuthoritativeAttempt,
+  ATTEMPT_COOKIE_NAME,
+  verifyAttemptToken,
+} from "../auth/attempt-session";
+import { extractCookie } from "../auth/guest-session";
+import {
   createSafeGameplayPayload,
   createFinalizedResultPayload,
   type SafeGameplayPayload,
@@ -23,14 +30,17 @@ export type StartDailyAttemptResult =
   | {
       readonly status: "STARTED";
       readonly payload: SafeGameplayPayload;
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "IN_PROGRESS";
       readonly payload: SafeGameplayPayload;
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "ALREADY_COMPLETED";
       readonly result: FinalizedResultPayload;
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "UNAVAILABLE";
@@ -41,6 +51,7 @@ export type StartClassicAttemptResult =
   | {
       readonly status: "STARTED";
       readonly payload: SafeGameplayPayload;
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "EMPTY_POOL";
@@ -52,20 +63,24 @@ export type SubmitAttemptResult =
       readonly status: "WON";
       readonly result: FinalizedResultPayload;
       readonly tileFeedback?: readonly [readonly TileFeedback[], readonly TileFeedback[]];
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "TIMED_OUT";
       readonly result: FinalizedResultPayload;
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "INCORRECT";
       readonly isMatch: false;
       readonly hintsUsed: number;
       readonly tileFeedback?: readonly [readonly TileFeedback[], readonly TileFeedback[]];
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "ALREADY_FINALIZED";
       readonly result: FinalizedResultPayload;
+      readonly attempt?: StoredAttempt;
     }
   | {
       readonly status: "ERROR";
@@ -78,7 +93,8 @@ export type SubmitAttemptResult =
  */
 export async function startDailyAttempt(
   guestId: string,
-  targetDate?: string
+  targetDate?: string,
+  request?: Request
 ): Promise<StartDailyAttemptResult> {
   const dateStr = targetDate || getServerDailyDateString();
   const scheduleResult = await resolveServerDailyAssignment(dateStr);
@@ -102,7 +118,21 @@ export async function startDailyAttempt(
   }
 
   // Check existing attempt in DB for this guest on this date
-  const existingAttempt = inMemoryDb.findDailyAttempt(guestId, dateStr);
+  let existingAttempt = inMemoryDb.findDailyAttempt(guestId, dateStr);
+
+  // If not found in memory, check request cookie
+  if (!existingAttempt && request) {
+    const rawToken = extractCookie(request.headers.get("cookie"), ATTEMPT_COOKIE_NAME);
+    const fromCookie = verifyAttemptToken(rawToken);
+    if (
+      fromCookie &&
+      fromCookie.guestId === guestId &&
+      fromCookie.mode === "DAILY" &&
+      fromCookie.dailyDate === dateStr
+    ) {
+      existingAttempt = persistAttempt(fromCookie);
+    }
+  }
 
   if (existingAttempt) {
     // If already finalized, return the read-only completion result
@@ -110,6 +140,7 @@ export async function startDailyAttempt(
       return {
         status: "ALREADY_COMPLETED",
         result: createFinalizedResultPayload(puzzle, existingAttempt),
+        attempt: existingAttempt,
       };
     }
 
@@ -126,11 +157,12 @@ export async function startDailyAttempt(
         endedAt: new Date(existingAttempt.deadline.getTime()),
         updatedAt: new Date(),
       };
-      inMemoryDb.saveAttempt(timedOutAttempt);
+      persistAttempt(timedOutAttempt);
 
       return {
         status: "ALREADY_COMPLETED",
         result: createFinalizedResultPayload(puzzle, timedOutAttempt),
+        attempt: timedOutAttempt,
       };
     }
 
@@ -138,15 +170,17 @@ export async function startDailyAttempt(
     return {
       status: "IN_PROGRESS",
       payload: createSafeGameplayPayload(puzzle, existingAttempt),
+      attempt: existingAttempt,
     };
   }
 
-  // Create brand new daily attempt
+  // Create brand new daily attempt with self-describing ID for serverless resilience
   const startedAt = new Date();
   const deadline = new Date(startedAt.getTime() + ROUND_DURATION_MS);
+  const randSuffix = crypto.randomBytes(4).toString("hex");
 
   const newAttempt: StoredAttempt = {
-    id: `att_${crypto.randomUUID()}`,
+    id: `att_daily_${dateStr}_${puzzle.id}_${startedAt.getTime()}_${randSuffix}`,
     guestId,
     mode: "DAILY",
     dailyDate: dateStr,
@@ -164,11 +198,12 @@ export async function startDailyAttempt(
     updatedAt: startedAt,
   };
 
-  inMemoryDb.saveAttempt(newAttempt);
+  persistAttempt(newAttempt);
 
   return {
     status: "STARTED",
     payload: createSafeGameplayPayload(puzzle, newAttempt),
+    attempt: newAttempt,
   };
 }
 
@@ -191,9 +226,10 @@ export async function startClassicAttempt(
 
   const startedAt = new Date();
   const deadline = new Date(startedAt.getTime() + ROUND_DURATION_MS);
+  const randSuffix = crypto.randomBytes(4).toString("hex");
 
   const newAttempt: StoredAttempt = {
-    id: `att_${crypto.randomUUID()}`,
+    id: `att_classic_${puzzle.id}_${startedAt.getTime()}_${randSuffix}`,
     guestId,
     mode: "CLASSIC",
     dailyDate: null,
@@ -211,11 +247,12 @@ export async function startClassicAttempt(
     updatedAt: startedAt,
   };
 
-  inMemoryDb.saveAttempt(newAttempt);
+  persistAttempt(newAttempt);
 
   return {
     status: "STARTED",
     payload: createSafeGameplayPayload(puzzle, newAttempt),
+    attempt: newAttempt,
   };
 }
 
@@ -226,9 +263,10 @@ export async function startClassicAttempt(
 export async function submitAuthoritativeAttempt(
   attemptId: string,
   guestId: string,
-  candidatePhrase: string
+  candidatePhrase: string,
+  request?: Request
 ): Promise<SubmitAttemptResult> {
-  const attempt = inMemoryDb.getAttempt(attemptId);
+  const attempt = await resolveAuthoritativeAttempt(attemptId, guestId, request);
 
   if (!attempt || attempt.guestId !== guestId) {
     return {
@@ -250,6 +288,7 @@ export async function submitAuthoritativeAttempt(
     return {
       status: "ALREADY_FINALIZED",
       result: createFinalizedResultPayload(puzzle, attempt),
+      attempt,
     };
   }
 
@@ -267,11 +306,12 @@ export async function submitAuthoritativeAttempt(
       endedAt: new Date(deadlineMs),
       updatedAt: new Date(),
     };
-    inMemoryDb.saveAttempt(timedOutAttempt);
+    persistAttempt(timedOutAttempt);
 
     return {
       status: "TIMED_OUT",
       result: createFinalizedResultPayload(puzzle, timedOutAttempt),
+      attempt: timedOutAttempt,
     };
   }
 
@@ -304,6 +344,7 @@ export async function submitAuthoritativeAttempt(
       isMatch: false,
       hintsUsed: attempt.hintsUsed,
       tileFeedback: [feedback0, feedback1],
+      attempt,
     };
   }
 
@@ -323,7 +364,7 @@ export async function submitAuthoritativeAttempt(
     updatedAt: new Date(),
   };
 
-  inMemoryDb.saveAttempt(wonAttempt);
+  persistAttempt(wonAttempt);
 
   // Update guest streaks/stats
   const profile = inMemoryDb.getGuestProfile(guestId);
@@ -350,6 +391,7 @@ export async function submitAuthoritativeAttempt(
     status: "WON",
     result: createFinalizedResultPayload(puzzle, wonAttempt),
     tileFeedback: [wonFeedback0, wonFeedback1],
+    attempt: wonAttempt,
   };
 }
 
@@ -358,9 +400,10 @@ export async function submitAuthoritativeAttempt(
  */
 export async function finalizeAuthoritativeTimeout(
   attemptId: string,
-  guestId: string
-): Promise<{ success: boolean; result?: FinalizedResultPayload; message?: string }> {
-  const attempt = inMemoryDb.getAttempt(attemptId);
+  guestId: string,
+  request?: Request
+): Promise<{ success: boolean; result?: FinalizedResultPayload; message?: string; attempt?: StoredAttempt }> {
+  const attempt = await resolveAuthoritativeAttempt(attemptId, guestId, request);
 
   if (!attempt || attempt.guestId !== guestId) {
     return {
@@ -382,6 +425,7 @@ export async function finalizeAuthoritativeTimeout(
     return {
       success: true,
       result: createFinalizedResultPayload(puzzle, attempt),
+      attempt,
     };
   }
 
@@ -395,7 +439,7 @@ export async function finalizeAuthoritativeTimeout(
     updatedAt: new Date(),
   };
 
-  inMemoryDb.saveAttempt(timedOutAttempt);
+  persistAttempt(timedOutAttempt);
 
   // Update profile counters
   const profile = inMemoryDb.getGuestProfile(guestId);
@@ -415,6 +459,7 @@ export async function finalizeAuthoritativeTimeout(
   return {
     success: true,
     result: createFinalizedResultPayload(puzzle, timedOutAttempt),
+    attempt: timedOutAttempt,
   };
 }
 
@@ -423,9 +468,10 @@ export async function finalizeAuthoritativeTimeout(
  */
 export async function getAttemptResultSafe(
   attemptId: string,
-  guestId: string
+  guestId: string,
+  request?: Request
 ): Promise<{ success: boolean; result?: FinalizedResultPayload; message?: string }> {
-  const attempt = inMemoryDb.getAttempt(attemptId);
+  const attempt = await resolveAuthoritativeAttempt(attemptId, guestId, request);
 
   if (!attempt || attempt.guestId !== guestId) {
     return {

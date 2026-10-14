@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
+import { attachAttemptCookie } from "@/server/auth/attempt-session";
 import { submitAuthoritativeAttempt } from "@/server/game/attempt-service";
 import { checkRateLimit } from "@/server/utils/rate-limit";
 
@@ -42,10 +43,14 @@ export async function POST(
   }
 
   const { phrase } = parseResult.data;
-  const result = await submitAuthoritativeAttempt(attemptId, session.guestId, phrase);
+  const result = await submitAuthoritativeAttempt(attemptId, session.guestId, phrase, request);
 
   const status = result.status === "ERROR" ? 404 : 200;
   const response = NextResponse.json(result, { status });
 
-  return attachGuestCookie(response, session);
+  const withGuest = attachGuestCookie(response, session);
+  if ("attempt" in result && result.attempt) {
+    return attachAttemptCookie(withGuest, result.attempt);
+  }
+  return withGuest;
 }

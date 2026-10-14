@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
+import { attachAttemptCookie } from "@/server/auth/attempt-session";
 import { startDailyAttempt } from "@/server/game/attempt-service";
 import { checkRateLimit } from "@/server/utils/rate-limit";
 
@@ -17,11 +18,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const result = await startDailyAttempt(session.guestId);
+  const result = await startDailyAttempt(session.guestId, undefined, request);
 
   const response = NextResponse.json(result, {
     status: result.status === "UNAVAILABLE" ? 503 : 200,
   });
 
-  return attachGuestCookie(response, session);
+  const withGuest = attachGuestCookie(response, session);
+  if ("attempt" in result && result.attempt) {
+    return attachAttemptCookie(withGuest, result.attempt);
+  }
+  return withGuest;
 }
+

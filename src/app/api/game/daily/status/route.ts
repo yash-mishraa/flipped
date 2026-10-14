@@ -3,6 +3,13 @@ import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-sess
 import { getServerDailyDateString } from "@/server/scheduling/daily-scheduler";
 import { inMemoryDb } from "@/server/db/client";
 import {
+  ATTEMPT_COOKIE_NAME,
+  verifyAttemptToken,
+  persistAttempt,
+  attachAttemptCookie,
+} from "@/server/auth/attempt-session";
+import { extractCookie } from "@/server/auth/guest-session";
+import {
   getPrivilegedPuzzleById,
   createFinalizedResultPayload,
 } from "@/server/puzzles/puzzle-repository";
@@ -13,7 +20,20 @@ export async function GET(request: Request): Promise<NextResponse> {
   const session = resolveGuestSession(request);
   const todayStr = getServerDailyDateString();
 
-  const attempt = inMemoryDb.findDailyAttempt(session.guestId, todayStr);
+  let attempt = inMemoryDb.findDailyAttempt(session.guestId, todayStr);
+
+  if (!attempt) {
+    const rawToken = extractCookie(request.headers.get("cookie"), ATTEMPT_COOKIE_NAME);
+    const fromCookie = verifyAttemptToken(rawToken);
+    if (
+      fromCookie &&
+      fromCookie.guestId === session.guestId &&
+      fromCookie.mode === "DAILY" &&
+      fromCookie.dailyDate === todayStr
+    ) {
+      attempt = persistAttempt(fromCookie);
+    }
+  }
 
   if (!attempt) {
     const response = NextResponse.json({
@@ -34,7 +54,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       attempt.isWon = false;
       attempt.finalScore = 0;
       attempt.endedAt = new Date(attempt.deadline.getTime());
-      inMemoryDb.saveAttempt(attempt);
+      persistAttempt(attempt);
     }
 
     const puzzle = await getPrivilegedPuzzleById(attempt.puzzleId);
@@ -46,7 +66,8 @@ export async function GET(request: Request): Promise<NextResponse> {
       hasCompleted: true,
       result,
     });
-    return attachGuestCookie(response, session);
+    const withGuest = attachGuestCookie(response, session);
+    return attachAttemptCookie(withGuest, attempt);
   }
 
   // Active in progress
@@ -57,5 +78,6 @@ export async function GET(request: Request): Promise<NextResponse> {
     attemptId: attempt.id,
     deadline: attempt.deadline.toISOString(),
   });
-  return attachGuestCookie(response, session);
+  const withGuest = attachGuestCookie(response, session);
+  return attachAttemptCookie(withGuest, attempt);
 }

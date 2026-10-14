@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
-import { inMemoryDb } from "@/server/db/client";
+import { resolveAuthoritativeAttempt, attachAttemptCookie } from "@/server/auth/attempt-session";
 import { getPrivilegedPuzzleById } from "@/server/puzzles/puzzle-repository";
 import { processAuthoritativeHint } from "@/server/game/hint-service";
 
@@ -13,7 +13,7 @@ export async function POST(
   const { id: attemptId } = await context.params;
   const session = resolveGuestSession(request);
 
-  const attempt = inMemoryDb.getAttempt(attemptId);
+  const attempt = await resolveAuthoritativeAttempt(attemptId, session.guestId, request);
   if (!attempt || attempt.guestId !== session.guestId) {
     return NextResponse.json({ error: "Attempt not found or unauthorized." }, { status: 404 });
   }
@@ -42,5 +42,9 @@ export async function POST(
   const status = result.success ? 200 : 400;
   const response = NextResponse.json(result, { status });
 
-  return attachGuestCookie(response, session);
+  const withGuest = attachGuestCookie(response, session);
+  if (result.attempt) {
+    return attachAttemptCookie(withGuest, result.attempt);
+  }
+  return withGuest;
 }

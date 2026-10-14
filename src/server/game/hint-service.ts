@@ -1,5 +1,6 @@
 import type { Puzzle } from "@/features/game/domain/types";
-import { inMemoryDb, type StoredAttempt } from "../db/client";
+import { type StoredAttempt } from "../db/client";
+import { persistAttempt } from "../auth/attempt-session";
 
 export interface ServerHintResult {
   readonly success: boolean;
@@ -8,6 +9,7 @@ export interface ServerHintResult {
   readonly letter?: string;
   readonly hintsUsed?: number;
   readonly message?: string;
+  readonly attempt?: StoredAttempt;
 }
 
 /**
@@ -76,14 +78,14 @@ export async function processAuthoritativeHint(
     .charAt(targetPosition.letterIndex)
     .toUpperCase();
 
-  // Atomically increment server-tracked hint count
+  // Atomically increment server-tracked hint count and persist across tiers
   const updatedAttempt: StoredAttempt = {
     ...attempt,
     hintsUsed: attempt.hintsUsed + 1,
     updatedAt: new Date(),
   };
 
-  inMemoryDb.saveAttempt(updatedAttempt);
+  persistAttempt(updatedAttempt);
 
   return {
     success: true,
@@ -91,5 +93,6 @@ export async function processAuthoritativeHint(
     letterIndex: targetPosition.letterIndex,
     letter,
     hintsUsed: updatedAttempt.hintsUsed,
+    attempt: updatedAttempt,
   };
 }

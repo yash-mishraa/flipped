@@ -11,7 +11,7 @@ export async function GET(
   const { id: attemptId } = await context.params;
   const session = resolveGuestSession(request);
 
-  const outcome = await getAttemptResultSafe(attemptId, session.guestId);
+  const outcome = await getAttemptResultSafe(attemptId, session.guestId, request);
 
   const status = outcome.success ? 200 : outcome.message?.includes("active") ? 403 : 404;
   const response = NextResponse.json(outcome, { status });

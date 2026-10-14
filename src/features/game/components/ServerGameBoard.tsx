@@ -267,8 +267,14 @@ export function ServerGameBoard({
             });
           }
           setErrorMessage("Some letters are incorrect. Incorrect letters are marked on the board.");
-        } else if (data.error) {
-          setErrorMessage(data.error);
+        } else if (data.status === "ALREADY_FINALIZED") {
+          setFinalizedResult(data.result);
+          setRoundStatus(data.result.isWon ? "WON" : "TIMED_OUT");
+          if (data.result.isWon) setShowWinModal(true);
+          if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+          onFinalized?.(data.result);
+        } else {
+          setErrorMessage(data.message || data.error || "Unable to verify answer. Please try again.");
         }
       } catch {
         setErrorMessage("Network error verifying answer. Please try again.");
@@ -278,6 +284,22 @@ export function ServerGameBoard({
     },
     [isSubmitting, roundStatus, payload.attemptId, onFinalized]
   );
+
+  // Explicit submit / Enter key handler
+  const handleSubmitCurrentBoard = useCallback(() => {
+    if (roundStatus !== "PLAYING" || isSubmitting) return;
+
+    const w0 = grid.words[0].map((t) => t.letter).join("");
+    const w1 = grid.words[1].map((t) => t.letter).join("");
+
+    if (w0.length < grid.words[0].length || w1.length < grid.words[1].length) {
+      setErrorMessage("Please complete both words before checking your answer.");
+      return;
+    }
+
+    const phrase = `${w0} ${w1}`;
+    submitCandidatePhrase(phrase);
+  }, [grid.words, isSubmitting, roundStatus, submitCandidatePhrase]);
 
   // Input letter into selected tile
   const handleInputLetter = (rawLetter: string) => {
@@ -518,8 +540,26 @@ export function ServerGameBoard({
           onInputLetter={handleInputLetter}
           onClearTile={handleClearTile}
           onNavigate={handleNavigate}
+          onEnter={handleSubmitCurrentBoard}
         />
       </section>
+
+      {/* Manual Check Answer Button & Keyboard Enter Hint */}
+      {roundStatus === "PLAYING" && (
+        <div className="flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSubmitCurrentBoard}
+            disabled={isSubmitting}
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-8 py-2.5 text-sm sm:text-base font-extrabold text-[#F7F0E5] shadow-md hover:bg-[#7B1E2B]/90 active:scale-95 transition-all disabled:opacity-50 border border-[#C49A6C]/40 cursor-pointer"
+          >
+            {isSubmitting ? "Checking Answer..." : "Check Answer"}
+          </button>
+          <span className="text-[11px] font-semibold text-[#8C6870]">
+            Or press <kbd className="rounded border border-[#C49A6C]/50 bg-[#faeee0] px-1 py-0.5 text-[10px] font-bold text-[#32171D]">Enter</kbd> to submit
+          </span>
+        </div>
+      )}
 
       {/* Inline Feedback Banner */}
       {errorMessage && (

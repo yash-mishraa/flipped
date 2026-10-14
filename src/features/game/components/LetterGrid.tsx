@@ -12,6 +12,7 @@ export interface LetterGridProps {
   readonly onInputLetter: (letter: string) => void;
   readonly onClearTile: () => void;
   readonly onNavigate: (direction: "left" | "right" | "up" | "down" | "home" | "end") => void;
+  readonly onEnter?: () => void;
 }
 
 /**
@@ -26,6 +27,7 @@ export function LetterGrid({
   onInputLetter,
   onClearTile,
   onNavigate,
+  onEnter,
 }: LetterGridProps): React.JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +43,10 @@ export function LetterGrid({
 
     // Handle navigation and editing keys
     switch (e.key) {
+      case "Enter":
+        e.preventDefault();
+        onEnter?.();
+        return;
       case "Backspace":
         e.preventDefault();
         onClearTile();
