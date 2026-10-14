@@ -713,7 +713,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 score: totalScore,
                 elapsedSeconds: durationSeconds,
                 hintsUsed: solvedList.reduce((acc, i) => acc + i.hintsUsed, 0),
-                wordLengths: [4, 4],
+                sprintPuzzlesSolved: solvedList.length,
               }}
             />
           </div>

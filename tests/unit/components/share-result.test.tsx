@@ -53,6 +53,24 @@ describe("Result Sharing System", () => {
       expect(text).toContain("Flipped Classic Practice");
       expect(text).toContain("🎯 Solved in 15s • Score: 95/100");
     });
+
+    it("formats Classic Sprint text with multi-puzzle score and correct boxes", () => {
+      const text = formatShareText({
+        mode: "CLASSIC",
+        isWon: true,
+        score: 377,
+        elapsedSeconds: 60,
+        hintsUsed: 3,
+        sprintPuzzlesSolved: 4,
+      });
+
+      expect(text).toContain("Flipped Classic Sprint (60s)");
+      expect(text).toContain("⚡ Solved: 4 Puzzles • Score: 377 pts");
+      expect(text).not.toContain("377/100"); // Must never show 377/100
+      expect(text).toContain("💡 Hints Used: 3");
+      expect(text).toContain("🟩 🟩 🟩 🟩"); // Exactly 4 boxes for 4 solved puzzles
+      expect(text).toContain("flipped-sepia.vercel.app/classic");
+    });
   });
 
   describe("shareResult helper", () => {
