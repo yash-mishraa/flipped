@@ -1,11 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 import type { Puzzle, LetterGrid as LetterGridType, LetterTile } from "../domain/types";
 import type { DailyAttemptRecord } from "../modes/mode-types";
 import { LetterGrid } from "./LetterGrid";
 import { ShareButton } from "./ShareButton";
+import { triggerVictoryConfetti } from "../utils/confetti";
+import { calculateDailyStreaks } from "../modes/statistics";
+import { loadProgress } from "../persistence/local-progress";
+import { syncUserProgress } from "../persistence/user-sync";
 
 export interface DailyCompletionCardProps {
   readonly date: string;
@@ -35,7 +40,7 @@ function createSolvedGrid(puzzle: Puzzle): LetterGridType {
 }
 
 /**
- * Formats YYYY-MM-DD into a localized friendly date (e.g. "Monday, October 12, 2026").
+ * Formats YYYY-MM-DD into a localized friendly date (e.g. "Wednesday, October 14, 2026").
  */
 function formatFriendlyDate(dateStr: string): string {
   try {
@@ -54,32 +59,95 @@ function formatFriendlyDate(dateStr: string): string {
 }
 
 /**
- * DailyCompletionCard renders a comprehensive read-only review of an already completed
- * daily challenge, preserving attempt metrics, transformations, and the solved letter grid.
+ * Returns celebration praise text based on the attempt score.
+ */
+function getPraiseText(score: number): string {
+  if (score >= 95) return "Genius!";
+  if (score >= 85) return "Magnificent!";
+  if (score >= 70) return "Impressive!";
+  if (score >= 50) return "Well Done!";
+  return "Solved!";
+}
+
+/**
+ * Formats countdown to next midnight local time.
+ */
+function getFormattedCountdown(): string {
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const diffMs = Math.max(0, tomorrow.getTime() - now.getTime());
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+/**
+ * DailyCompletionCard renders a celebratory, comprehensive victory review of a daily challenge.
+ * Includes confetti burst on victory, 4-stat metrics with live streak, solution grid,
+ * semantic transformations, live next puzzle countdown, and account synchronization.
  */
 export function DailyCompletionCard({
   date,
   puzzle,
   attempt,
 }: DailyCompletionCardProps): React.JSX.Element {
+  const { isSignedIn, user } = useUser();
   const isWon = attempt.status === "WON";
   const solvedGrid = createSolvedGrid(puzzle);
   const friendlyDate = formatFriendlyDate(date);
   const canonicalPhrase = puzzle.answerWords.join(" ");
+
+  // Initial local streak calculation
+  const [streak, setStreak] = useState<number>(() => {
+    const progress = loadProgress();
+    const streaks = calculateDailyStreaks(progress.daily, date);
+    return streaks.currentStreak > 0 ? streaks.currentStreak : isWon && !attempt.isArchive ? 1 : 0;
+  });
+
+  // Live countdown to next daily challenge
+  const [countdown, setCountdown] = useState<string>(getFormattedCountdown);
+
+  // Trigger celebration confetti on victory and sync with cloud database
+  useEffect(() => {
+    if (isWon) {
+      triggerVictoryConfetti();
+    }
+
+    if (isSignedIn && user?.id) {
+      syncUserProgress(user.id).then((res) => {
+        if (res?.stats?.daily?.currentStreak !== undefined) {
+          setStreak(res.stats.daily.currentStreak);
+        }
+      });
+    }
+  }, [isWon, isSignedIn, user?.id]);
+
+  // Live countdown timer tick
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(getFormattedCountdown());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div
       role="region"
       aria-label="Daily challenge completion review"
       data-testid="daily-completion-card"
-      className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 rounded-3xl border border-[#C49A6C] bg-white/95 p-6 shadow-xl backdrop-blur-sm sm:p-8"
+      className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 rounded-3xl border border-[#C49A6C]/70 bg-white/95 p-6 shadow-xl backdrop-blur-md sm:p-8"
     >
-      {/* Header status indicator */}
-      <div className="flex flex-col items-center text-center">
+      {/* Header status indicator & Celebration Praise */}
+      <div className="flex flex-col items-center text-center w-full">
         <div className="flex items-center gap-2">
           <span
-            className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
-              isWon ? "bg-[#C49A6C] text-[#32171D]" : "border border-[#C49A6C] bg-[#faeee0] text-[#32171D]"
+            className={`rounded-full px-3.5 py-1 text-xs font-bold uppercase tracking-wider ${
+              isWon
+                ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs"
+                : "border border-[#C49A6C] bg-[#faeee0] text-[#32171D]"
             }`}
           >
             {isWon ? "Daily Solved" : "Time Expired"}
@@ -87,35 +155,48 @@ export function DailyCompletionCard({
           <span className="text-xs font-semibold text-[#8C6870]">• {date}</span>
         </div>
 
-        <h2 className="mt-3 text-2xl font-black tracking-tight text-[#32171D] sm:text-3xl">
+        {isWon && (
+          <div className="mt-3 text-base sm:text-lg font-black tracking-widest uppercase text-[#7B1E2B] animate-fade-in">
+            {getPraiseText(attempt.finalScore)}
+          </div>
+        )}
+
+        <h2 className="mt-1 text-2xl sm:text-4xl font-black tracking-tight text-[#32171D]">
           {attempt.solvedPhrase || canonicalPhrase}
         </h2>
         <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">{friendlyDate}</p>
       </div>
 
-      {/* Stats Summary Grid */}
-      <div className="grid w-full grid-cols-3 gap-2.5 text-center">
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-          <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+      {/* 4-Stat Summary Grid: Score, Time, Hints, Daily Streak */}
+      <div className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
+          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
             Score
           </div>
-          <p className={`mt-1 text-2xl font-black ${isWon ? "text-[#7B1E2B]" : "text-[#32171D]"}`}>
+          <p className={`mt-1 text-2xl sm:text-3xl font-black ${isWon ? "text-[#7B1E2B]" : "text-[#32171D]"}`}>
             {attempt.finalScore}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-          <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
+          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
             Time
           </div>
-          <p className="mt-1 text-2xl font-black text-[#32171D]">{attempt.elapsedSeconds}s</p>
+          <p className="mt-1 text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.elapsedSeconds}s</p>
         </div>
 
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-          <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
+          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
             Hints
           </div>
-          <p className="mt-1 text-2xl font-black text-[#32171D]">{attempt.hintsUsed}</p>
+          <p className="mt-1 text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.hintsUsed}</p>
+        </div>
+
+        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
+          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
+            Streak
+          </div>
+          <p className="mt-1 text-2xl sm:text-3xl font-black text-[#7B1E2B]">{streak}</p>
         </div>
       </div>
 
@@ -159,14 +240,26 @@ export function DailyCompletionCard({
         </div>
       </div>
 
-      {/* One-attempt reminder notice */}
-      <div className="w-full rounded-xl bg-[#faeee0] border border-[#C49A6C]/60 p-3.5 text-center text-xs text-[#32171D]">
-        <p className="font-semibold text-[#7B1E2B]">Today&apos;s Daily Challenge is Locked</p>
-        <p className="mt-0.5 text-[#6B4E55]">
-          Daily challenges can only be played once for score. Come back tomorrow for the next
-          puzzle, or play unlimited practice rounds in Classic mode!
-        </p>
+      {/* Live Countdown to Next Daily Challenge */}
+      <div className="w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/30 py-3.5 px-4 text-center">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
+          Next Daily Challenge In
+        </span>
+        <div className="mt-0.5 font-mono text-xl font-black text-[#32171D]">
+          {countdown}
+        </div>
       </div>
+
+      {/* Account Cloud Sync Status */}
+      {isSignedIn ? (
+        <div className="text-xs font-semibold text-[#7B1E2B]">
+          Daily streak &amp; statistics synced to your account
+        </div>
+      ) : (
+        <div className="w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/40 p-3 text-center text-xs text-[#6B4E55]">
+          <span className="font-bold text-[#7B1E2B]">Guest Session.</span> Sign in or create an account to preserve your daily streak across devices!
+        </div>
+      )}
 
       {/* Result Sharing */}
       <div className="w-full flex justify-center">
@@ -209,3 +302,4 @@ export function DailyCompletionCard({
     </div>
   );
 }
+

@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
 import { DailyCompletionCard } from "@/features/game/components/DailyCompletionCard";
 import { saveDailyAttempt } from "@/features/game/persistence/local-progress";
+import { syncUserProgress } from "@/features/game/persistence/user-sync";
 import { getDailyDateString } from "@/features/game/modes/daily-scheduler";
 import type {
   SafeGameplayPayload,
@@ -59,6 +61,7 @@ function convertFinalizedToCardProps(finalized: FinalizedResultPayload): {
 }
 
 function DailyPageContent(): React.JSX.Element {
+  const { isSignedIn, user } = useUser();
   const searchParams = useSearchParams();
   const queryDate = searchParams?.get("date") || undefined;
 
@@ -90,6 +93,9 @@ function DailyPageContent(): React.JSX.Element {
           ...attempt,
           isArchive: Boolean(queryDate && queryDate !== todayStr),
         });
+        if (isSignedIn && user?.id) {
+          syncUserProgress(user.id);
+        }
         setPayload(null);
       } else if (data.status === "STARTED" || data.status === "IN_PROGRESS") {
         setPayload(data.payload);
@@ -106,7 +112,7 @@ function DailyPageContent(): React.JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [queryDate, todayStr]);
+  }, [queryDate, todayStr, isSignedIn, user?.id]);
 
   useEffect(() => {
     fetchDailyChallenge();
@@ -225,6 +231,9 @@ function DailyPageContent(): React.JSX.Element {
                   ...attempt,
                   isArchive: isArchiveChallenge,
                 });
+                if (isSignedIn && user?.id) {
+                  syncUserProgress(user.id);
+                }
               }}
             />
           ) : null}

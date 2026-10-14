@@ -7,6 +7,7 @@ import type { Puzzle, TerminalResult } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
 import { syncUserProgress } from "../persistence/user-sync";
 import { ShareButton } from "./ShareButton";
+import { triggerVictoryConfetti } from "../utils/confetti";
 
 export interface SuccessScreenProps {
   readonly puzzle: Puzzle;
@@ -41,6 +42,7 @@ export function SuccessScreen({
   const handleReplayAction = onNextPuzzle ?? onPlayAgain;
 
   useEffect(() => {
+    triggerVictoryConfetti();
     if (isSignedIn && user?.id) {
       syncUserProgress(user.id);
     }

@@ -2,10 +2,15 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import HomePage from "@/app/page";
-import { setOnboardingCompleted } from "@/features/game/persistence/local-progress";
+import {
+  setOnboardingCompleted,
+  clearProgress,
+  saveDailyAttempt,
+} from "@/features/game/persistence/local-progress";
 
 describe("Production Home Screen (HomePage)", () => {
   beforeEach(() => {
+    clearProgress();
     setOnboardingCompleted(true);
   });
 
@@ -40,4 +45,27 @@ describe("Production Home Screen (HomePage)", () => {
       screen.getByRole("heading", { name: "How Flipped Works", level: 2 })
     ).toBeInTheDocument();
   });
+
+  it("does not render daily streak indicator for first-time visitors", () => {
+    render(<HomePage />);
+    expect(screen.queryByTestId("home-daily-streak")).not.toBeInTheDocument();
+  });
+
+  it("renders daily streak badge for returning players who have played daily challenges", () => {
+    saveDailyAttempt({
+      date: "2026-10-13",
+      puzzleId: "p-test",
+      status: "WON",
+      finalScore: 92,
+      elapsedSeconds: 18,
+      hintsUsed: 0,
+      solvedPhrase: "WILD LIFE",
+      completedAt: "2026-10-13T12:00:00.000Z",
+    });
+
+    render(<HomePage />);
+    expect(screen.getByTestId("home-daily-streak")).toBeInTheDocument();
+    expect(screen.getByText("Daily Streak:")).toBeInTheDocument();
+  });
 });
+
