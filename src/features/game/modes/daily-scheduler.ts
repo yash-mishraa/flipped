@@ -38,11 +38,14 @@ export function getDailyDateString(
  * Safe for client-side evaluation without leaking puzzle answers.
  */
 export function getDailyScheduleStatus(
-  dateString: string
+  dateString: string,
+  todayStr: string = getDailyDateString()
 ): "AVAILABLE" | "FUTURE_UNPUBLISHED" | "UNAVAILABLE" {
   const assignment = DAILY_SCHEDULE_MAP.get(dateString);
   if (!assignment) return "UNAVAILABLE";
-  if (assignment.publicationStatus !== "PUBLISHED") return "FUTURE_UNPUBLISHED";
+  if (dateString > todayStr || assignment.publicationStatus !== "PUBLISHED") {
+    return "FUTURE_UNPUBLISHED";
+  }
   return "AVAILABLE";
 }
 
@@ -50,7 +53,10 @@ export function getDailyScheduleStatus(
  * Deterministically retrieves the puzzle assignment for a specific calendar date (YYYY-MM-DD).
  * Ensures future unpublished puzzles do not leak answers to the client.
  */
-export function getDailyPuzzle(dateString: string): DailyPuzzleResult {
+export function getDailyPuzzle(
+  dateString: string,
+  todayStr: string = getDailyDateString()
+): DailyPuzzleResult {
   const assignment = DAILY_SCHEDULE_MAP.get(dateString);
 
   if (!assignment) {
@@ -61,7 +67,7 @@ export function getDailyPuzzle(dateString: string): DailyPuzzleResult {
     };
   }
 
-  if (assignment.publicationStatus !== "PUBLISHED") {
+  if (dateString > todayStr || assignment.publicationStatus !== "PUBLISHED") {
     return {
       status: "FUTURE_UNPUBLISHED",
       date: dateString,
@@ -87,8 +93,13 @@ export function getDailyPuzzle(dateString: string): DailyPuzzleResult {
 }
 
 /**
- * Retrieves all published daily assignments in chronological order for the Archive view.
+ * Retrieves all published daily assignments in chronological order up to today for the Archive view.
+ * Ensures future scheduled dates are never visible in the archive before their calendar date arrives.
  */
-export function getPublishedDailySchedule(): readonly DailyPuzzleAssignment[] {
-  return PUBLISHED_DAILY_SCHEDULE.filter((item) => item.publicationStatus === "PUBLISHED");
+export function getPublishedDailySchedule(
+  currentDateStr: string = getDailyDateString()
+): readonly DailyPuzzleAssignment[] {
+  return PUBLISHED_DAILY_SCHEDULE.filter(
+    (item) => item.publicationStatus === "PUBLISHED" && item.date <= currentDateStr
+  );
 }

@@ -43,13 +43,16 @@ export default function ArchivePage(): React.JSX.Element {
     setMounted(true);
   }, []);
 
-  const published = getPublishedDailySchedule();
+  const currentToday = todayStr || getDailyDateString();
+  const published = getPublishedDailySchedule(currentToday);
   // Map date to chronological challenge number (Challenge #1 = earliest date)
   const challengeNumberMap = new Map<string, number>();
   published.forEach((a, idx) => challengeNumberMap.set(a.date, idx + 1));
 
-  // Sort descending: newest date first
-  const sortedSchedule = [...published].sort((a, b) => b.date.localeCompare(a.date));
+  // Sort descending: newest date first, strictly up to today
+  const sortedSchedule = [...published]
+    .filter((a) => a.date <= currentToday)
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   if (!mounted) {
     return (

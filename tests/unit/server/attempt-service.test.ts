@@ -66,6 +66,17 @@ describe("Authoritative Attempt Lifecycle Service", () => {
         expect(secondStart.result.canonicalPhrase).toBe("BITTER TRUTH");
       }
     });
+
+    it("rejects starting a daily attempt for a future scheduled date", async () => {
+      const unassigned = await startDailyAttempt(guestA, "2099-01-01");
+      expect(unassigned.status).toBe("UNAVAILABLE");
+
+      const futureScheduled = await startDailyAttempt(guestA, "2026-10-15");
+      expect(futureScheduled.status).toBe("UNAVAILABLE");
+      if (futureScheduled.status === "UNAVAILABLE") {
+        expect(futureScheduled.message).toContain("has not yet been published");
+      }
+    });
   });
 
   describe("Classic Attempt Lifecycle", () => {

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   getDailyDateString,
   getDailyPuzzle,
+  getDailyScheduleStatus,
   getPublishedDailySchedule,
   DEFAULT_DAILY_TIMEZONE,
 } from "@/features/game/modes/daily-scheduler";
@@ -33,9 +34,25 @@ describe("Daily Scheduler", () => {
     });
   });
 
+  describe("getDailyScheduleStatus", () => {
+    it("returns AVAILABLE for past or current published dates", () => {
+      expect(getDailyScheduleStatus("2026-10-12", "2026-10-14")).toBe("AVAILABLE");
+      expect(getDailyScheduleStatus("2026-10-14", "2026-10-14")).toBe("AVAILABLE");
+    });
+
+    it("returns FUTURE_UNPUBLISHED for future dates", () => {
+      expect(getDailyScheduleStatus("2026-10-15", "2026-10-14")).toBe("FUTURE_UNPUBLISHED");
+      expect(getDailyScheduleStatus("2026-10-20", "2026-10-14")).toBe("FUTURE_UNPUBLISHED");
+    });
+
+    it("returns UNAVAILABLE for dates not in the schedule", () => {
+      expect(getDailyScheduleStatus("2025-01-01", "2026-10-14")).toBe("UNAVAILABLE");
+    });
+  });
+
   describe("getDailyPuzzle", () => {
     it("returns AVAILABLE for scheduled and published daily puzzles", () => {
-      const result = getDailyPuzzle("2026-10-12");
+      const result = getDailyPuzzle("2026-10-12", "2026-10-14");
       expect(result.status).toBe("AVAILABLE");
       if (result.status === "AVAILABLE") {
         expect(result.date).toBe("2026-10-12");
@@ -45,7 +62,7 @@ describe("Daily Scheduler", () => {
     });
 
     it("returns FUTURE_UNPUBLISHED for scheduled but unpublished daily puzzles", () => {
-      const result = getDailyPuzzle("2026-10-20");
+      const result = getDailyPuzzle("2026-10-20", "2026-10-14");
       expect(result.status).toBe("FUTURE_UNPUBLISHED");
       if (result.status === "FUTURE_UNPUBLISHED") {
         expect(result.date).toBe("2026-10-20");
@@ -53,8 +70,17 @@ describe("Daily Scheduler", () => {
       }
     });
 
+    it("returns FUTURE_UNPUBLISHED for future dates even if marked PUBLISHED in schedule", () => {
+      const result = getDailyPuzzle("2026-10-15", "2026-10-14");
+      expect(result.status).toBe("FUTURE_UNPUBLISHED");
+      if (result.status === "FUTURE_UNPUBLISHED") {
+        expect(result.date).toBe("2026-10-15");
+        expect(result.message).toContain("has not yet been published");
+      }
+    });
+
     it("returns UNAVAILABLE for unassigned calendar dates", () => {
-      const result = getDailyPuzzle("2025-01-01");
+      const result = getDailyPuzzle("2025-01-01", "2026-10-14");
       expect(result.status).toBe("UNAVAILABLE");
       if (result.status === "UNAVAILABLE") {
         expect(result.date).toBe("2025-01-01");
@@ -64,11 +90,20 @@ describe("Daily Scheduler", () => {
   });
 
   describe("getPublishedDailySchedule", () => {
-    it("returns only published assignments", () => {
-      const schedule = getPublishedDailySchedule();
+    it("returns only published assignments up to the cutoff date", () => {
+      const schedule = getPublishedDailySchedule("2026-10-14");
       expect(schedule.length).toBeGreaterThan(0);
       expect(schedule.every((item) => item.publicationStatus === "PUBLISHED")).toBe(true);
+      expect(schedule.every((item) => item.date <= "2026-10-14")).toBe(true);
+      expect(schedule.some((item) => item.date === "2026-10-15")).toBe(false);
+      expect(schedule.some((item) => item.date === "2026-10-16")).toBe(false);
       expect(schedule.some((item) => item.puzzleId === "light-house")).toBe(false);
+    });
+
+    it("excludes future dates when called with default today", () => {
+      const today = getDailyDateString();
+      const schedule = getPublishedDailySchedule();
+      expect(schedule.every((item) => item.date <= today)).toBe(true);
     });
   });
 });

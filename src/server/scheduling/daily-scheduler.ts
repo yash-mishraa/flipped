@@ -67,7 +67,8 @@ export async function resolveServerDailyAssignment(
     };
   }
 
-  if (assignment.publicationStatus !== "PUBLISHED") {
+  const todayStr = getServerDailyDateString();
+  if (dateString > todayStr || assignment.publicationStatus !== "PUBLISHED") {
     return {
       status: "FUTURE_UNPUBLISHED",
       date: dateString,
