@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { FlippedSymbol, FlippedLogo } from "@/components/FlippedLogo";
+import { SplashIntro } from "@/components/SplashIntro";
 import fs from "fs";
 import path from "path";
 
@@ -65,5 +66,17 @@ describe("Brand Identity System — Specifications & Components", () => {
     expect(faviconContent).toContain("#F7F0E5"); // Warm cream symbol
     expect(faviconContent).toContain("M 0 0 L 64 0 L 48 16 L 16 16 L 16 64 L 0 64 Z"); // Spine & Top bar
     expect(faviconContent).toContain("M 24 24 L 56 24 L 40 40 L 24 40 Z"); // Middle tile
+  });
+
+  it("renders the SplashIntro with crimson background and cream FLIPPED wordmark", () => {
+    render(<SplashIntro forceShow />);
+
+    const splash = screen.getByTestId("splash-intro");
+    expect(splash).toBeInTheDocument();
+    expect(splash).toHaveClass("bg-[#7B1E2B]");
+
+    // Brand wordmark
+    expect(screen.getByText("FLIPPED")).toHaveClass("text-[#F7F0E5]");
+    expect(screen.getByText("Word Deduction Puzzle")).toBeInTheDocument();
   });
 });

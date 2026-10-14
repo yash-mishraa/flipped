@@ -18,6 +18,7 @@ import { AcidSquares } from "@/components/AcidSquares";
 import DecryptedText from "@/components/DecryptedText";
 import { Footer } from "@/components/Footer";
 import { FlippedSymbol } from "@/components/FlippedLogo";
+import { SplashIntro } from "@/components/SplashIntro";
 import { loadProgress } from "@/features/game/persistence/local-progress";
 import { getDailyDateString, getDailyScheduleStatus } from "@/features/game/modes/daily-scheduler";
 import { calculateDailyStreaks } from "@/features/game/modes/statistics";
@@ -76,6 +77,7 @@ export default function HomePage(): React.JSX.Element {
 
   return (
     <div className="home-page flex min-h-screen flex-col">
+      <SplashIntro />
       <AcidSquares className="home-acid-background" color="#F7F0E5" accentColor="#C49A6C" />
       <Header />
 
