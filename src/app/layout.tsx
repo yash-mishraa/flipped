@@ -9,9 +9,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "FLIPPED — Quick decisions. Lasting impressions.",
+  title: "FLIPPED — Word Deduction Puzzle",
   description:
-    "A split second. A different game. Deduce two clue words into a familiar phrase before the 60-second timer runs out. Movement without noise. Competition with character.",
+    "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
   applicationName: "FLIPPED",
   icons: {
     icon: [
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "FLIPPED — A split second. A different game.",
-    description: "Quick decisions. Playful competition. Make your next move count.",
+    title: "FLIPPED — Word Deduction Puzzle",
+    description: "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
     type: "website",
     siteName: "FLIPPED",
   },
   twitter: {
     card: "summary",
-    title: "FLIPPED — Quick decisions. Lasting impressions.",
-    description: "A split second. A different game. The editorial word deduction puzzle.",
+    title: "FLIPPED — Word Deduction Puzzle",
+    description: "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
   },
 };
 

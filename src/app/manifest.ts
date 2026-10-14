@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "FLIPPED — Word Deduction Puzzle",
     short_name: "FLIPPED",
-    description: "Quick decisions. Lasting impressions. The editorial word deduction puzzle.",
+    description: "Flip two clue words into a familiar phrase before the 60-second timer runs out.",
     start_url: "/",
     display: "standalone",
     background_color: "#F7F0E5",
