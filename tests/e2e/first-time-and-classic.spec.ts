@@ -13,10 +13,13 @@ test.describe("Journey A & B — First-Time Player & Classic Mode", () => {
     await page.goto("/");
 
     // 1. Verify How to Play button is visible and works
-    const howToPlayButton = page.getByRole("button", { name: /How to Play/i });
+    const howToPlayButton = page.getByRole("button", { name: /How to Play/i }).first();
     await expect(howToPlayButton).toBeVisible();
     await howToPlayButton.click();
     await expect(page.getByRole("heading", { name: "How Flipped Works", level: 2 })).toBeVisible();
+
+    // Close tutorial dialog so page links become clickable
+    await page.getByRole("button", { name: /Close tutorial dialog/i }).click();
 
     // 2. Navigate to Classic Mode via top navigation
     const classicLink = page.getByRole("link", { name: /Classic/i }).first();

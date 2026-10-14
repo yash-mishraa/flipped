@@ -1,12 +1,12 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import HomePage from "@/app/page";
 import { setOnboardingCompleted } from "@/features/game/persistence/local-progress";
 
 describe("Production Home Screen (HomePage)", () => {
   beforeEach(() => {
-    setOnboardingCompleted(true); // Prevent auto-opening tutorial during home screen layout tests
+    setOnboardingCompleted(true);
   });
 
   it("renders the game title and core challenge headline", () => {
@@ -17,25 +17,26 @@ describe("Production Home Screen (HomePage)", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Daily Challenge card and navigation to classic and game modes", () => {
+  it("renders the primary action buttons: Daily Challenge, How to Play, and Auth", () => {
     render(<HomePage />);
-    expect(screen.getByTestId("home-daily-card")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Daily Mode", level: 2 })).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /Classic/i })[0]).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Play Daily Challenge/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /How to Play/i })[0]).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Log In \/ Create Account/i })).toBeInTheDocument();
   });
 
-  it("renders How Flipped Works section with semantic examples", () => {
+  it("renders navigation links to Classic, Archive, and Statistics via the shell", () => {
     render(<HomePage />);
+    expect(screen.getAllByRole("link", { name: /Classic/i })[0]).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Archive/i })[0]).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Statistics/i })[0]).toBeInTheDocument();
+  });
+
+  it("opens the How Flipped Works tutorial modal when How to Play is clicked", () => {
+    render(<HomePage />);
+    const howToPlayBtns = screen.getAllByRole("button", { name: /How to Play/i });
+    fireEvent.click(howToPlayBtns[0]);
     expect(
       screen.getByRole("heading", { name: "How Flipped Works", level: 2 })
     ).toBeInTheDocument();
-    expect(screen.getByText("SLOW + MEAL")).toBeInTheDocument();
-    expect(screen.getByText("FAST FOOD")).toBeInTheDocument();
-  });
-
-  it("renders navigation links to Archive and Statistics", () => {
-    render(<HomePage />);
-    expect(screen.getAllByRole("link", { name: /Archive/i })[0]).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /Statistics/i })[0]).toBeInTheDocument();
   });
 });

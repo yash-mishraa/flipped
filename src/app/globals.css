@@ -83,44 +83,18 @@ button { font: inherit; }
 
 /* A quiet, print-led frame shared by every route. */
 body > div { min-height: 100vh; }
+/* Navigation header */
 header.sticky {
-  position: relative !important;
-  background: transparent !important;
-  border-color: transparent !important;
-  border-bottom: 0 !important;
-  backdrop-filter: none !important;
+  position: sticky;
+  top: 0;
+  z-index: 40;
 }
-header.sticky > div { max-width: 1120px !important; min-height: 66px; }
-header.sticky a[href="/"] > div { display: none !important; }
 header.sticky a[href="/"] span {
-  font-family: var(--serif); font-size: 25px !important; font-weight: 700 !important;
-  letter-spacing: -.06em !important; color: var(--ink) !important;
+  font-family: var(--serif);
+  font-weight: 700;
+  letter-spacing: -.04em;
+  color: var(--ink);
 }
-header.sticky nav a, header.sticky nav button {
-  border: 0 !important; border-radius: 0 !important; background: transparent !important;
-  box-shadow: none !important; padding: 10px 11px !important; color: var(--muted) !important;
-  font-size: 13px !important;
-}
-header.sticky nav a[aria-current="page"], header.sticky nav a:hover,
-header.sticky nav button:hover { color: var(--accent) !important; }
-
-.breadcrumb-navigation {
-  display: flex; width: 100%; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 2px 5px; color: var(--muted); font-size: 13px; font-weight: 500;
-}
-.breadcrumb-navigation a, .breadcrumb-navigation button {
-  display: inline-flex; min-height: 38px; align-items: center; gap: 7px;
-  color: var(--muted); text-decoration: none; white-space: nowrap;
-}
-.breadcrumb-navigation a:hover, .breadcrumb-navigation button:hover,
-.breadcrumb-navigation a[aria-current="page"] { color: var(--accent) !important; }
-.breadcrumb-navigation .breadcrumb-home { color: var(--ink); font-family: var(--serif); font-size: 19px; font-weight: 700; letter-spacing: -.05em; }
-.breadcrumb-home svg { width: 18px; height: 18px; }
-.breadcrumb-navigation a:not(.breadcrumb-home) svg, .breadcrumb-navigation button svg { width: 14px; height: 14px; }
-.breadcrumb-navigation .breadcrumb-separator { width: 14px; height: 14px; color: var(--rule); }
-.breadcrumb-item { display: inline-flex; align-items: center; gap: 5px; }
-.breadcrumb-utilities { margin-left: 5px; }
-.breadcrumb-utilities button { border: 0; background: transparent; cursor: pointer; padding: 0 8px; }
 
 .home-page { position: relative; isolation: isolate; }
 .home-page > header, .home-page > main, .home-page > footer { position: relative; z-index: 1; }
@@ -221,12 +195,6 @@ main [role="radiogroup"] button[aria-checked="true"] { border-color: var(--accen
   [data-testid="letter-grid"] { padding-inline: 0 !important; overflow-x: visible !important; width: 100%; }
   [data-testid="letter-grid"] > div { flex-wrap: wrap !important; justify-content: center !important; gap: 12px !important; }
   [data-testid^="word-group-"] { flex: 0 0 auto; justify-content: center; }
-  .breadcrumb-navigation { gap: 0 2px; font-size: 12px; }
-  .breadcrumb-navigation a, .breadcrumb-navigation button { min-height: 34px; gap: 4px; padding-inline: 5px !important; }
-  .breadcrumb-navigation .breadcrumb-home { font-size: 16px; }
-  .breadcrumb-navigation .breadcrumb-separator { width: 11px; }
-  .breadcrumb-navigation .breadcrumb-home svg { width: 16px; height: 16px; }
-  .breadcrumb-utilities { margin-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

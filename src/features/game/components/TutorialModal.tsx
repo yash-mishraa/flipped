@@ -160,7 +160,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
               <BookOpen className="h-4 w-4" aria-hidden="true" />
             </div>
             <h2 id="tutorial-dialog-title" className="text-lg font-bold text-[#32171D]">
-              How to Play Flipped
+              How Flipped Works
             </h2>
           </div>
 
