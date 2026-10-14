@@ -415,6 +415,22 @@ Every development script was executed and verified directly:
   - Cream white: `#F7F0E5` (canvas background, tile text, primary surfaces)
   - Dark wine: `#32171D` (primary typography, confirmed/filled letter tiles)
   - Muted gold: `#C49A6C` (borders, badges, icons, divider lines)
-- **Eliminated**: Dark/light mode switcher, `flipped-theme` localStorage hooks, `MutationObserver` on `data-theme`, `html[data-theme="dark"]` CSS rules.
-- **Coverage**: Updated `layout.tsx`, `globals.css`, `Header`, `Footer`, `page.tsx` (Hero, Cards, How It Works, Archive, Stats), `daily`, `classic`, `archive`, `stats`, `LetterTile`, `GameHUD`, `GameTimer`, `HintControl`, `DifficultySelector`, `TutorialModal`, `SuccessScreen`, `TimeoutScreen`, `DailyCompletionCard`, `ShareButton`.
 - **Verification**: Zero theme-switch remnants, 100% test pass rate (224 unit tests, 12 Playwright E2E tests, clean TypeScript typecheck, clean ESLint, Next.js production build succeeded).
+
+---
+
+## 6. Official Brand Identity System Implementation (2026-10-14)
+
+### 1. Specification Compliance
+- **Geometry**: Extracted mathematical specification of split-F symbol: 64 × 64 source grid, 16-unit spine, 8-unit open seam, 45° diagonal cuts, separate middle tile.
+- **Favicons & PWA Assets**: Built `scripts/generate-brand-assets.mjs` generating:
+  - `favicon.svg`: Cream on Crimson vector signature with 12.5% inset.
+  - `favicon-16x16.png`, `favicon-32x32.png`, `favicon-48x48.png`: Sharp pixel-fitted favicons.
+  - `favicon.ico`: Windows multi-size ICO.
+  - `apple-touch-icon.png`: 180×180 iOS touch icon.
+  - `icon-192.png`, `icon-512.png`: PWA manifest icons.
+  - `logo.svg`, `logo-symbol.svg`, `logo-symbol-cream.svg`: Vector marks.
+- **Components**: Created `FlippedSymbol` and `FlippedLogo` in `src/components/FlippedLogo.tsx`.
+- **Navigation & Layout**: Integrated `FlippedSymbol` into `breadcrumb.tsx`, `Header.tsx`, `Footer.tsx`, and `page.tsx`.
+- **Metadata**: Configured `layout.tsx` icons, OpenGraph, Twitter cards, and `manifest.ts` PWA metadata.
+- **Verification**: 228 / 228 unit tests passing (including `brand-identity.test.tsx`), 12 / 12 Playwright E2E tests passing, Next.js production build passing with 10 static routes.

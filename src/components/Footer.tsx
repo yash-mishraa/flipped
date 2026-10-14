@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Keyboard, ShieldCheck } from "lucide-react";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
+import { FlippedSymbol } from "@/components/FlippedLogo";
 
 export function Footer(): React.JSX.Element {
   const [tutorialOpen, setTutorialOpen] = useState(false);
@@ -15,14 +16,15 @@ export function Footer(): React.JSX.Element {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-2">
+                <FlippedSymbol size={18} variant="crimson" />
                 <span className="font-extrabold text-sm tracking-tight text-[#32171D]">
                   FLIPPED
                 </span>
                 <span className="text-[#C49A6C]">•</span>
-                <span className="text-[#6B4E55]">The Editorial Word Deduction Puzzle</span>
+                <span className="text-[#6B4E55]">Quick decisions. Lasting impressions.</span>
               </div>
               <p className="text-[11px] text-[#8C6D68]">
-                Flip two clue words into a familiar phrase before the 60-second timer runs out.
+                A split second. A different game. Flip two clue words into a familiar phrase before the 60-second timer runs out.
               </p>
             </div>
 

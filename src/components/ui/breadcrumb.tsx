@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Archive, BarChart2, BookOpen, Calendar, ChevronRight, Compass, House } from "lucide-react";
+import { Archive, BarChart2, BookOpen, Calendar, ChevronRight, Compass } from "lucide-react";
+import { FlippedSymbol } from "@/components/FlippedLogo";
 
 export interface BreadcrumbNavigationProps {
   readonly pathname: string;
@@ -25,8 +26,8 @@ export default function BreadcrumbNavigation({
 }: BreadcrumbNavigationProps): React.JSX.Element {
   return (
     <nav className="breadcrumb-navigation" aria-label="Main Navigation">
-      <Link href="/" aria-label="Flipped home" aria-current={pathname === "/" ? "page" : undefined} className="breadcrumb-home">
-        <House aria-hidden="true" />
+      <Link href="/" aria-label="Flipped home" aria-current={pathname === "/" ? "page" : undefined} className="breadcrumb-home flex items-center gap-2">
+        <FlippedSymbol size={18} variant="crimson" />
         <span>FLIPPED</span>
       </Link>
       <Separator />

@@ -336,3 +336,30 @@ This document records architectural decisions, their context, alternatives consi
   - Establishes a bold, cohesive literary aesthetic tailored specifically to word deduction and editorial puzzles.
   - Simplifies the codebase by eliminating theme switching state management, observer callbacks, and dual-theme style divergence.
   - Guarantees 100% visual consistency across desktop and mobile devices.
+
+---
+
+## ADR-023: Official FLIPPED Brand Identity System Implementation
+
+- **Date**: 2026-10-14
+- **Status**: Accepted
+- **Context**: The user provided the official brand identity system specification PDF ("FLIPPED — IDENTITY SYSTEM"). The specification details the mathematical geometry of the split-F symbol, favicon dimensions, color palette roles, horizontal lockup proportions, and brand copy.
+- **Decision**:
+  1. **Split-F Signature Symbol (64 × 64 source grid)**:
+     - Spine width = 16 units, Open seam = 8 units.
+     - Top bar diagonal cut: 45° cut (dx=-16, dy=16) from (64, 0) to (48, 16).
+     - Middle tile diagonal cut: 45° cut (dx=-16, dy=16) from (56, 24) to (40, 40).
+     - Geometry path: `M 0 0 L 64 0 L 48 16 L 16 16 L 16 64 L 0 64 Z M 24 24 L 56 24 L 40 40 L 24 40 Z`.
+     - Preserves the separate middle tile and open seam without distortion, outlines, or enclosing circles.
+  2. **Favicon System (16 · 32 · 48 & High-DPI)**:
+     - Generated vector SVG favicon (`favicon.svg`) with Cream `#F7F0E5` symbol on Crimson `#7B1E2B` substrate.
+     - Generated raster favicons matching exact inset rules: 16×16 (12px mark / 2px inset), 32×32 (24px mark / 4px inset), 48×48 (36px mark / 6px inset), 180×180 apple-touch-icon, and multi-resolution `favicon.ico`.
+     - Added Web App Manifest (`manifest.ts`) linking high-res PWA icons (`icon-192.png`, `icon-512.png`).
+  3. **Horizontal Lockup & Navigation Integration**:
+     - Created `FlippedSymbol` and `FlippedLogo` in `src/components/FlippedLogo.tsx` adhering to horizontal lockup rules: mark height $h$, gap $0.5h$, wordmark font size $1.16h$, tracking $0.035h$, Inter Extra Bold 800 uppercase.
+     - Replaced generic navigation icons with `FlippedSymbol` in `breadcrumb.tsx` and `Footer.tsx`.
+     - Integrated signature symbol and official brand taglines (*"Quick decisions. Lasting impressions."*, *"Think fast. Flip the moment."*, *"A split second. A different game."*) into `page.tsx` and `layout.tsx`.
+- **Rationale**:
+  - Unifies product identity with the official brand book guidelines.
+  - Ensures sharp, recognizable browser tabs, bookmarks, and mobile home screen icons across all screen densities.
+  - Keeps branding scalable, deterministic, and 100% reproducible via `npm run brand:build`.

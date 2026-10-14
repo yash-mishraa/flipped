@@ -19,6 +19,7 @@ import { Header } from "@/components/Header";
 import { AcidSquares } from "@/components/AcidSquares";
 import DecryptedText from "@/components/DecryptedText";
 import { Footer } from "@/components/Footer";
+import { FlippedSymbol } from "@/components/FlippedLogo";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
 import { loadProgress, isOnboardingCompleted } from "@/features/game/persistence/local-progress";
 import { getDailyDateString, getDailyScheduleStatus } from "@/features/game/modes/daily-scheduler";
@@ -87,9 +88,13 @@ export default function HomePage(): React.JSX.Element {
       <main className="mx-auto flex flex-1 w-full max-w-5xl flex-col px-4 py-8 sm:px-6 sm:py-12">
         {/* Hero Section */}
         <section className="text-center space-y-4 my-4 sm:my-8" aria-label="Game Introduction">
+          <div className="flex justify-center">
+            <FlippedSymbol size={54} variant="crimson" />
+          </div>
+
           <div className="inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-semibold text-[#7B1E2B]">
             <Sparkles className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
-            <span>The Daily Mental Deduction Challenge</span>
+            <span>Quick decisions. Lasting impressions.</span>
           </div>
 
           <h1 aria-label="FLIPPED" className="home-wordmark text-4xl font-black tracking-tight text-[#32171D] sm:text-5xl md:text-6xl">

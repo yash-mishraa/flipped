@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 64" width="460" height="64">
+  <!-- Standalone Symbol -->
+  <g transform="translate(0, 0)">
+    <path d="M 0 0 L 64 0 L 48 16 L 16 16 L 16 64 L 0 64 Z M 24 24 L 56 24 L 40 40 L 24 40 Z" fill="#7B1E2B" fill-rule="evenodd"/>
+  </g>
+  <!-- Wordmark in Inter Extra Bold 800 -->
+  <text x="96" y="56" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="74.24" font-weight="800" letter-spacing="2.24" fill="#32171D">FLIPPED</text>
+</svg>
