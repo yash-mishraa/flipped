@@ -1,38 +1,38 @@
 .branched-menu {
-  --bm-w: 240px;
+  --bm-w: 280px;
   --bm-ink: #32171D;
   --bm-accent: #7B1E2B;
   --bm-line: #C49A6C;
-  --bm-font: 14px;
-  --bm-row: 36px;
-  --bm-indent: 40px;
-  --bm-line-w: 1.5;
-  --bm-draw: 400ms;
-  --bm-fold: 300ms;
+  --bm-font: 16px;
+  --bm-row: 46px;
+  --bm-indent: 44px;
+  --bm-line-w: 2;
+  --bm-draw: 350ms;
+  --bm-fold: 260ms;
   --bm-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --bm-muted: color-mix(in srgb, var(--bm-ink) 55%, transparent);
+  --bm-muted: #6B4E55;
 
   position: relative;
   display: flex;
   flex-direction: column;
-  width: fit-content;
+  width: 100%;
   max-width: min(var(--bm-w), 100%);
-  padding-left: 14px;
+  padding-left: 16px;
   color: var(--bm-ink);
   font-family: inherit;
   font-size: var(--bm-font);
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .branched-menu::before {
   content: '';
   position: absolute;
-  top: 8px;
-  bottom: 0;
+  top: 10px;
+  bottom: 8px;
   left: 0;
-  width: 2px;
-  border-radius: 1px;
-  background: linear-gradient(to bottom, var(--bm-line) 0%, var(--bm-line) 55%, transparent 100%);
+  width: 2.5px;
+  border-radius: 1.5px;
+  background: linear-gradient(to bottom, var(--bm-line) 0%, var(--bm-line) 75%, transparent 100%);
 }
 
 .branched-menu__marker {
@@ -40,9 +40,9 @@
   top: -1px;
   left: 0;
   z-index: 1;
-  width: 2px;
-  height: 16px;
-  border-radius: 1px;
+  width: 2.5px;
+  height: 20px;
+  border-radius: 1.5px;
   background: var(--bm-accent);
   opacity: 0;
   transition:
@@ -57,18 +57,22 @@
 .branched-menu__section {
   display: flex;
   flex-direction: column;
+  margin-bottom: 4px;
 }
 
 .branched-menu__head {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 0;
-  padding: 9px 0;
+  padding: 12px 0 6px 0;
   border: 0;
   background: none;
   color: var(--bm-muted);
   font: inherit;
   font-size: calc(var(--bm-font) + 1px);
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   text-align: left;
   cursor: pointer;
   outline: none;
@@ -83,7 +87,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .branched-menu__head:hover {
-    color: var(--bm-ink);
+    color: var(--bm-accent);
   }
 }
 
@@ -104,7 +108,7 @@
 
 .branched-menu__tree {
   position: relative;
-  padding: 6px 0;
+  padding: 4px 0 8px 0;
   box-sizing: border-box;
 }
 
@@ -120,7 +124,7 @@
 
 .branched-menu__section[data-open] .branched-menu__lines {
   opacity: 1;
-  transition: opacity 250ms ease 100ms;
+  transition: opacity 250ms ease 80ms;
 }
 
 .branched-menu__base,
@@ -143,33 +147,37 @@
 .branched-menu__item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   height: var(--bm-row);
-  margin: 0;
-  padding: 0 0 0 var(--bm-indent);
+  margin: 2px 0;
+  padding: 0 12px 0 var(--bm-indent);
   border: 0;
+  border-radius: 12px;
   background: none;
   color: var(--bm-muted);
   font: inherit;
+  font-size: var(--bm-font);
   font-weight: 600;
   text-align: left;
   cursor: pointer;
   outline: none;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  transition: color 200ms ease, transform 150ms ease;
+  transition: all 180ms ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .branched-menu__item:hover {
     color: var(--bm-ink);
+    background-color: rgba(196, 154, 108, 0.12);
   }
 }
 
 .branched-menu__item[data-active] {
   color: var(--bm-accent);
-  font-weight: 700;
+  font-weight: 800;
+  background-color: rgba(123, 30, 43, 0.08);
 }
 
 .branched-menu__icon {
