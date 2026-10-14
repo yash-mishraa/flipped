@@ -43,10 +43,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>): React.JSX.Element {
+  const publishableKey =
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+    "pk_test_c2FmZS1jYXQtMjI1OC5jbGVyay5hY2NvdW50cy5kZXYk";
+
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#F7F0E5] text-[#32171D] antialiased selection:bg-[#7B1E2B] selection:text-[#F7F0E5]">
-        <ClerkProvider>{children}</ClerkProvider>
+        <ClerkProvider publishableKey={publishableKey}>{children}</ClerkProvider>
       </body>
     </html>
   );
