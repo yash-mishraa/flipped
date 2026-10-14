@@ -2,20 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import {
-  Trophy,
-  Hourglass,
-  Sparkles,
-  Clock,
-  Lightbulb,
-  Compass,
-  Calendar,
-  Home,
-} from "lucide-react";
 import type { Puzzle, LetterGrid as LetterGridType, LetterTile } from "../domain/types";
 import type { DailyAttemptRecord } from "../modes/mode-types";
 import { LetterGrid } from "./LetterGrid";
-
 import { ShareButton } from "./ShareButton";
 
 export interface DailyCompletionCardProps {
@@ -87,18 +76,6 @@ export function DailyCompletionCard({
     >
       {/* Header status indicator */}
       <div className="flex flex-col items-center text-center">
-        <div
-          className={`mb-3 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ${
-            isWon ? "bg-[#faeee0] text-[#C49A6C]" : "bg-[#faeee0] text-[#32171D]"
-          }`}
-        >
-          {isWon ? (
-            <Trophy className="h-7 w-7" aria-hidden="true" />
-          ) : (
-            <Hourglass className="h-7 w-7" aria-hidden="true" />
-          )}
-        </div>
-
         <div className="flex items-center gap-2">
           <span
             className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
@@ -110,7 +87,7 @@ export function DailyCompletionCard({
           <span className="text-xs font-semibold text-[#8C6870]">• {date}</span>
         </div>
 
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-[#32171D] sm:text-3xl">
+        <h2 className="mt-3 text-2xl font-black tracking-tight text-[#32171D] sm:text-3xl">
           {attempt.solvedPhrase || canonicalPhrase}
         </h2>
         <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">{friendlyDate}</p>
@@ -119,9 +96,8 @@ export function DailyCompletionCard({
       {/* Stats Summary Grid */}
       <div className="grid w-full grid-cols-3 gap-2.5 text-center">
         <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-          <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#8C6870] uppercase">
-            <Sparkles className="h-3 w-3 text-[#7B1E2B]" aria-hidden="true" />
-            <span>Score</span>
+          <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+            Score
           </div>
           <p className={`mt-1 text-2xl font-black ${isWon ? "text-[#7B1E2B]" : "text-[#32171D]"}`}>
             {attempt.finalScore}
@@ -129,17 +105,15 @@ export function DailyCompletionCard({
         </div>
 
         <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-          <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#8C6870] uppercase">
-            <Clock className="h-3 w-3 text-[#C49A6C]" aria-hidden="true" />
-            <span>Time</span>
+          <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+            Time
           </div>
           <p className="mt-1 text-2xl font-black text-[#32171D]">{attempt.elapsedSeconds}s</p>
         </div>
 
         <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-          <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#8C6870] uppercase">
-            <Lightbulb className="h-3 w-3 text-[#C49A6C]" aria-hidden="true" />
-            <span>Hints</span>
+          <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+            Hints
           </div>
           <p className="mt-1 text-2xl font-black text-[#32171D]">{attempt.hintsUsed}</p>
         </div>
@@ -213,26 +187,23 @@ export function DailyCompletionCard({
       <div className="flex w-full flex-col gap-2.5 sm:flex-row">
         <Link
           href="/classic"
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition hover:bg-[#631722] active:scale-95"
+          className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition hover:bg-[#631722] active:scale-95"
         >
-          <Compass className="h-4 w-4" aria-hidden="true" />
-          <span>Play Classic Mode</span>
+          Play Classic Mode
         </Link>
 
         <Link
           href="/archive"
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#C49A6C] bg-white px-4 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+          className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
         >
-          <Calendar className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />
-          <span>Daily Archive</span>
+          Daily Archive
         </Link>
 
         <Link
           href="/"
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#C49A6C] bg-white px-4 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+          className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
         >
-          <Home className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />
-          <span>Home</span>
+          Home
         </Link>
       </div>
     </div>

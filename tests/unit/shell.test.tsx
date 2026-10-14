@@ -34,7 +34,8 @@ describe("Production Home Screen (HomePage)", () => {
   it("opens the How Flipped Works tutorial modal when How to Play is clicked", () => {
     render(<HomePage />);
     const howToPlayBtns = screen.getAllByRole("button", { name: /How to Play/i });
-    fireEvent.click(howToPlayBtns[0]);
+    expect(howToPlayBtns.length).toBeGreaterThan(0);
+    fireEvent.click(howToPlayBtns[0]!);
     expect(
       screen.getByRole("heading", { name: "How Flipped Works", level: 2 })
     ).toBeInTheDocument();

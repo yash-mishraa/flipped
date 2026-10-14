@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface DurationOption {
@@ -69,10 +68,7 @@ export function ClassicDurationSelector({
               disabled && "opacity-50 cursor-not-allowed"
             )}
           >
-            <div className="flex items-center gap-1.5">
-              <Clock className={cn("h-3.5 w-3.5", isSelected ? "text-[#F7F0E5]" : "text-[#7B1E2B]")} />
-              <span className="text-sm font-extrabold">{option.label}</span>
-            </div>
+            <span className="text-sm font-extrabold">{option.label}</span>
             <span
               className={cn(
                 "mt-0.5 text-[10px]",

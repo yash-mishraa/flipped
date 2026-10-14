@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Archive, BarChart2, BookOpen, Calendar, ChevronRight, Compass } from "lucide-react";
 import { FlippedSymbol } from "@/components/FlippedLogo";
 
 export interface BreadcrumbNavigationProps {
@@ -10,14 +9,14 @@ export interface BreadcrumbNavigationProps {
 }
 
 const links = [
-  { href: "/daily", label: "Daily", icon: Calendar },
-  { href: "/classic", label: "Classic", icon: Compass },
-  { href: "/archive", label: "Archive", icon: Archive },
-  { href: "/stats", label: "Statistics", icon: BarChart2 },
+  { href: "/daily", label: "Daily" },
+  { href: "/classic", label: "Classic" },
+  { href: "/archive", label: "Archive" },
+  { href: "/stats", label: "Statistics" },
 ] as const;
 
 function Separator(): React.JSX.Element {
-  return <ChevronRight className="breadcrumb-separator" aria-hidden="true" />;
+  return <span className="breadcrumb-separator text-stone-300 mx-1 select-none" aria-hidden="true">/</span>;
 }
 
 export default function BreadcrumbNavigation({
@@ -30,19 +29,17 @@ export default function BreadcrumbNavigation({
         <span>FLIPPED</span>
       </Link>
       <Separator />
-      {links.map(({ href, label, icon: Icon }, index) => (
+      {links.map(({ href, label }, index) => (
         <span className="breadcrumb-item" key={href}>
           {index > 0 && <Separator />}
           <Link href={href} aria-current={pathname === href ? "page" : undefined}>
-            <Icon aria-hidden="true" />
             <span>{label}</span>
           </Link>
         </span>
       ))}
       <span className="breadcrumb-item breadcrumb-utilities">
         <Separator />
-        <Link href="/#how-to-play" className="inline-flex items-center gap-1">
-          <BookOpen aria-hidden="true" />
+        <Link href="/#how-to-play" className="inline-flex items-center">
           <span>How to Play</span>
         </Link>
       </span>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Share2, Check, AlertCircle } from "lucide-react";
 import { shareResult, type ShareResultOptions } from "../utils/share-result";
 
 export interface ShareButtonProps {
@@ -43,28 +42,21 @@ export function ShareButton({ options, className }: ShareButtonProps): React.JSX
         aria-label={copied ? "Copied results to clipboard" : "Share results"}
         className={
           className ||
-          "inline-flex items-center justify-center gap-2 rounded-xl border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
+          "inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-6 py-2.5 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
         }
       >
         {copied ? (
-          <>
-            <Check className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />
-            <span className="text-[#7B1E2B] font-bold">Copied to Clipboard!</span>
-          </>
+          <span className="text-[#7B1E2B] font-bold">Copied to Clipboard!</span>
         ) : (
-          <>
-            <Share2 className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />
-            <span>Share Result</span>
-          </>
+          <span>Share Result</span>
         )}
       </button>
 
       {errorMsg && (
         <span
           role="status"
-          className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-[#7B1E2B] flex items-center gap-1"
+          className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-[#7B1E2B]"
         >
-          <AlertCircle className="h-3 w-3" />
           {errorMsg}
         </span>
       )}

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Check, Lock, X } from "lucide-react";
 import type { LetterTile as TileModel } from "../domain/types";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +13,7 @@ export interface LetterTileProps {
 
 /**
  * LetterTile renders an individual character slot within an answer word.
- * Provides distinct multi-modal visual cues (colors, borders, icons, text styles)
+ * Provides distinct multi-modal visual cues (colors, borders, text styles)
  * to ensure accessibility across color vision deficiencies.
  */
 export function LetterTile({
@@ -79,52 +78,13 @@ export function LetterTile({
         !isFixed && !isRoundOver && "cursor-pointer active:scale-95"
       )}
     >
-      {/* Direct, instantaneous, crisp typography without canvas animation glitches */}
+      {/* Crisp typography */}
       <span
         aria-hidden="true"
         className="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-none select-none"
       >
         {letter}
       </span>
-
-      {/* Non-color visual indicator badges */}
-      {isFixed && (
-        <span
-          className="absolute top-1 right-1 text-[#C49A6C]"
-          title="Fixed clue letter"
-          aria-hidden="true"
-        >
-          <Lock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-        </span>
-      )}
-
-      {!isFixed && feedback === "CONFIRMED" && (
-        <span
-          className="absolute top-1 right-1 text-[#C49A6C]"
-          title="Confirmed in correct position"
-          aria-hidden="true"
-        >
-          <Check className="h-3 w-3 stroke-[3]" />
-        </span>
-      )}
-
-      {!isFixed && feedback === "ELIMINATED" && (
-        <span
-          className="absolute top-1 right-1 text-[#7B1E2B]"
-          title="Incorrect letter"
-          aria-hidden="true"
-        >
-          <X className="h-3 w-3 stroke-[3]" />
-        </span>
-      )}
-
-      {!isFixed && feedback === "PENDING" && (
-        <span
-          className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-[#C49A6C]"
-          title="In puzzle, but in different position"
-          aria-hidden="true"
-        />
-      )}
     </button>
   );
 }

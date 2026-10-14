@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Calendar, AlertCircle, RotateCcw } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
@@ -131,33 +130,29 @@ function DailyPageContent(): React.JSX.Element {
   // Handle unavailable or unpublished daily challenge
   if (errorMsg) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
+      <div className="flex min-h-[100dvh] flex-col bg-[#F7F0E5]">
         <Header />
-        <main className="mx-auto flex flex-1 w-full max-w-xl flex-col justify-center px-6 py-12 text-center">
+        <main className="mx-auto flex flex-1 w-full max-w-xl flex-col justify-center px-6 py-8 text-center">
           <div className="rounded-3xl border border-[#C49A6C]/40 bg-[#FDFBF7] p-8 shadow-sm">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#faeee0] text-[#7B1E2B]">
-              <AlertCircle className="h-6 w-6" aria-hidden="true" />
-            </div>
             <h1 className="text-2xl font-bold text-[#32171D]">Daily Challenge Notice</h1>
             <p className="mt-2 text-sm text-[#6B4E55]">{errorMsg}</p>
             <div className="mt-6 flex justify-center gap-3">
               <button
                 type="button"
                 onClick={fetchDailyChallenge}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#C49A6C] px-4 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] transition"
+                className="rounded-full border border-[#C49A6C] px-5 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.98] transition"
               >
-                <RotateCcw className="h-4 w-4" />
-                <span>Retry</span>
+                Retry
               </button>
               <Link
                 href="/"
-                className="rounded-xl border border-[#C49A6C] px-4 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] transition"
+                className="rounded-full border border-[#C49A6C] px-5 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.98] transition"
               >
                 Home
               </Link>
               <Link
                 href="/classic"
-                className="rounded-xl bg-[#7B1E2B] px-4 py-2 text-sm font-bold text-[#F7F0E5] hover:opacity-90 transition"
+                className="rounded-full bg-[#7B1E2B] px-5 py-2 text-sm font-bold text-[#F7F0E5] hover:opacity-90 active:scale-[0.98] transition"
               >
                 Play Classic
               </Link>
@@ -172,32 +167,28 @@ function DailyPageContent(): React.JSX.Element {
   const currentDateDisplay = payload?.date || completedResult?.date || "Today";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F7F0E5]">
+    <div className="flex min-h-[100dvh] flex-col bg-[#F7F0E5]">
       <Header />
-      <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col justify-between px-4 py-8 sm:px-8 sm:py-12">
+      <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-4 px-4 py-4 sm:px-8 sm:py-6">
         {/* Navigation and Top Bar */}
-        <header className="flex flex-col items-center gap-4 text-center">
-          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/40 pb-4">
+        <header className="flex flex-col items-center gap-3 text-center">
+          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-3">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
             >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Home</span>
+              Home
             </Link>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C49A6C] bg-[#faeee0] px-3 py-1 text-xs font-semibold text-[#7B1E2B]">
-              <Calendar className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
-              <span>
-                {isArchiveChallenge ? `Archive Challenge • ${currentDateDisplay}` : `Daily Challenge • ${currentDateDisplay}`}
-              </span>
-            </div>
+            <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-1.5 text-xs font-semibold text-[#7B1E2B]">
+              {isArchiveChallenge ? `Archive • ${currentDateDisplay}` : `Daily • ${currentDateDisplay}`}
+            </span>
 
             <Link
               href="/archive"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
             >
-              <span>Archive</span>
+              Archive
             </Link>
           </div>
 

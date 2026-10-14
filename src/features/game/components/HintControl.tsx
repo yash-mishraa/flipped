@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface HintControlProps {
@@ -48,13 +47,12 @@ export function HintControl({
         disabled={isRoundOver || isProcessing}
         aria-label={`Use a hint. Cost is 5 points deduction. ${hintsUsed} used so far.`}
         className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-2 text-xs font-semibold text-[#32171D] shadow-sm transition-all duration-150 select-none",
+          "inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-2 text-xs font-semibold text-[#32171D] shadow-sm transition-all duration-150 select-none cursor-pointer",
           "hover:bg-[#f4ddc5] hover:border-[#C49A6C] active:scale-95",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2",
           (isRoundOver || isProcessing) && "cursor-not-allowed opacity-50"
         )}
       >
-        <Lightbulb className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />
         <span>Use Hint</span>
         <span className="rounded-full bg-[#C49A6C] px-2 py-0.5 text-[10px] font-bold text-[#32171D]">
           -5 pts

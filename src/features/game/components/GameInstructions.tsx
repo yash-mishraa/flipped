@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { HelpCircle, ChevronDown, ChevronUp, Lock, Check, X } from "lucide-react";
 
 /**
  * GameInstructions renders a collapsible, screen-reader friendly guide
@@ -17,17 +16,12 @@ export function GameInstructions(): React.JSX.Element {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-controls="instructions-content"
-        className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#32171D] transition-colors hover:text-[#7B1E2B]"
+        className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#32171D] transition-colors hover:text-[#7B1E2B] cursor-pointer"
       >
-        <div className="flex items-center gap-2">
-          <HelpCircle className="h-4 w-4 text-[#7B1E2B]" aria-hidden="true" />
-          <span>How to Play & 4 Transformation Permutations</span>
-        </div>
-        {isOpen ? (
-          <ChevronUp className="h-4 w-4 text-[#8C6870]" aria-hidden="true" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-[#8C6870]" aria-hidden="true" />
-        )}
+        <span>How to Play & 4 Transformation Permutations</span>
+        <span className="text-xs text-[#8C6870] font-bold" aria-hidden="true">
+          {isOpen ? "Hide ▲" : "Show ▼"}
+        </span>
       </button>
 
       {isOpen && (
@@ -64,27 +58,27 @@ export function GameInstructions(): React.JSX.Element {
             </h4>
             <ul className="mt-2 space-y-1.5 text-[11px]">
               <li className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded border border-[#C49A6C] bg-[#32171D] text-[#C49A6C]">
-                  <Lock className="h-3 w-3" />
+                <span className="flex h-5 w-5 items-center justify-center rounded border border-[#C49A6C] bg-[#32171D] text-[#C49A6C] font-bold text-[10px]">
+                  F
                 </span>
                 <span>
                   <strong>Fixed Clue:</strong> Permanently revealed first letter, cannot be edited.
                 </span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded border border-[#C49A6C] bg-[#32171D] text-[#F7F0E5]">
-                  <Check className="h-3 w-3" />
+                <span className="flex h-5 w-5 items-center justify-center rounded border border-[#C49A6C] bg-[#32171D] text-[#F7F0E5] font-bold text-[10px]">
+                  C
                 </span>
                 <span>
                   <strong>Confirmed:</strong> Correct letter in the exact position.
                 </span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded border border-dashed border-[#7B1E2B] bg-[#7B1E2B]/10 text-[#7B1E2B]">
-                  <X className="h-3 w-3" />
+                <span className="flex h-5 w-5 items-center justify-center rounded border border-dashed border-[#7B1E2B] bg-[#7B1E2B]/10 text-[#7B1E2B] font-bold text-[10px] line-through">
+                  W
                 </span>
                 <span>
-                  <strong>Wrong Letter:</strong> Marked with a dashed crimson border, strikethrough, and X icon.
+                  <strong>Wrong Letter:</strong> Marked with a dashed crimson border and strikethrough.
                 </span>
               </li>
             </ul>

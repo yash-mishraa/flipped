@@ -19,7 +19,6 @@ import { SuccessScreen } from "./SuccessScreen";
 import { TimeoutScreen } from "./TimeoutScreen";
 import { GameInstructions } from "./GameInstructions";
 import { formatTime, getTimerUrgency } from "../domain/timer-utils";
-import { X } from "lucide-react";
 
 export interface ServerGameBoardProps {
   readonly payload: SafeGameplayPayload;
@@ -591,9 +590,9 @@ export function ServerGameBoard({
               type="button"
               onClick={() => setShowWinModal(false)}
               aria-label="Close victory popup"
-              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition"
+              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition font-bold text-sm cursor-pointer"
             >
-              <X className="h-4 w-4" />
+              ✕
             </button>
             <SuccessScreen
               puzzle={safePuzzleView}

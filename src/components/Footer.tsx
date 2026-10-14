@@ -6,9 +6,9 @@ import { FlippedSymbol } from "@/components/FlippedLogo";
 
 export function Footer(): React.JSX.Element {
   return (
-    <footer className="mt-16 border-t border-[#C49A6C]/40 bg-[#F7F0E5]/80 py-8 text-[#6B4E55] text-xs">
+    <footer className="mt-auto border-t border-[#C49A6C]/30 bg-[#F7F0E5]/90 py-3.5 text-[#6B4E55] text-xs">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="space-y-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <FlippedSymbol size={18} variant="crimson" />

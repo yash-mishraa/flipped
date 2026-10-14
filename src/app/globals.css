@@ -1,4 +1,18 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-destructive-foreground: oklch(1 0 0);
+  --color-color-destructive-foreground: var(--color-destructive-foreground);
+}
+
+:root {
+  --destructive-foreground: oklch(1 0 0);
+}
+
+.dark {
+  --destructive-foreground: oklch(1 0 0);
+}
 
 @theme {
   --color-crimson: #7B1E2B;
@@ -67,13 +81,13 @@
 body {
   background: var(--bg-primary);
   color: var(--ink);
-  min-height: 100vh;
+  min-height: 100dvh;
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body, body > div, div.min-h-screen { background-color: var(--bg-primary) !important; color: var(--ink); }
+body, div.min-h-screen { background-color: var(--bg-primary) !important; color: var(--ink); }
 
 ::selection { background: #C49A6C; color: #32171D; }
 
@@ -81,8 +95,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; }
 :focus-visible { outline: 2px solid var(--accent) !important; outline-offset: 3px; }
 
-/* A quiet, print-led frame shared by every route. */
-body > div { min-height: 100vh; }
 /* Navigation header */
 header.sticky {
   position: sticky;
@@ -94,6 +106,15 @@ header.sticky a[href="/"] span {
   font-weight: 700;
   letter-spacing: -.04em;
   color: var(--ink);
+}
+
+/* Clerk development mode badge suppression */
+.cl-dev-mode,
+[data-localization-key*="developmentMode"],
+.cl-internal-1dauvpw,
+div[class*="devModeBadge"],
+div[class*="developmentMode"] {
+  display: none !important;
 }
 
 .home-page { position: relative; isolation: isolate; }
@@ -111,14 +132,6 @@ header.sticky a[href="/"] span {
 .acid-squares { display: block; }
 
 main { color: var(--ink); }
-main [class*="rounded-3xl"], main [class*="rounded-2xl"] {
-  border-radius: 4px !important;
-  box-shadow: none !important;
-}
-main [class*="rounded-3xl"][class*="border"],
-main [class*="rounded-2xl"][class*="border"] {
-  border-color: var(--rule) !important;
-}
 main [class*="bg-white"][class*="shadow"] { box-shadow: none !important; }
 main div[class*="rounded-"][class*="border"]:not([data-testid^="tile-"]) {
   border-color: transparent !important; border-radius: 0 !important; box-shadow: none !important;

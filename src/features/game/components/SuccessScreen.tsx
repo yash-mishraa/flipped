@@ -2,12 +2,10 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Trophy, RotateCcw, Home, Clock, Sparkles, Lightbulb, UserCheck } from "lucide-react";
 import { Show, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import type { Puzzle, TerminalResult } from "../domain/types";
 import type { GameMode } from "../modes/mode-types";
 import { syncUserProgress } from "../persistence/user-sync";
-
 import { ShareButton } from "./ShareButton";
 
 export interface SuccessScreenProps {
@@ -56,16 +54,11 @@ export function SuccessScreen({
       className="mx-auto w-full max-w-lg rounded-2xl border border-[#C49A6C] bg-white/95 p-6 shadow-lg backdrop-blur-sm sm:p-8"
     >
       <div className="flex flex-col items-center text-center">
-        {/* Celebration Trophy Icon */}
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#faeee0] text-[#C49A6C] shadow-sm">
-          <Trophy className="h-7 w-7" aria-hidden="true" />
-        </div>
-
-        <span className="rounded-full bg-[#C49A6C] px-3 py-1 text-xs font-bold text-[#32171D] uppercase tracking-wider">
+        <span className="rounded-full bg-[#C49A6C] px-3.5 py-1 text-xs font-bold text-[#32171D] uppercase tracking-wider">
           {isDaily ? "Daily Puzzle Solved!" : "Puzzle Solved!"}
         </span>
 
-        <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#32171D]">
+        <h2 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#32171D]">
           {solvedPhrase || canonicalPhrase}
         </h2>
 
@@ -94,25 +87,22 @@ export function SuccessScreen({
         {/* Stats Grid */}
         <div className="mt-5 grid w-full grid-cols-3 gap-2.5 text-center">
           <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3">
-            <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#8C6870] uppercase">
-              <Sparkles className="h-3 w-3 text-[#7B1E2B]" aria-hidden="true" />
-              <span>Score</span>
+            <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+              Score
             </div>
             <p className="mt-1 text-2xl font-black text-[#7B1E2B]">{finalScore}</p>
           </div>
 
           <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3">
-            <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#8C6870] uppercase">
-              <Clock className="h-3 w-3 text-[#C49A6C]" aria-hidden="true" />
-              <span>Time</span>
+            <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+              Time
             </div>
             <p className="mt-1 text-2xl font-black text-[#32171D]">{elapsedSeconds}s</p>
           </div>
 
           <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3">
-            <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#8C6870] uppercase">
-              <Lightbulb className="h-3 w-3 text-[#C49A6C]" aria-hidden="true" />
-              <span>Hints</span>
+            <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
+              Hints
             </div>
             <p className="mt-1 text-2xl font-black text-[#32171D]">{hintsUsed}</p>
           </div>
@@ -136,9 +126,8 @@ export function SuccessScreen({
         {/* Clerk Account Sync Banner for Guest Players */}
         <Show when="signed-out">
           <div className="mt-5 w-full rounded-xl border border-[#C49A6C] bg-[#faeee0]/70 p-4 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
-              <UserCheck className="h-4 w-4" />
-              <span>Save &amp; Sync Your Progress</span>
+            <div className="text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
+              Save &amp; Sync Your Progress
             </div>
             <p className="mt-1 text-xs text-[#6B4E55]">
               Playing as guest. Create a free account to track your daily streak and stats across devices!
@@ -147,7 +136,7 @@ export function SuccessScreen({
               <SignUpButton mode="modal">
                 <button
                   type="button"
-                  className="rounded-lg bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
+                  className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95 cursor-pointer"
                 >
                   Create Free Account
                 </button>
@@ -155,7 +144,7 @@ export function SuccessScreen({
               <SignInButton mode="modal">
                 <button
                   type="button"
-                  className="rounded-lg border border-[#C49A6C] bg-white px-3 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95"
+                  className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95 cursor-pointer"
                 >
                   Log In
                 </button>
@@ -165,9 +154,8 @@ export function SuccessScreen({
         </Show>
 
         <Show when="signed-in">
-          <div className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#7B1E2B]">
-            <UserCheck className="h-3.5 w-3.5" />
-            <span>Progress synced to your account</span>
+          <div className="mt-4 text-xs font-semibold text-[#7B1E2B]">
+            Progress synced to your account
           </div>
         </Show>
 
@@ -177,15 +165,15 @@ export function SuccessScreen({
             <>
               <Link
                 href="/classic"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
+                className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
               >
-                <span>Play Classic Mode</span>
+                Play Classic Mode
               </Link>
               <Link
                 href="/archive"
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+                className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
               >
-                <span>Daily Archive</span>
+                Daily Archive
               </Link>
             </>
           ) : (
@@ -194,20 +182,18 @@ export function SuccessScreen({
                 type="button"
                 onClick={handleReplayAction}
                 data-testid="play-again-button"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
+                className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
               >
-                <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                <span>{mode === "CLASSIC" ? nextPuzzleLabel : "Play Again"}</span>
+                {mode === "CLASSIC" ? nextPuzzleLabel : "Play Again"}
               </button>
             )
           )}
 
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+            className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
           >
-            <Home className="h-4 w-4 text-[#C49A6C]" aria-hidden="true" />
-            <span>Home</span>
+            Home
           </Link>
         </div>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Clock, AlertTriangle, AlertCircle } from "lucide-react";
 import type { TimerUrgency } from "../domain/timer-utils";
 import { cn } from "@/lib/utils";
 
@@ -41,20 +40,6 @@ export function GameTimer({
     }
   };
 
-  const renderIcon = () => {
-    switch (urgency) {
-      case "critical":
-        return <AlertTriangle className="h-4 w-4 text-[#7B1E2B] shrink-0" aria-hidden="true" />;
-      case "urgent":
-        return <AlertCircle className="h-4 w-4 text-[#C49A6C] shrink-0" aria-hidden="true" />;
-      case "expired":
-        return <Clock className="h-4 w-4 text-[#8C6870] shrink-0" aria-hidden="true" />;
-      case "normal":
-      default:
-        return <Clock className="h-4 w-4 text-[#C49A6C] shrink-0" aria-hidden="true" />;
-    }
-  };
-
   return (
     <div
       role="timer"
@@ -63,11 +48,10 @@ export function GameTimer({
       data-testid="game-timer"
       data-urgency={urgency}
       className={cn(
-        "inline-flex items-center gap-2 rounded-xl border px-3.5 py-1.5 transition-colors duration-200",
+        "inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-1.5 transition-colors duration-200",
         getUrgencyStyles()
       )}
     >
-      {renderIcon()}
       <span className="font-mono text-lg sm:text-xl font-black tracking-widest tabular-nums">
         {formattedTime}
       </span>

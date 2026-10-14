@@ -2,16 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import {
-  Trophy,
-  Clock,
-  Sparkles,
-  RotateCcw,
-  Play,
-  SkipForward,
-  UserCheck,
-  Home,
-} from "lucide-react";
 import { Show, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { syncUserProgress } from "../persistence/user-sync";
 import type {
@@ -555,8 +545,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
 
         {/* Stats strip */}
         <div className="flex items-center justify-center gap-6 rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/70 py-3 px-6 text-xs text-[#6B4E55]">
-          <div className="flex items-center gap-1.5">
-            <Trophy className="h-4 w-4 text-[#C49A6C]" />
+          <div>
             <span className="font-extrabold text-[#32171D]">{classicWins}</span> Wins
           </div>
           <span className="text-[#C49A6C]">•</span>
@@ -615,15 +604,12 @@ export function ClassicSprintBoard(): React.JSX.Element {
           data-testid="start-game-button"
           onClick={handleStartSprint}
           disabled={loadingNext}
-          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[#7B1E2B] py-4 text-base font-extrabold text-[#F7F0E5] shadow-lg transition hover:bg-[#631722] active:scale-95 disabled:opacity-50 cursor-pointer"
+          className="flex w-full items-center justify-center rounded-full bg-[#7B1E2B] py-3.5 text-base font-extrabold text-[#F7F0E5] shadow-lg transition hover:bg-[#631722] active:scale-95 disabled:opacity-50 cursor-pointer"
         >
           {loadingNext ? (
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : (
-            <>
-              <Play className="h-5 w-5 fill-current" />
-              <span>Start {durationSeconds / 60}-Minute Sprint</span>
-            </>
+            <span>Start {durationSeconds / 60}-Minute Sprint</span>
           )}
         </button>
       </div>
@@ -641,16 +627,11 @@ export function ClassicSprintBoard(): React.JSX.Element {
         className="mx-auto w-full max-w-xl rounded-3xl border border-[#C49A6C] bg-white/95 p-6 shadow-xl backdrop-blur-sm sm:p-8"
       >
         <div className="flex flex-col items-center text-center">
-          {/* Trophy Header */}
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#faeee0] text-[#7B1E2B] shadow-sm">
-            <Trophy className="h-8 w-8" />
-          </div>
-
           <span className="rounded-full bg-[#C49A6C] px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#32171D]">
             Sprint Finished!
           </span>
 
-          <h2 className="mt-2 text-3xl font-extrabold text-[#32171D]">
+          <h2 className="mt-3 text-3xl font-extrabold text-[#32171D]">
             {solvedList.length} {solvedList.length === 1 ? "Puzzle" : "Puzzles"} Solved
           </h2>
           <p className="mt-1 text-xs text-[#6B4E55]">
@@ -660,17 +641,15 @@ export function ClassicSprintBoard(): React.JSX.Element {
           {/* Stats Cards */}
           <div className="mt-6 grid w-full grid-cols-2 gap-3">
             <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/60 p-4">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase text-[#8C6870]">
-                <Sparkles className="h-3.5 w-3.5 text-[#7B1E2B]" />
-                <span>Total Score</span>
+              <div className="text-xs font-bold uppercase text-[#8C6870]">
+                Total Score
               </div>
               <p className="mt-1 text-3xl font-black text-[#7B1E2B]">{totalScore}</p>
             </div>
 
             <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/60 p-4">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase text-[#8C6870]">
-                <Clock className="h-3.5 w-3.5 text-[#C49A6C]" />
-                <span>Words Solved</span>
+              <div className="text-xs font-bold uppercase text-[#8C6870]">
+                Words Solved
               </div>
               <p className="mt-1 text-3xl font-black text-[#32171D]">{solvedList.length}</p>
             </div>
@@ -726,9 +705,8 @@ export function ClassicSprintBoard(): React.JSX.Element {
           {/* Clerk Account Sync for Guest Players */}
           <Show when="signed-out">
             <div className="mt-5 w-full rounded-2xl border border-[#C49A6C] bg-[#faeee0]/70 p-4 text-center">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
-                <UserCheck className="h-4 w-4" />
-                <span>Save Your Sprint Record</span>
+              <div className="text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
+                Save Your Sprint Record
               </div>
               <p className="mt-1 text-xs text-[#6B4E55]">
                 Create a free account to track your sprint scores and compete with friends!
@@ -737,7 +715,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignUpButton mode="modal">
                   <button
                     type="button"
-                    className="rounded-lg bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
+                    className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
                   >
                     Create Free Account
                   </button>
@@ -745,7 +723,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignInButton mode="modal">
                   <button
                     type="button"
-                    className="rounded-lg border border-[#C49A6C] bg-white px-3 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95"
+                    className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95"
                   >
                     Log In
                   </button>
@@ -755,9 +733,8 @@ export function ClassicSprintBoard(): React.JSX.Element {
           </Show>
 
           <Show when="signed-in">
-            <div className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#7B1E2B]">
-              <UserCheck className="h-3.5 w-3.5" />
-              <span>Sprint record saved to your account</span>
+            <div className="mt-4 text-xs font-semibold text-[#7B1E2B]">
+              Sprint record saved to your account
             </div>
           </Show>
 
@@ -766,24 +743,22 @@ export function ClassicSprintBoard(): React.JSX.Element {
             <button
               type="button"
               onClick={handleStartSprint}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
+              className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
             >
-              <RotateCcw className="h-4 w-4" />
-              <span>Play Again ({durationSeconds / 60}m)</span>
+              Play Again ({durationSeconds / 60}m)
             </button>
             <button
               type="button"
               onClick={() => setGameState("LOBBY")}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-95"
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-95"
             >
-              <span>Change Settings</span>
+              Change Settings
             </button>
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-95"
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-95"
             >
-              <Home className="h-4 w-4 text-[#C49A6C]" />
-              <span>Home</span>
+              Home
             </Link>
           </div>
         </div>
@@ -843,7 +818,6 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 : "bg-[#faeee0] text-[#32171D] border-[#C49A6C]"
           }`}
         >
-          <Clock className="h-5 w-5" />
           <span>{formattedSprintTime}</span>
         </div>
 
@@ -852,11 +826,10 @@ export function ClassicSprintBoard(): React.JSX.Element {
           type="button"
           onClick={handleSkipPuzzle}
           disabled={loadingNext}
-          className="inline-flex items-center gap-1 rounded-xl border border-[#C49A6C]/50 bg-[#faeee0]/70 px-3 py-1.5 text-xs font-bold text-[#32171D] hover:bg-[#faeee0] hover:border-[#7B1E2B] transition active:scale-95 cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-full border border-[#C49A6C]/50 bg-[#faeee0]/70 px-4 py-1.5 text-xs font-bold text-[#32171D] hover:bg-[#faeee0] hover:border-[#7B1E2B] transition active:scale-95 cursor-pointer disabled:opacity-50"
           title="Skip this puzzle"
         >
-          <span>Skip</span>
-          <SkipForward className="h-3.5 w-3.5 text-[#7B1E2B]" />
+          Skip
         </button>
       </div>
 
@@ -866,7 +839,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
           role="status"
           className="w-full max-w-lg rounded-xl border border-[#C49A6C] bg-[#faeee0] px-4 py-2.5 text-center text-xs sm:text-sm font-extrabold text-[#7B1E2B] shadow-sm animate-bounce"
         >
-          🎉 {celebrationToast}
+          {celebrationToast}
         </div>
       )}
 

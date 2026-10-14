@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Play, Sparkles, Lightbulb, RotateCcw } from "lucide-react";
 import type { Puzzle, RoundStatus } from "../domain/types";
 import { GameTimer } from "./GameTimer";
 import type { TimerUrgency } from "../domain/timer-utils";
@@ -78,13 +77,11 @@ export function GameHUD({
           {getStatusBadge()}
           <span className="hidden sm:inline text-xs text-[#8C6870]">•</span>
           <div className="flex items-center gap-1 text-xs text-[#6B4E55]">
-            <Sparkles className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
             <span>Score:</span>
             <strong className="text-[#32171D] font-bold">{score}</strong>
           </div>
           <span className="hidden sm:inline text-xs text-[#8C6870]">•</span>
           <div className="flex items-center gap-1 text-xs text-[#6B4E55]">
-            <Lightbulb className="h-3.5 w-3.5 text-[#C49A6C]" aria-hidden="true" />
             <span>Hints:</span>
             <strong className="text-[#32171D] font-bold">{hintsUsed}</strong>
           </div>
@@ -104,10 +101,9 @@ export function GameHUD({
               onClick={onRestart}
               title="Restart round from scratch"
               aria-label="Restart round"
-              className="inline-flex items-center gap-1 rounded-lg border border-[#C49A6C] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95 cursor-pointer"
             >
-              <RotateCcw className="h-3.5 w-3.5 text-[#7B1E2B]" aria-hidden="true" />
-              <span className="hidden sm:inline">Reset</span>
+              Reset
             </button>
           )}
         </div>
@@ -144,10 +140,9 @@ export function GameHUD({
               type="button"
               onClick={onStartGame}
               data-testid="start-game-button"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-6 py-3 text-base font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[#7B1E2B] px-6 py-3 text-base font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
             >
-              <Play className="h-5 w-5 fill-[#F7F0E5]" aria-hidden="true" />
-              <span>Start Game (60s)</span>
+              Start Game (60s)
             </button>
             <p className="text-xs text-[#6B4E55]">
               You have 60 seconds. Editable tiles unlock immediately upon starting.

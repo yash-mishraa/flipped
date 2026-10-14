@@ -50,7 +50,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#F7F0E5] text-[#32171D] antialiased selection:bg-[#7B1E2B] selection:text-[#F7F0E5]">
-        <ClerkProvider publishableKey={publishableKey}>{children}</ClerkProvider>
+        <ClerkProvider
+          publishableKey={publishableKey}
+          appearance={
+            {
+              layout: {
+                unsafe_disableDevelopmentModeWarnings: true,
+              },
+            } as Record<string, unknown>
+          }
+        >
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Sparkles, Trophy, RotateCcw } from "lucide-react";
 import type { RoundState } from "../domain/types";
 
 export interface GameFeedbackProps {
@@ -24,14 +23,12 @@ export function GameFeedback({ state, onRestart }: GameFeedbackProps): React.JSX
         aria-label="Round completion summary"
         data-testid="victory-banner"
       >
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-          <Trophy className="h-6 w-6" aria-hidden="true" />
-        </div>
-
-        <h3 className="text-2xl font-extrabold tracking-tight text-stone-900">Puzzle Solved!</h3>
+        <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-800">
+          Puzzle Solved!
+        </span>
 
         {solvedPhrase && (
-          <p className="mt-1 text-lg font-bold tracking-wider text-emerald-800">{solvedPhrase}</p>
+          <p className="mt-3 text-lg font-bold tracking-wider text-emerald-800">{solvedPhrase}</p>
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-3 border-y border-stone-100 py-3 text-sm">
@@ -48,10 +45,9 @@ export function GameFeedback({ state, onRestart }: GameFeedbackProps): React.JSX
         <button
           type="button"
           onClick={onRestart}
-          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-coral-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
+          className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-coral-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2 cursor-pointer"
         >
-          <RotateCcw className="h-4 w-4" aria-hidden="true" />
-          <span>Play Fresh Round</span>
+          Play Fresh Round
         </button>
       </div>
     );
@@ -60,7 +56,6 @@ export function GameFeedback({ state, onRestart }: GameFeedbackProps): React.JSX
   // Active round live status
   return (
     <div className="flex items-center justify-center gap-2 text-xs font-medium text-stone-500">
-      <Sparkles className="h-3.5 w-3.5 text-coral-500" aria-hidden="true" />
       <span>Auto-detecting answers as you type</span>
     </div>
   );
