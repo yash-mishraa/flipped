@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Show, SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { Show, SignInButton, useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { AcidSquares } from "@/components/AcidSquares";
 import DecryptedText from "@/components/DecryptedText";
@@ -144,10 +144,16 @@ export default function HomePage(): React.JSX.Element {
             </Show>
 
             <Show when="signed-in">
-              <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#C49A6C]/40 bg-white/90 px-4 py-2 text-xs font-semibold text-[#32171D] shadow-xs">
-                <UserButton />
-                <span>Account Connected</span>
-              </div>
+              <Link href="/classic" className="w-full block">
+                <ShinyButton
+                  label="Play Classic Mode"
+                  className="w-full"
+                  fillColor="#32171D"
+                  labelColor="#F7F0E5"
+                  accentColor="#C49A6C"
+                  cornerRadius={24}
+                />
+              </Link>
             </Show>
           </div>
         </section>
