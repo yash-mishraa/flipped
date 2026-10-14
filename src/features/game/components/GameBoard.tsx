@@ -91,7 +91,13 @@ export function GameBoard({
           completedAt: new Date().toISOString(),
         });
       } else if (mode === "CLASSIC") {
-        recordClassicGame(puzzle.id, puzzle.difficulty, state.status === "WON");
+        recordClassicGame(
+          puzzle.id,
+          puzzle.difficulty,
+          state.status === "WON",
+          state.status === "WON" ? state.score : 0,
+          timer.elapsedSeconds
+        );
       }
     }
   }, [state, timer.elapsedSeconds, puzzle, mode, date, onPuzzleComplete]);

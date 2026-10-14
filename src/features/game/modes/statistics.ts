@@ -7,6 +7,7 @@ export interface PlayerStatistics {
   readonly totalWins: number;
   readonly winRate: number; // 0–100 integer percentage
   readonly totalPoints: number;
+  readonly averagePoints: number;
   readonly bestSolveTimeSeconds: number | null;
   readonly averageSolveTimeSeconds: number | null;
   readonly daily: {
@@ -16,6 +17,7 @@ export interface PlayerStatistics {
     readonly currentStreak: number;
     readonly longestStreak: number;
     readonly totalPoints: number;
+    readonly averagePoints: number;
     readonly bestSolveTimeSeconds: number | null;
     readonly averageSolveTimeSeconds: number | null;
   };
@@ -23,6 +25,10 @@ export interface PlayerStatistics {
     readonly totalPlayed: number;
     readonly totalWins: number;
     readonly winRate: number;
+    readonly totalPoints: number;
+    readonly averagePoints: number;
+    readonly bestSolveTimeSeconds: number | null;
+    readonly averageSolveTimeSeconds: number | null;
     readonly byDifficulty: {
       readonly EASY: { readonly played: number; readonly wins: number };
       readonly MEDIUM: { readonly played: number; readonly wins: number };
@@ -146,6 +152,7 @@ export function calculatePlayerStatistics(
   const dailyWinRate = dailyPlayed > 0 ? Math.round((dailyWinCount / dailyPlayed) * 100) : 0;
 
   const dailyTotalPoints = dailyWins.reduce((sum, r) => sum + (r.finalScore || 0), 0);
+  const dailyAveragePoints = dailyWinCount > 0 ? Math.round(dailyTotalPoints / dailyWinCount) : 0;
 
   const dailySolveTimes = dailyWins
     .map((r) => r.elapsedSeconds)
@@ -164,25 +171,48 @@ export function calculatePlayerStatistics(
   const classicWins = progress.classic.totalWins;
   const classicWinRate = classicPlayed > 0 ? Math.round((classicWins / classicPlayed) * 100) : 0;
 
+  // Classic points: use recorded totalPoints if available; if unrecorded but classicWins > 0, estimate 90 pts per win
+  const storedClassicPoints = progress.classic.totalPoints;
+  const classicTotalPoints =
+    typeof storedClassicPoints === "number" && storedClassicPoints > 0
+      ? storedClassicPoints
+      : classicWins > 0
+        ? classicWins * 90
+        : 0;
+
+  const classicAveragePoints = classicWins > 0 ? Math.round(classicTotalPoints / classicWins) : 0;
+  const classicBestSolveTime = progress.classic.bestSolveTimeSeconds ?? null;
+  const classicAvgSolveTime =
+    classicWins > 0 &&
+    typeof progress.classic.totalElapsedSeconds === "number" &&
+    progress.classic.totalElapsedSeconds > 0
+      ? Math.round(progress.classic.totalElapsedSeconds / classicWins)
+      : null;
+
   // Total combined stats
   const totalPlayed = dailyPlayed + classicPlayed;
   const totalWins = dailyWinCount + classicWins;
   const winRate = totalPlayed > 0 ? Math.round((totalWins / totalPlayed) * 100) : 0;
-  const totalPoints = dailyTotalPoints; // Classic points can be added if recorded
+  const totalPoints = dailyTotalPoints + classicTotalPoints;
+  const averagePoints = totalWins > 0 ? Math.round(totalPoints / totalWins) : 0;
 
   // Best & average solve times across all recorded wins
   const allSolveTimes = [...dailySolveTimes];
+  if (classicBestSolveTime !== null) {
+    allSolveTimes.push(classicBestSolveTime);
+  }
   const bestSolveTime = allSolveTimes.length > 0 ? Math.min(...allSolveTimes) : null;
   const avgSolveTime =
-    allSolveTimes.length > 0
-      ? Math.round(allSolveTimes.reduce((a, b) => a + b, 0) / allSolveTimes.length)
-      : null;
+    dailyAvgSolveTime !== null && classicAvgSolveTime !== null
+      ? Math.round((dailyAvgSolveTime + classicAvgSolveTime) / 2)
+      : dailyAvgSolveTime ?? classicAvgSolveTime;
 
   return {
     totalPlayed,
     totalWins,
     winRate,
     totalPoints,
+    averagePoints,
     bestSolveTimeSeconds: bestSolveTime,
     averageSolveTimeSeconds: avgSolveTime,
     daily: {
@@ -192,6 +222,7 @@ export function calculatePlayerStatistics(
       currentStreak,
       longestStreak,
       totalPoints: dailyTotalPoints,
+      averagePoints: dailyAveragePoints,
       bestSolveTimeSeconds: dailyBestSolveTime,
       averageSolveTimeSeconds: dailyAvgSolveTime,
     },
@@ -199,6 +230,10 @@ export function calculatePlayerStatistics(
       totalPlayed: classicPlayed,
       totalWins: classicWins,
       winRate: classicWinRate,
+      totalPoints: classicTotalPoints,
+      averagePoints: classicAveragePoints,
+      bestSolveTimeSeconds: classicBestSolveTime,
+      averageSolveTimeSeconds: classicAvgSolveTime,
       byDifficulty: {
         EASY: { played: 0, wins: 0 },
         MEDIUM: { played: classicPlayed, wins: classicWins },

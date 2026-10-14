@@ -54,14 +54,14 @@ export default function StatisticsPage(): React.JSX.Element {
         {/* Title */}
         <div className="text-center space-y-1.5">
           <span className="inline-block rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-semibold text-[#7B1E2B]">
-            Authoritative Solving Records
+            Stats of your account
           </span>
 
           <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
             Player Statistics
           </h1>
           <p className="mx-auto max-w-md text-xs sm:text-sm text-[#6B4E55]">
-            Performance metrics derived exclusively from validated Daily and Classic game rounds.
+            Track your solving streaks, points, and speed records across Daily and Classic modes.
           </p>
         </div>
 
@@ -101,9 +101,9 @@ export default function StatisticsPage(): React.JSX.Element {
               </div>
 
               <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5">
-                <span className="text-xs font-bold text-[#7B1E2B] block">Authoritative Records</span>
+                <span className="text-xs font-bold text-[#7B1E2B] block">Verified Records</span>
                 <p className="mt-1 text-[11px] text-[#6B4E55] leading-normal">
-                  Every solved puzzle and timing record is verified and saved to your account.
+                  Every solved puzzle, score, and timing record is verified and saved to your account.
                 </p>
               </div>
 
@@ -211,7 +211,7 @@ export default function StatisticsPage(): React.JSX.Element {
               <div className="rounded-3xl border border-[#C49A6C]/40 bg-[#FDFBF7] p-8 text-center shadow-xs">
                 <h2 className="text-xl font-bold text-[#32171D]">No Games Completed Yet</h2>
                 <p className="mx-auto mt-2 max-w-sm text-xs text-[#6B4E55]">
-                  Complete your first Daily Challenge or practice in Classic mode to start building your official performance statistics!
+                  Complete your first Daily Challenge or practice in Classic mode to start building your personal statistics!
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
                   <Link
@@ -235,7 +235,11 @@ export default function StatisticsPage(): React.JSX.Element {
                   <div className="mb-4 flex items-center justify-center gap-2">
                     <span className="h-px w-8 bg-[#C49A6C]/30" aria-hidden="true" />
                     <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#8C6870]">
-                      Statistics
+                      {activeTab === "DAILY"
+                        ? "Daily Challenge Stats"
+                        : activeTab === "CLASSIC"
+                          ? "Classic Practice Stats"
+                          : "Total Statistics"}
                     </h2>
                     <span className="h-px w-8 bg-[#C49A6C]/30" aria-hidden="true" />
                   </div>
@@ -284,86 +288,242 @@ export default function StatisticsPage(): React.JSX.Element {
 
                     <div className="px-1 sm:px-2">
                       <p className="text-2xl sm:text-4xl font-black tracking-tight text-[#7B1E2B]">
-                        {stats.daily.currentStreak}
+                        {activeTab === "DAILY"
+                          ? stats.daily.currentStreak
+                          : activeTab === "CLASSIC"
+                            ? stats.classic.totalPoints
+                            : stats.totalPoints}
                       </p>
                       <p className="mt-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#8C6D68]">
-                        Streak
+                        {activeTab === "DAILY"
+                          ? "Streak"
+                          : activeTab === "CLASSIC"
+                            ? "Classic Pts"
+                            : "Total Pts"}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Secondary Metrics Card: Speed & Performance Grid */}
-                <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs">
-                  <div className="mb-3 flex items-center justify-between border-b border-[#C49A6C]/20 pb-2.5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#8C6870]">
-                      Speed &amp; Scoring
-                    </span>
-                    <span className="rounded-full bg-[#faeee0] px-2.5 py-0.5 text-[10px] font-bold text-[#7B1E2B] border border-[#C49A6C]/30">
-                      Performance
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/25 text-center">
-                    <div className="px-2">
-                      <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
-                        Best Solve Time
+                {/* Secondary Metrics Card: Tailored by activeTab */}
+                {activeTab === "ALL" && (
+                  <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#C49A6C]/20 pb-2.5">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#8C6870]">
+                        Speed &amp; Scoring Overview
                       </span>
-                      <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
-                        {stats.bestSolveTimeSeconds !== null ? `${stats.bestSolveTimeSeconds}s` : "—"}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Fastest completion</p>
-                    </div>
-
-                    <div className="px-2">
-                      <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
-                        Average Solve Time
+                      <span className="text-xs font-bold text-[#7B1E2B]">
+                        Total Points: {stats.totalPoints}
                       </span>
-                      <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
-                        {stats.averageSolveTimeSeconds !== null
-                          ? `${stats.averageSolveTimeSeconds}s`
-                          : "—"}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Across all solves</p>
                     </div>
 
-                    <div className="px-2">
-                      <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
-                        Total Points
+                    <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/25 text-center">
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Best Solve Time
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
+                          {stats.bestSolveTimeSeconds !== null ? `${stats.bestSolveTimeSeconds}s` : "—"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Fastest completion</p>
+                      </div>
+
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Average Solve Time
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
+                          {stats.averageSolveTimeSeconds !== null
+                            ? `${stats.averageSolveTimeSeconds}s`
+                            : "—"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Across all solves</p>
+                      </div>
+
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Avg Points / Win
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#7B1E2B]">
+                          {stats.averagePoints}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Average per solve</p>
+                      </div>
+                    </div>
+
+                    {/* Breakdown by Game Mode */}
+                    <div className="border-t border-[#C49A6C]/20 pt-3 grid grid-cols-2 gap-3 text-center">
+                      <div className="rounded-xl bg-[#faeee0]/60 p-2.5 border border-[#C49A6C]/30">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">
+                          Daily Points
+                        </span>
+                        <p className="text-lg font-black text-[#7B1E2B]">
+                          {stats.daily.totalPoints} pts
+                        </p>
+                        <p className="text-[10px] text-[#6B4E55]">
+                          {stats.daily.totalWins} solved ({stats.daily.averagePoints} avg)
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-[#faeee0]/60 p-2.5 border border-[#C49A6C]/30">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">
+                          Classic Points
+                        </span>
+                        <p className="text-lg font-black text-[#32171D]">
+                          {stats.classic.totalPoints} pts
+                        </p>
+                        <p className="text-[10px] text-[#6B4E55]">
+                          {stats.classic.totalWins} solved ({stats.classic.averagePoints} avg)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "DAILY" && (
+                  <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#C49A6C]/20 pb-2.5">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#8C6870]">
+                        Daily Scoring &amp; Efficiency
                       </span>
-                      <p className="mt-1 text-xl sm:text-2xl font-black text-[#7B1E2B]">
-                        {stats.totalPoints}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Cumulative score</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Daily Streak Highlight Card */}
-                <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-bold text-[#32171D] text-sm sm:text-base">Daily Streak Tracking</h3>
-                    <p className="text-xs text-[#6B4E55] mt-0.5">
-                      Consecutive calendar days with an official Daily win (Asia/Kolkata timezone).
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    <div className="rounded-xl border border-[#C49A6C]/40 bg-[#faeee0] px-4 py-2 text-center flex-1 sm:flex-initial">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">Active</span>
-                      <p className="text-lg sm:text-xl font-black text-[#7B1E2B]">
-                        {stats.daily.currentStreak} {stats.daily.currentStreak === 1 ? "day" : "days"}
-                      </p>
+                      <span className="text-xs font-bold text-[#7B1E2B]">
+                        Daily Total: {stats.daily.totalPoints} pts
+                      </span>
                     </div>
 
-                    <div className="rounded-xl border border-[#C49A6C]/30 bg-white px-4 py-2 text-center flex-1 sm:flex-initial">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">All-Time Best</span>
-                      <p className="text-lg sm:text-xl font-black text-[#32171D]">
-                        {stats.daily.longestStreak} {stats.daily.longestStreak === 1 ? "day" : "days"}
-                      </p>
+                    <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/25 text-center">
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Avg Daily Points
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#7B1E2B]">
+                          {stats.daily.averagePoints}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Per daily win</p>
+                      </div>
+
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Best Daily Time
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
+                          {stats.daily.bestSolveTimeSeconds !== null ? `${stats.daily.bestSolveTimeSeconds}s` : "—"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Fastest daily solve</p>
+                      </div>
+
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Avg Daily Time
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
+                          {stats.daily.averageSolveTimeSeconds !== null
+                            ? `${stats.daily.averageSolveTimeSeconds}s`
+                            : "—"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Average completion</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {activeTab === "CLASSIC" && (
+                  <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#C49A6C]/20 pb-2.5">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#8C6870]">
+                        Classic Sprint Performance
+                      </span>
+                      <span className="text-xs font-bold text-[#7B1E2B]">
+                        Classic Total: {stats.classic.totalPoints} pts
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/25 text-center">
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Total Classic Points
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#7B1E2B]">
+                          {stats.classic.totalPoints}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Sprint points</p>
+                      </div>
+
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Avg Classic Points
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
+                          {stats.classic.averagePoints}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Per sprint round</p>
+                      </div>
+
+                      <div className="px-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-[#8C6D68] uppercase block">
+                          Best Solve Time
+                        </span>
+                        <p className="mt-1 text-xl sm:text-2xl font-black text-[#32171D]">
+                          {stats.classic.bestSolveTimeSeconds !== null ? `${stats.classic.bestSolveTimeSeconds}s` : "—"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#8C6870] hidden sm:block">Fastest sprint solve</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Highlight Card: Streak for All/Daily, Sprint info for Classic */}
+                {activeTab !== "CLASSIC" ? (
+                  <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-[#32171D] text-sm sm:text-base">Daily Streak Tracking</h3>
+                      <p className="text-xs text-[#6B4E55] mt-0.5">
+                        Consecutive calendar days with a completed daily challenge win.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                      <div className="rounded-xl border border-[#C49A6C]/40 bg-[#faeee0] px-4 py-2 text-center flex-1 sm:flex-initial">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">Active Streak</span>
+                        <p className="text-lg sm:text-xl font-black text-[#7B1E2B]">
+                          {stats.daily.currentStreak} {stats.daily.currentStreak === 1 ? "day" : "days"}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl border border-[#C49A6C]/30 bg-white px-4 py-2 text-center flex-1 sm:flex-initial">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">All-Time Best</span>
+                        <p className="text-lg sm:text-xl font-black text-[#32171D]">
+                          {stats.daily.longestStreak} {stats.daily.longestStreak === 1 ? "day" : "days"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-[#32171D] text-sm sm:text-base">Classic Sprint Practice</h3>
+                      <p className="text-xs text-[#6B4E55] mt-0.5">
+                        Continuous word transformations under time pressure to build speed and vocabulary.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                      <div className="rounded-xl border border-[#C49A6C]/40 bg-[#faeee0] px-4 py-2 text-center flex-1 sm:flex-initial">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">Classic Wins</span>
+                        <p className="text-lg sm:text-xl font-black text-[#7B1E2B]">
+                          {stats.classic.totalWins}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl border border-[#C49A6C]/30 bg-white px-4 py-2 text-center flex-1 sm:flex-initial">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870] block">Avg Sprint Points</span>
+                        <p className="text-lg sm:text-xl font-black text-[#32171D]">
+                          {stats.classic.averagePoints} pts
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Quick Navigation to Modes */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-[#C49A6C]/40 bg-white p-3.5 sm:p-4 shadow-2xs">

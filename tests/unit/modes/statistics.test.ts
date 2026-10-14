@@ -273,5 +273,47 @@ describe("Statistics Engine", () => {
       expect(stats.bestSolveTimeSeconds).toBe(20);
       expect(stats.averageSolveTimeSeconds).toBe(25);
     });
+
+    it("accurately sums Daily and Classic points to ~1000 for 11 solved puzzles", () => {
+      // User scenario: 1 Daily win with 98 points + 10 Classic wins
+      const progress: StoredProgressSchema = {
+        version: 1,
+        daily: {
+          "2026-10-14": {
+            date: "2026-10-14",
+            puzzleId: "daily-1",
+            status: "WON",
+            finalScore: 98,
+            elapsedSeconds: 22,
+            hintsUsed: 0,
+            completedAt: "2026-10-14T12:00:00Z",
+          },
+        },
+        classic: {
+          recentlyPlayedIds: ["c1", "c2"],
+          lastDifficulty: "MEDIUM",
+          totalPlayed: 10,
+          totalWins: 10,
+          totalPoints: 920, // 10 solves averaging 92 pts
+          bestSolveTimeSeconds: 8,
+          totalElapsedSeconds: 120,
+        },
+      };
+
+      const stats = calculatePlayerStatistics(progress, "2026-10-14");
+      expect(stats.totalPlayed).toBe(11);
+      expect(stats.totalWins).toBe(11);
+      expect(stats.winRate).toBe(100);
+
+      // Total points: 98 daily + 920 classic = 1018 pts (around 1000 pts!)
+      expect(stats.totalPoints).toBe(1018);
+      expect(stats.daily.totalPoints).toBe(98);
+      expect(stats.daily.averagePoints).toBe(98);
+      expect(stats.classic.totalPoints).toBe(920);
+      expect(stats.classic.averagePoints).toBe(92);
+      expect(stats.averagePoints).toBe(Math.round(1018 / 11)); // 93
+      expect(stats.classic.bestSolveTimeSeconds).toBe(8);
+      expect(stats.classic.averageSolveTimeSeconds).toBe(12); // 120 / 10
+    });
   });
 });

@@ -275,7 +275,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
           };
 
           setSolvedList((prev) => [solvedItem, ...prev]);
-          recordClassicGame(currentPayload.puzzleId, difficulty, true);
+          recordClassicGame(currentPayload.puzzleId, difficulty, true, puzzlePts, solveTimeSec);
 
           setCelebrationToast(
             `+${puzzlePts} pts! "${solvedItem.solvedPhrase}" solved! Next word coming up...`

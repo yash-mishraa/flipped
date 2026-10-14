@@ -103,6 +103,22 @@ export async function POST(request: Request): Promise<NextResponse> {
     ])
   ).slice(0, 20);
 
+  const clientClassicPoints =
+    typeof clientProgress?.classic?.totalPoints === "number" && clientProgress.classic.totalPoints > 0
+      ? clientProgress.classic.totalPoints
+      : (clientProgress?.classic?.totalWins ?? 0) * 90;
+  const existingClassicPoints =
+    typeof existing.classic?.totalPoints === "number" && existing.classic.totalPoints > 0
+      ? existing.classic.totalPoints
+      : (existing.classic?.totalWins ?? 0) * 90;
+
+  const clientBestTime = clientProgress?.classic?.bestSolveTimeSeconds ?? null;
+  const existingBestTime = existing.classic?.bestSolveTimeSeconds ?? null;
+  const mergedBestTime =
+    clientBestTime !== null && existingBestTime !== null
+      ? Math.min(clientBestTime, existingBestTime)
+      : clientBestTime ?? existingBestTime;
+
   const mergedClassic = {
     recentlyPlayedIds: mergedRecentIds,
     lastDifficulty:
@@ -114,6 +130,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     totalWins: Math.max(
       clientProgress?.classic?.totalWins ?? 0,
       existing.classic?.totalWins ?? 0
+    ),
+    totalPoints: Math.max(clientClassicPoints, existingClassicPoints),
+    bestSolveTimeSeconds: mergedBestTime,
+    totalElapsedSeconds: Math.max(
+      clientProgress?.classic?.totalElapsedSeconds ?? 0,
+      existing.classic?.totalElapsedSeconds ?? 0
     ),
   };
 

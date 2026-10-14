@@ -13,6 +13,9 @@ export interface StoredProgressSchema {
     readonly lastDifficulty: Difficulty;
     readonly totalPlayed: number;
     readonly totalWins: number;
+    readonly totalPoints?: number;
+    readonly bestSolveTimeSeconds?: number | null;
+    readonly totalElapsedSeconds?: number;
   };
 }
 
@@ -24,6 +27,9 @@ export const INITIAL_PROGRESS_DATA: StoredProgressSchema = {
     lastDifficulty: "MEDIUM",
     totalPlayed: 0,
     totalWins: 0,
+    totalPoints: 0,
+    bestSolveTimeSeconds: null,
+    totalElapsedSeconds: 0,
   },
 };
 
@@ -64,6 +70,12 @@ export function loadProgress(): StoredProgressSchema {
       return INITIAL_PROGRESS_DATA;
     }
 
+    const wins = typeof parsed.classic?.totalWins === "number" ? parsed.classic.totalWins : 0;
+    const storedPoints =
+      typeof parsed.classic?.totalPoints === "number" ? parsed.classic.totalPoints : 0;
+    // Fallback: If player already has classic wins recorded but points were 0/missing, estimate ~90 pts per win
+    const totalPoints = storedPoints > 0 ? storedPoints : wins > 0 ? wins * 90 : 0;
+
     return {
       version: 1,
       daily: parsed.daily ?? {},
@@ -74,7 +86,16 @@ export function loadProgress(): StoredProgressSchema {
         lastDifficulty: parsed.classic?.lastDifficulty ?? "MEDIUM",
         totalPlayed:
           typeof parsed.classic?.totalPlayed === "number" ? parsed.classic.totalPlayed : 0,
-        totalWins: typeof parsed.classic?.totalWins === "number" ? parsed.classic.totalWins : 0,
+        totalWins: wins,
+        totalPoints,
+        bestSolveTimeSeconds:
+          typeof parsed.classic?.bestSolveTimeSeconds === "number"
+            ? parsed.classic.bestSolveTimeSeconds
+            : null,
+        totalElapsedSeconds:
+          typeof parsed.classic?.totalElapsedSeconds === "number"
+            ? parsed.classic.totalElapsedSeconds
+            : 0,
       },
     };
   } catch {
@@ -139,17 +160,36 @@ export function getClassicLastDifficulty(): Difficulty {
 }
 
 /**
- * Records a completed Classic game, maintaining recent puzzle history and counters.
+ * Records a completed Classic game, maintaining recent puzzle history, cumulative points, and speed records.
  */
 export function recordClassicGame(
   puzzleId: string,
   difficulty: Difficulty,
   won: boolean,
+  points: number = 0,
+  elapsedSeconds?: number,
   maxRecentKeep: number = 20
 ): void {
   const current = loadProgress();
   const filteredRecents = current.classic.recentlyPlayedIds.filter((id) => id !== puzzleId);
   const updatedRecents = [puzzleId, ...filteredRecents].slice(0, maxRecentKeep);
+
+  const prevBestTime = current.classic.bestSolveTimeSeconds ?? null;
+  const newBestTime =
+    won && typeof elapsedSeconds === "number" && elapsedSeconds > 0
+      ? prevBestTime !== null
+        ? Math.min(prevBestTime, elapsedSeconds)
+        : elapsedSeconds
+      : prevBestTime;
+
+  const currentPoints =
+    typeof current.classic.totalPoints === "number" && current.classic.totalPoints > 0
+      ? current.classic.totalPoints
+      : current.classic.totalWins > 0
+        ? current.classic.totalWins * 90
+        : 0;
+
+  const earnedPoints = won ? (points > 0 ? points : 90) : 0;
 
   const updated: StoredProgressSchema = {
     ...current,
@@ -158,6 +198,11 @@ export function recordClassicGame(
       lastDifficulty: difficulty,
       totalPlayed: current.classic.totalPlayed + 1,
       totalWins: current.classic.totalWins + (won ? 1 : 0),
+      totalPoints: currentPoints + earnedPoints,
+      bestSolveTimeSeconds: newBestTime,
+      totalElapsedSeconds:
+        (current.classic.totalElapsedSeconds ?? 0) +
+        (typeof elapsedSeconds === "number" ? elapsedSeconds : 0),
     },
   };
   saveProgress(updated);

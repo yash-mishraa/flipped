@@ -18,6 +18,19 @@ vi.mock("@clerk/nextjs", () => ({
   clerkMiddleware: () => () => {},
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 if (typeof window !== "undefined") {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
