@@ -620,7 +620,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
           data-testid="start-game-button"
           onClick={handleStartSprint}
           disabled={loadingNext}
-          className="flex w-full items-center justify-center rounded-full bg-[#7B1E2B] py-3.5 text-base font-extrabold text-[#F7F0E5] shadow-lg transition hover:bg-[#631722] active:scale-95 disabled:opacity-50 cursor-pointer"
+          className="flex w-full items-center justify-center rounded-full bg-[#7B1E2B] py-3.5 text-base font-extrabold text-[#F7F0E5] shadow-lg transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-xl active:scale-[0.97] disabled:opacity-50 cursor-pointer"
         >
           {loadingNext ? (
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -731,7 +731,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignUpButton mode="modal">
                   <button
                     type="button"
-                    className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
+                    className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] active:scale-[0.97]"
                   >
                     Create Free Account
                   </button>
@@ -739,7 +739,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignInButton mode="modal">
                   <button
                     type="button"
-                    className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95"
+                    className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] shadow-2xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
                   >
                     Log In
                   </button>
@@ -759,20 +759,20 @@ export function ClassicSprintBoard(): React.JSX.Element {
             <button
               type="button"
               onClick={handleStartSprint}
-              className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95"
+              className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97]"
             >
               Play Again ({durationSeconds / 60}m)
             </button>
             <button
               type="button"
               onClick={() => setGameState("LOBBY")}
-              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-95"
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
             >
               Change Settings
             </button>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-95"
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
             >
               Home
             </Link>
@@ -842,7 +842,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
           type="button"
           onClick={handleSkipPuzzle}
           disabled={loadingNext}
-          className="inline-flex items-center justify-center rounded-full border border-[#C49A6C]/50 bg-[#faeee0]/70 px-4 py-1.5 text-xs font-bold text-[#32171D] hover:bg-[#faeee0] hover:border-[#7B1E2B] transition active:scale-95 cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-full border border-[#C49A6C]/50 bg-[#faeee0]/70 px-4 py-1.5 text-xs font-bold text-[#32171D] hover:bg-[#faeee0] hover:border-[#7B1E2B] transition-all duration-200 ease-out active:scale-[0.97] cursor-pointer disabled:opacity-50"
           title="Skip this puzzle"
         >
           Skip
@@ -908,7 +908,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
               type="button"
               onClick={handleSubmitCurrentBoard}
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-8 py-2.5 text-sm sm:text-base font-extrabold text-[#F7F0E5] shadow-md hover:bg-[#631722] active:scale-95 transition-all disabled:opacity-50 border border-[#C49A6C]/40 cursor-pointer"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-8 py-2.5 text-sm sm:text-base font-extrabold text-[#F7F0E5] shadow-md hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 ease-out disabled:opacity-50 border border-[#C49A6C]/40 cursor-pointer"
             >
               {isSubmitting ? "Verifying..." : "Check Answer"}
             </button>

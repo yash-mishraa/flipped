@@ -71,11 +71,11 @@ export function LetterTile({
       data-has-letter={Boolean(letter)}
       data-selected={isSelected}
       className={cn(
-        "relative flex h-14 w-11 sm:h-16 sm:w-13 md:h-18 md:w-15 items-center justify-center rounded-lg border-2 text-xl sm:text-2xl font-bold select-none transition-colors duration-75 motion-reduce:transition-none motion-reduce:transform-none",
+        "relative flex h-14 w-11 sm:h-16 sm:w-13 md:h-18 md:w-15 items-center justify-center rounded-lg border-2 text-xl sm:text-2xl font-bold select-none transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
         feedbackClasses,
         selectionClasses,
         isFixed && "cursor-default opacity-95",
-        !isFixed && !isRoundOver && "cursor-pointer"
+        !isFixed && !isRoundOver && "cursor-pointer active:scale-[0.96]"
       )}
     >
       {/* Blinking cursor caret when this box is active and waiting for a letter */}

@@ -146,19 +146,19 @@ function DailyPageContent(): React.JSX.Element {
               <button
                 type="button"
                 onClick={fetchDailyChallenge}
-                className="rounded-full border border-[#C49A6C] px-5 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.98] transition"
+                className="rounded-full border border-[#C49A6C] px-5 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer"
               >
                 Retry
               </button>
               <Link
                 href="/"
-                className="rounded-full border border-[#C49A6C] px-5 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.98] transition"
+                className="rounded-full border border-[#C49A6C] px-5 py-2 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out"
               >
                 Home
               </Link>
               <Link
                 href="/classic"
-                className="rounded-full bg-[#7B1E2B] px-5 py-2 text-sm font-bold text-[#F7F0E5] hover:opacity-90 active:scale-[0.98] transition"
+                className="rounded-full bg-[#7B1E2B] px-5 py-2 text-sm font-bold text-[#F7F0E5] hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 ease-out"
               >
                 Play Classic
               </Link>

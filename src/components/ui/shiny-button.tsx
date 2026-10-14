@@ -125,11 +125,18 @@ export function ShinyButton({
           transparent calc(var(--gradient-percent-${instanceId}) * 4)
         ) border-box;
       box-shadow: inset 0 0 0 1px var(--gleam-inset);
-      transition: var(--transition);
+      transition:
+        transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+        var(--transition);
       transition-property:
+        transform,
+        box-shadow,
         --gradient-angle-offset-${instanceId},
         --gradient-percent-${instanceId},
         --gradient-shine-${instanceId};
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
     }
 
     .${scope}::before,
@@ -144,8 +151,13 @@ export function ShinyButton({
       z-index: -1;
     }
 
+    .${scope}:hover {
+      box-shadow: inset 0 0 0 1px var(--gleam-inset), 0 4px 16px rgba(123, 30, 43, 0.18);
+    }
+
     .${scope}:active {
-      translate: 0 1px;
+      transform: scale(0.975) translateY(1px);
+      transition-duration: 80ms;
     }
 
     .${scope}::before {

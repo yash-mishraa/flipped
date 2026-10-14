@@ -61,11 +61,11 @@ export function ClassicDurationSelector({
             disabled={disabled}
             onClick={() => onSelectDuration(option.seconds)}
             className={cn(
-              "flex flex-col items-center justify-center rounded-xl border p-3 text-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] cursor-pointer",
+              "flex flex-col items-center justify-center rounded-xl border p-3 text-center transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] cursor-pointer active:scale-[0.97]",
               isSelected
-                ? "border-[#7B1E2B] bg-[#7B1E2B] text-[#F7F0E5] shadow-sm font-bold"
-                : "border-[#C49A6C]/40 bg-white/80 text-[#32171D] hover:border-[#7B1E2B] hover:bg-white",
-              disabled && "opacity-50 cursor-not-allowed"
+                ? "border-[#7B1E2B] bg-[#7B1E2B] text-[#F7F0E5] shadow-sm font-bold scale-[1.02]"
+                : "border-[#C49A6C]/40 bg-white/80 text-[#32171D] hover:border-[#7B1E2B] hover:bg-white hover:shadow-xs",
+              disabled && "opacity-50 cursor-not-allowed active:scale-100"
             )}
           >
             <span className="text-sm font-extrabold">{option.label}</span>

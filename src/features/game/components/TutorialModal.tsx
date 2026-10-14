@@ -156,7 +156,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
               type="button"
               onClick={handleSkip}
               aria-label="Close tutorial dialog"
-              className="rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold text-[#8C6870] hover:bg-[#faeee0] hover:text-[#32171D] transition cursor-pointer"
+              className="rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold text-[#8C6870] hover:bg-[#faeee0] hover:text-[#32171D] transition-all duration-200 ease-out active:scale-[0.92] cursor-pointer"
             >
               ✕
             </button>
@@ -255,14 +255,14 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
                           onClick={() =>
                             !isFixed && setSelectedSlot({ wordIndex: 0, letterIndex: idx })
                           }
-                          className={`flex h-11 w-9 sm:h-12 sm:w-10 items-center justify-center rounded-lg border-2 text-base sm:text-lg font-bold transition ${
+                          className={`flex h-11 w-9 sm:h-12 sm:w-10 items-center justify-center rounded-lg border-2 text-base sm:text-lg font-bold transition-all duration-200 ease-out ${
                             isFixed
                               ? "bg-[#32171D] text-[#C49A6C] border-[#C49A6C]"
                               : isSelected
-                                ? "border-[#7B1E2B] ring-2 ring-[#7B1E2B] ring-offset-1 bg-white"
+                                ? "border-[#7B1E2B] ring-2 ring-[#7B1E2B] ring-offset-1 bg-white active:scale-[0.96]"
                                 : letter
-                                  ? "bg-[#faeee0] border-[#C49A6C] text-[#32171D]"
-                                  : "bg-[#F7F0E5] border-[#C49A6C]/60 text-[#32171D]"
+                                  ? "bg-[#faeee0] border-[#C49A6C] text-[#32171D] active:scale-[0.96]"
+                                  : "bg-[#F7F0E5] border-[#C49A6C]/60 text-[#32171D] active:scale-[0.96]"
                           }`}
                         >
                           {letter}
@@ -285,14 +285,14 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
                           onClick={() =>
                             !isFixed && setSelectedSlot({ wordIndex: 1, letterIndex: idx })
                           }
-                          className={`flex h-11 w-9 sm:h-12 sm:w-10 items-center justify-center rounded-lg border-2 text-base sm:text-lg font-bold transition ${
+                          className={`flex h-11 w-9 sm:h-12 sm:w-10 items-center justify-center rounded-lg border-2 text-base sm:text-lg font-bold transition-all duration-200 ease-out ${
                             isFixed
                               ? "bg-[#32171D] text-[#C49A6C] border-[#C49A6C]"
                               : isSelected
-                                ? "border-[#7B1E2B] ring-2 ring-[#7B1E2B] ring-offset-1 bg-white"
+                                ? "border-[#7B1E2B] ring-2 ring-[#7B1E2B] ring-offset-1 bg-white active:scale-[0.96]"
                                 : letter
-                                  ? "bg-[#faeee0] border-[#C49A6C] text-[#32171D]"
-                                  : "bg-[#F7F0E5] border-[#C49A6C]/60 text-[#32171D]"
+                                  ? "bg-[#faeee0] border-[#C49A6C] text-[#32171D] active:scale-[0.96]"
+                                  : "bg-[#F7F0E5] border-[#C49A6C]/60 text-[#32171D] active:scale-[0.96]"
                           }`}
                         >
                           {letter}
@@ -310,7 +310,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
                   <button
                     type="button"
                     onClick={resetPractice}
-                    className="mt-3 text-xs text-[#8C6870] hover:text-[#32171D] underline cursor-pointer"
+                    className="mt-3 text-xs text-[#8C6870] hover:text-[#32171D] underline cursor-pointer transition-colors duration-200"
                   >
                     Reset Grid
                   </button>
@@ -359,7 +359,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
             <button
               type="button"
               onClick={() => setStep(step - 1)}
-              className="rounded-full border border-[#C49A6C] px-4 py-1.5 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.98] transition cursor-pointer"
+              className="rounded-full border border-[#C49A6C] px-4 py-1.5 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.96] transition-all duration-200 ease-out cursor-pointer"
             >
               Back
             </button>
@@ -367,7 +367,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
             <button
               type="button"
               onClick={handleSkip}
-              className="text-xs font-semibold text-[#8C6870] hover:text-[#32171D] transition cursor-pointer"
+              className="text-xs font-semibold text-[#8C6870] hover:text-[#32171D] transition-colors duration-200 cursor-pointer"
             >
               Skip Tutorial
             </button>
@@ -377,7 +377,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
             <button
               type="button"
               onClick={() => setStep(step + 1)}
-              className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-[0.98] transition cursor-pointer"
+              className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] hover:shadow-sm active:scale-[0.96] transition-all duration-200 ease-out cursor-pointer"
             >
               Next
             </button>
@@ -386,7 +386,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
               type="button"
               onClick={handleComplete}
               data-testid="start-playing-button"
-              className="rounded-full bg-[#7B1E2B] px-6 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-[0.98] transition cursor-pointer"
+              className="rounded-full bg-[#7B1E2B] px-6 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] hover:shadow-sm active:scale-[0.96] transition-all duration-200 ease-out cursor-pointer"
             >
               Start Playing
             </button>

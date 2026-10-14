@@ -148,7 +148,7 @@ export function GameBoard({
               type="button"
               onClick={() => setShowWinModal(false)}
               aria-label="Close victory popup"
-              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition text-sm font-bold cursor-pointer"
+              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition-all duration-200 ease-out active:scale-[0.92] text-sm font-bold cursor-pointer"
             >
               ✕
             </button>

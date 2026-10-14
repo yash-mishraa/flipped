@@ -84,7 +84,7 @@ export default function StatisticsPage(): React.JSX.Element {
               <SignUpButton mode="modal">
                 <button
                   type="button"
-                  className="rounded-full border border-[#C49A6C] bg-white px-6 py-3 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.98] transition cursor-pointer"
+                  className="rounded-full border border-[#C49A6C] bg-white px-6 py-3 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer"
                 >
                   Create Free Account
                 </button>
@@ -171,8 +171,8 @@ export default function StatisticsPage(): React.JSX.Element {
                   <TabsTrigger
                     value="ALL"
                     onClick={() => setActiveTab("ALL")}
-                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                      activeTab === "ALL" ? "bg-[#7B1E2B] text-[#F7F0E5]" : "text-[#6B4E55]"
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ease-out active:scale-[0.96] ${
+                      activeTab === "ALL" ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs" : "text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5"
                     }`}
                   >
                     Overview
@@ -180,8 +180,8 @@ export default function StatisticsPage(): React.JSX.Element {
                   <TabsTrigger
                     value="DAILY"
                     onClick={() => setActiveTab("DAILY")}
-                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                      activeTab === "DAILY" ? "bg-[#7B1E2B] text-[#F7F0E5]" : "text-[#6B4E55]"
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ease-out active:scale-[0.96] ${
+                      activeTab === "DAILY" ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs" : "text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5"
                     }`}
                   >
                     Daily Challenge
@@ -189,8 +189,8 @@ export default function StatisticsPage(): React.JSX.Element {
                   <TabsTrigger
                     value="CLASSIC"
                     onClick={() => setActiveTab("CLASSIC")}
-                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                      activeTab === "CLASSIC" ? "bg-[#7B1E2B] text-[#F7F0E5]" : "text-[#6B4E55]"
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ease-out active:scale-[0.96] ${
+                      activeTab === "CLASSIC" ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs" : "text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5"
                     }`}
                   >
                     Classic Practice

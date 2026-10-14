@@ -77,7 +77,7 @@ export default function ArchivePage(): React.JSX.Element {
           <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-3">
             <Link
               href="/"
-              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
+              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.96]"
             >
               Home
             </Link>
@@ -88,7 +88,7 @@ export default function ArchivePage(): React.JSX.Element {
 
             <Link
               href="/daily"
-              className="rounded-full bg-[#7B1E2B] px-4 py-1.5 text-xs font-bold text-[#F7F0E5] shadow-xs transition hover:opacity-90 active:scale-[0.98]"
+              className="rounded-full bg-[#7B1E2B] px-4 py-1.5 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:opacity-90 hover:shadow-sm active:scale-[0.96]"
             >
               Today
             </Link>
@@ -172,7 +172,7 @@ export default function ArchivePage(): React.JSX.Element {
 
                     <Link
                       href={isToday ? "/daily" : `/daily?date=${assignment.date}`}
-                      className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition hover:bg-[#631722] active:scale-[0.98]"
+                      className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-sm active:scale-[0.96]"
                     >
                       <span>{attempt ? (attempt.status === "WON" ? "View" : "Replay") : "Play"}</span>
                     </Link>

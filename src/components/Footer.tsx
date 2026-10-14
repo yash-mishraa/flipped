@@ -31,19 +31,19 @@ export function Footer(): React.JSX.Element {
               aria-label="Footer Navigation"
               className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#6B4E55]"
             >
-              <Link href="/daily" className="hover:text-[#7B1E2B] transition">
+              <Link href="/daily" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
                 Daily
               </Link>
               <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-              <Link href="/classic" className="hover:text-[#7B1E2B] transition">
+              <Link href="/classic" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
                 Classic
               </Link>
               <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-              <Link href="/archive" className="hover:text-[#7B1E2B] transition">
+              <Link href="/archive" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
                 Archive
               </Link>
               <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-              <Link href="/stats" className="hover:text-[#7B1E2B] transition">
+              <Link href="/stats" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
                 Statistics
               </Link>
               <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
@@ -53,7 +53,7 @@ export function Footer(): React.JSX.Element {
                   e.preventDefault();
                   setShowTutorial(true);
                 }}
-                className="hover:text-[#7B1E2B] transition cursor-pointer"
+                className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out cursor-pointer"
               >
                 How to Play
               </Link>

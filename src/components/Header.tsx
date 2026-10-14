@@ -53,10 +53,10 @@ export function Header(): React.JSX.Element {
                       key={href}
                       value={href}
                       asChild
-                      className={`text-xs font-semibold px-3 py-1 rounded-full transition ${
+                      className={`text-xs font-semibold px-3 py-1 rounded-full transition-all duration-200 ease-out active:scale-[0.96] ${
                         isActive
-                          ? "bg-[#7B1E2B] text-[#F7F0E5]"
-                          : "text-[#6B4E55] hover:text-[#32171D]"
+                          ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs"
+                          : "text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5"
                       }`}
                     >
                       <Link href={href}>{label}</Link>
@@ -67,7 +67,7 @@ export function Header(): React.JSX.Element {
                 <TabsTrigger
                   value="how-to-play"
                   onClick={() => setShowTutorial(true)}
-                  className="text-xs font-semibold px-3 py-1 rounded-full text-[#6B4E55] hover:text-[#32171D] transition cursor-pointer"
+                  className="text-xs font-semibold px-3 py-1 rounded-full text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5 transition-all duration-200 ease-out active:scale-[0.96] cursor-pointer"
                 >
                   How to Play
                 </TabsTrigger>
@@ -93,7 +93,7 @@ export function Header(): React.JSX.Element {
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-expanded={mobileMenuOpen}
               aria-label="Toggle navigation menu"
-              className="md:hidden inline-flex items-center justify-center rounded-full border border-[#C49A6C]/50 bg-[#faeee0] px-3.5 py-1 text-xs font-bold text-[#32171D] shadow-2xs hover:bg-[#faeee0]/80 active:scale-95 transition cursor-pointer"
+              className="md:hidden inline-flex items-center justify-center rounded-full border border-[#C49A6C]/50 bg-[#faeee0] px-3.5 py-1 text-xs font-bold text-[#32171D] shadow-2xs hover:bg-[#faeee0]/80 active:scale-[0.96] transition-all duration-200 ease-out cursor-pointer"
             >
               {mobileMenuOpen ? "Close" : "Menu"}
             </button>
@@ -104,7 +104,7 @@ export function Header(): React.JSX.Element {
         {mobileMenuOpen && (
           <nav
             aria-label="Mobile Navigation"
-            className="md:hidden border-t border-[#C49A6C]/20 bg-[#F7F0E5]/98 px-3.5 py-2.5 shadow-md backdrop-blur-lg"
+            className="md:hidden border-t border-[#C49A6C]/20 bg-[#F7F0E5]/98 px-3.5 py-2.5 shadow-md backdrop-blur-lg animate-fade-in"
           >
             <div className="grid grid-cols-2 gap-1.5">
               {navItems.map(({ href, label }) => {
@@ -114,7 +114,7 @@ export function Header(): React.JSX.Element {
                     key={href}
                     href={href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-center rounded-full px-3 py-2 text-xs font-bold transition ${
+                    className={`flex items-center justify-center rounded-full px-3 py-2 text-xs font-bold transition-all duration-200 ease-out active:scale-[0.96] ${
                       isActive
                         ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs"
                         : "bg-white/80 text-[#32171D] border border-[#C49A6C]/30 hover:bg-[#faeee0]"

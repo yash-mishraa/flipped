@@ -16,7 +16,7 @@ export function GameInstructions(): React.JSX.Element {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-controls="instructions-content"
-        className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#32171D] transition-colors hover:text-[#7B1E2B] cursor-pointer"
+        className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#32171D] transition-all duration-200 ease-out hover:text-[#7B1E2B] active:opacity-75 cursor-pointer"
       >
         <span>How to Play & 4 Transformation Permutations</span>
         <span className="text-xs text-[#8C6870] font-bold" aria-hidden="true">

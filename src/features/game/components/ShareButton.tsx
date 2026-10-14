@@ -42,7 +42,7 @@ export function ShareButton({ options, className }: ShareButtonProps): React.JSX
         aria-label={copied ? "Copied results to clipboard" : "Share results"}
         className={
           className ||
-          "inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-6 py-2.5 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
+          "inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-6 py-2.5 text-sm font-semibold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] hover:shadow-sm active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
         }
       >
         {copied ? (

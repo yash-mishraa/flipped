@@ -47,10 +47,10 @@ export function HintControl({
         disabled={isRoundOver || isProcessing}
         aria-label={`Use a hint. Cost is 5 points deduction. ${hintsUsed} used so far.`}
         className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-2 text-xs font-semibold text-[#32171D] shadow-sm transition-all duration-150 select-none cursor-pointer",
-          "hover:bg-[#f4ddc5] hover:border-[#C49A6C] active:scale-95",
+          "inline-flex items-center gap-2 rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-2 text-xs font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out select-none cursor-pointer",
+          "hover:bg-[#f4ddc5] hover:border-[#C49A6C] hover:shadow-xs active:scale-[0.97]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2",
-          (isRoundOver || isProcessing) && "cursor-not-allowed opacity-50"
+          (isRoundOver || isProcessing) && "cursor-not-allowed opacity-50 active:scale-100"
         )}
       >
         <span>Use Hint</span>

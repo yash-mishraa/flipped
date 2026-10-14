@@ -123,7 +123,7 @@ export default function HomePage(): React.JSX.Element {
             <button
               type="button"
               onClick={() => setShowTutorial(true)}
-              className="w-full rounded-full border border-[#C49A6C] bg-white/90 px-6 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-[0.98] transition cursor-pointer"
+              className="w-full rounded-full border border-[#C49A6C] bg-white/90 px-6 py-3 text-sm font-semibold text-[#32171D] shadow-xs hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer"
             >
               How to Play
             </button>

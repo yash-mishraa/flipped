@@ -25,7 +25,7 @@ export default function PlayPage(): React.JSX.Element {
         <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-3">
           <Link
             href="/"
-            className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
+            className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
           >
             Home
           </Link>
@@ -38,7 +38,7 @@ export default function PlayPage(): React.JSX.Element {
             type="button"
             onClick={handleNextFixture}
             title="Cycle to next test puzzle fixture"
-            className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
+            className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97] cursor-pointer"
           >
             <span className="hidden sm:inline">
               Next Puzzle ({puzzleIndex + 1}/{TEST_PUZZLES.length})

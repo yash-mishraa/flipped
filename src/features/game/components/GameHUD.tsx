@@ -101,7 +101,7 @@ export function GameHUD({
               onClick={onRestart}
               title="Restart round from scratch"
               aria-label="Restart round"
-              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95 cursor-pointer"
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.96] cursor-pointer"
             >
               Reset
             </button>
@@ -140,7 +140,7 @@ export function GameHUD({
               type="button"
               onClick={onStartGame}
               data-testid="start-game-button"
-              className="inline-flex w-full items-center justify-center rounded-full bg-[#7B1E2B] px-6 py-3 text-base font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[#7B1E2B] px-6 py-3 text-base font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
             >
               Start Game (60s)
             </button>

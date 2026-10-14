@@ -564,7 +564,7 @@ export function ServerGameBoard({
             type="button"
             onClick={handleSubmitCurrentBoard}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-8 py-2.5 text-sm sm:text-base font-extrabold text-[#F7F0E5] shadow-md hover:bg-[#7B1E2B]/90 active:scale-95 transition-all disabled:opacity-50 border border-[#C49A6C]/40 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#7B1E2B] px-8 py-2.5 text-sm sm:text-base font-extrabold text-[#F7F0E5] shadow-md hover:bg-[#7B1E2B]/90 active:scale-[0.97] transition-all duration-200 ease-out disabled:opacity-50 border border-[#C49A6C]/40 cursor-pointer"
           >
             {isSubmitting ? "Checking Answer..." : "Check Answer"}
           </button>
@@ -604,7 +604,7 @@ export function ServerGameBoard({
               type="button"
               onClick={() => setShowWinModal(false)}
               aria-label="Close victory popup"
-              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition font-bold text-sm cursor-pointer"
+              className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#32171D] text-[#F7F0E5] border border-[#C49A6C] shadow-md hover:bg-[#7B1E2B] transition-all duration-200 ease-out active:scale-[0.92] font-bold text-sm cursor-pointer"
             >
               ✕
             </button>

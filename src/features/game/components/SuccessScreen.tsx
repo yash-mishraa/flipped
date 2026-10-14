@@ -138,7 +138,7 @@ export function SuccessScreen({
               <SignUpButton mode="modal">
                 <button
                   type="button"
-                  className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow transition hover:bg-[#631722] active:scale-95 cursor-pointer"
+                  className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] active:scale-[0.97] cursor-pointer"
                 >
                   Create Free Account
                 </button>
@@ -146,7 +146,7 @@ export function SuccessScreen({
               <SignInButton mode="modal">
                 <button
                   type="button"
-                  className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-95 cursor-pointer"
+                  className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] shadow-2xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97] cursor-pointer"
                 >
                   Log In
                 </button>
@@ -167,13 +167,13 @@ export function SuccessScreen({
             <>
               <Link
                 href="/classic"
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
+                className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2"
               >
                 Play Classic Mode
               </Link>
               <Link
                 href="/archive"
-                className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+                className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
               >
                 Daily Archive
               </Link>
@@ -184,7 +184,7 @@ export function SuccessScreen({
                 type="button"
                 onClick={handleReplayAction}
                 data-testid="play-again-button"
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all hover:bg-[#631722] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
+                className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer"
               >
                 {mode === "CLASSIC" ? nextPuzzleLabel : "Play Again"}
               </button>
@@ -193,7 +193,7 @@ export function SuccessScreen({
 
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition hover:bg-[#faeee0] active:scale-95"
+            className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
           >
             Home
           </Link>

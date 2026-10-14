@@ -69,11 +69,11 @@ export function DifficultySelector({
             onClick={() => onSelectDifficulty(option.id)}
             data-testid={`difficulty-${option.id.toLowerCase()}`}
             className={cn(
-              "flex flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer",
+              "flex flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E2B] focus-visible:ring-offset-2 cursor-pointer active:scale-[0.98]",
               isSelected
                 ? "border-[#7B1E2B] bg-white shadow-md ring-1 ring-[#7B1E2B]"
-                : "border-[#C49A6C]/50 bg-white/70 hover:border-[#C49A6C] hover:bg-white",
-              disabled && "opacity-60 cursor-not-allowed"
+                : "border-[#C49A6C]/50 bg-white/70 hover:border-[#C49A6C] hover:bg-white hover:shadow-xs",
+              disabled && "opacity-60 cursor-not-allowed active:scale-100"
             )}
           >
             <div>

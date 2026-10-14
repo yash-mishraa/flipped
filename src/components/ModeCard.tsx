@@ -54,7 +54,7 @@ export function ModeCard({ modeInfo, ctaHref, statusLabel }: ModeCardProps): Rea
       <div className="mt-6 pt-4 border-t border-stone-100">
         <Link
           href={targetHref}
-          className="inline-flex w-full items-center justify-center rounded-full bg-coral-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-coral-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
+          className="inline-flex w-full items-center justify-center rounded-full bg-coral-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 ease-out hover:bg-coral-600 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:ring-offset-2"
         >
           {ctaText}
         </Link>
