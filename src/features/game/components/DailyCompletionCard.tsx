@@ -167,43 +167,56 @@ export function DailyCompletionCard({
         <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">{friendlyDate}</p>
       </div>
 
-      {/* 4-Stat Summary Grid: Score, Time, Hints, Daily Streak */}
-      <div className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
-          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
-            Score
-          </div>
-          <p className={`mt-1 text-2xl sm:text-3xl font-black ${isWon ? "text-[#7B1E2B]" : "text-[#32171D]"}`}>
-            {attempt.finalScore}
-          </p>
+      {/* Wordle-Style 4-Stat Summary Block: Single row across mobile & desktop with dividers */}
+      <div className="w-full rounded-2xl border border-[#C49A6C]/60 bg-white p-4 shadow-2xs text-center">
+        <div className="mb-3 flex items-center justify-center gap-2">
+          <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
+            Statistics
+          </span>
+          <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
         </div>
 
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
-          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
-            Time
+        <div className="grid grid-cols-4 divide-x divide-[#C49A6C]/30 text-center">
+          <div className="px-1">
+            <p className={`text-2xl sm:text-3xl font-black ${isWon ? "text-[#7B1E2B]" : "text-[#32171D]"}`}>
+              {attempt.finalScore}
+            </p>
+            <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+              Score
+            </p>
           </div>
-          <p className="mt-1 text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.elapsedSeconds}s</p>
-        </div>
 
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
-          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
-            Hints
+          <div className="px-1">
+            <p className="text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.elapsedSeconds}s</p>
+            <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+              Time
+            </p>
           </div>
-          <p className="mt-1 text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.hintsUsed}</p>
-        </div>
 
-        <div className="rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3.5 shadow-2xs">
-          <div className="text-[11px] font-bold text-[#8C6870] uppercase tracking-wider">
-            Streak
+          <div className="px-1">
+            <p className="text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.hintsUsed}</p>
+            <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+              Hints
+            </p>
           </div>
-          <p className="mt-1 text-2xl sm:text-3xl font-black text-[#7B1E2B]">{streak}</p>
+
+          <div className="px-1">
+            <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B]">{streak}</p>
+            <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+              Streak
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Solved Grid Preview */}
-      <section className="w-full" aria-label="Solved Letter Grid Review">
-        <div className="mb-2 text-center">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6870]">
+      {/* Solved Grid Preview Framed in Inset Stage */}
+      <section
+        className="w-full rounded-2xl border border-[#C49A6C]/45 bg-[#faeee0]/40 p-4 shadow-2xs"
+        aria-label="Solved Letter Grid Review"
+      >
+        <div className="mb-3 text-center">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
             Solution Grid
           </span>
         </div>

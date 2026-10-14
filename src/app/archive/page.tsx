@@ -106,73 +106,93 @@ export default function ArchivePage(): React.JSX.Element {
 
         {/* Archive List */}
         <section className="my-4 w-full flex-1" aria-label="Published Daily Puzzles">
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {sortedSchedule.map((assignment) => {
               const puzzle = PUBLIC_PUZZLES_BY_ID.get(assignment.puzzleId);
               const attempt = dailyAttempts[assignment.date];
               const isToday = assignment.date === todayStr;
               const challengeNum = challengeNumberMap.get(assignment.date) ?? 1;
               const { dayName, formattedDate } = formatFriendlyDateWithDay(assignment.date);
+              const monthShort = formattedDate.split(" ")[0]?.toUpperCase() || "OCT";
 
               return (
                 <div
                   key={assignment.date}
                   data-testid={`archive-item-${assignment.date}`}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-[#C49A6C]/40 bg-white/80 p-5 shadow-xs transition hover:border-[#7B1E2B] hover:bg-white"
+                  className={`flex items-center justify-between gap-3 rounded-2xl border bg-white p-3 sm:p-4 shadow-2xs transition-all duration-200 hover:border-[#7B1E2B] hover:shadow-xs ${
+                    isToday
+                      ? "border-[#7B1E2B]/70 ring-1 ring-[#7B1E2B]/20"
+                      : "border-[#C49A6C]/45"
+                  }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#faeee0] font-bold text-[#32171D]">
-                      {assignment.date.slice(8, 10)}
+                  {/* Left: Date Tile & Challenge Details */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Date Tile: 2-line day + month */}
+                    <div
+                      className={`flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 flex-col items-center justify-center rounded-xl border font-bold text-center leading-none ${
+                        isToday
+                          ? "bg-[#7B1E2B] text-[#F7F0E5] border-[#7B1E2B]"
+                          : "bg-[#faeee0] text-[#32171D] border-[#C49A6C]/50"
+                      }`}
+                    >
+                      <span className="text-sm sm:text-base font-black">
+                        {assignment.date.slice(8, 10)}
+                      </span>
+                      <span
+                        className={`text-[9px] font-extrabold tracking-wide uppercase ${
+                          isToday ? "text-[#F7F0E5]/80" : "text-[#8C6D68]"
+                        }`}
+                      >
+                        {monthShort}
+                      </span>
                     </div>
 
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-[#6B4E55]">
-                          {dayName} • {formattedDate}
-                        </span>
-                        {isToday && (
-                          <span className="rounded-full bg-[#7B1E2B] px-2 py-0.5 text-[10px] font-bold text-[#F7F0E5]">
-                            TODAY
-                          </span>
-                        )}
-                        {assignment.note && (
-                          <span className="text-xs text-[#8C6D68]">• {assignment.note}</span>
-                        )}
-                      </div>
-
-                      <div className="mt-1 flex items-center gap-2">
-                        <span className="font-extrabold text-[#32171D] text-base">
+                    {/* Metadata */}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-extrabold text-[#32171D] text-sm sm:text-base leading-tight">
                           Challenge #{challengeNum}
                         </span>
                         {puzzle && (
-                          <span className="rounded bg-[#faeee0] border border-[#C49A6C]/40 px-1.5 py-0.5 text-[10px] font-bold text-[#7B1E2B]">
+                          <span className="rounded bg-[#faeee0] border border-[#C49A6C]/40 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-extrabold text-[#7B1E2B] uppercase">
                             {puzzle.difficulty}
+                          </span>
+                        )}
+                        {isToday && (
+                          <span className="rounded-full bg-[#7B1E2B] px-2 py-0.5 text-[9px] font-extrabold text-[#F7F0E5]">
+                            TODAY
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-0.5 flex items-center gap-1.5 text-xs text-[#8C6D68] truncate">
+                        <span className="truncate">{dayName}, {formattedDate}</span>
+                        {attempt && attempt.status === "WON" ? (
+                          <span className="font-bold text-[#7B1E2B] shrink-0">
+                            • Solved ({attempt.finalScore} pts)
+                          </span>
+                        ) : attempt ? (
+                          <span className="font-medium text-[#8C6D68] shrink-0">
+                            • Timed Out
+                          </span>
+                        ) : (
+                          <span className="text-[#8C6D68]/70 shrink-0">
+                            • Unplayed
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    {attempt ? (
-                      <div className="flex items-center gap-2">
-                        {attempt.status === "WON" ? (
-                          <span className="rounded-full bg-[#faeee0] border border-[#C49A6C] px-3 py-1 text-xs font-bold text-[#32171D]">
-                            Solved ({attempt.finalScore} pts)
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-[#faeee0]/50 border border-[#C49A6C]/40 px-3 py-1 text-xs font-semibold text-[#6B4E55]">
-                            Timed Out
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs font-medium text-[#8C6D68]">Unplayed</span>
-                    )}
-
+                  {/* Right: Vertically Centered Action Button */}
+                  <div className="shrink-0">
                     <Link
                       href={isToday ? "/daily" : `/daily?date=${assignment.date}`}
-                      className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-sm active:scale-[0.96]"
+                      className={`inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-1.5 sm:py-2 text-xs font-bold shadow-xs transition-all duration-200 ease-out active:scale-[0.96] ${
+                        attempt && attempt.status === "WON"
+                          ? "bg-[#faeee0] border border-[#C49A6C] text-[#32171D] hover:bg-[#f4ddc5]"
+                          : "bg-[#7B1E2B] text-[#F7F0E5] hover:bg-[#631722]"
+                      }`}
                     >
                       <span>{attempt ? (attempt.status === "WON" ? "View" : "Replay") : "Play"}</span>
                     </Link>

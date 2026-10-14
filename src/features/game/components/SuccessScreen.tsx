@@ -86,27 +86,37 @@ export function SuccessScreen({
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="mt-5 grid w-full grid-cols-3 gap-2.5 text-center">
-          <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3">
-            <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
-              Score
-            </div>
-            <p className="mt-1 text-2xl font-black text-[#7B1E2B]">{finalScore}</p>
+        {/* Wordle-Style Stats Grid */}
+        <div className="mt-5 w-full rounded-2xl border border-[#C49A6C]/60 bg-white p-4 shadow-2xs text-center">
+          <div className="mb-2.5 flex items-center justify-center gap-2">
+            <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
+              Performance
+            </span>
+            <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
           </div>
 
-          <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3">
-            <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
-              Time
+          <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/30 text-center">
+            <div className="px-1">
+              <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B]">{finalScore}</p>
+              <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+                Score
+              </p>
             </div>
-            <p className="mt-1 text-2xl font-black text-[#32171D]">{elapsedSeconds}s</p>
-          </div>
 
-          <div className="rounded-xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3">
-            <div className="text-[11px] font-semibold text-[#8C6870] uppercase">
-              Hints
+            <div className="px-1">
+              <p className="text-2xl sm:text-3xl font-black text-[#32171D]">{elapsedSeconds}s</p>
+              <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+                Time
+              </p>
             </div>
-            <p className="mt-1 text-2xl font-black text-[#32171D]">{hintsUsed}</p>
+
+            <div className="px-1">
+              <p className="text-2xl sm:text-3xl font-black text-[#32171D]">{hintsUsed}</p>
+              <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
+                Hints
+              </p>
+            </div>
           </div>
         </div>
 
