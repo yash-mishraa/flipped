@@ -216,7 +216,7 @@ export default function ArchivePage(): React.JSX.Element {
 
         {/* Footer Notice */}
         <footer className="border-t border-[#C49A6C]/30 pt-3 text-center text-xs text-[#6B4E55]">
-          <p>Flipped Daily Archive • Calendar days reset according to Asia/Kolkata timezone</p>
+          <p>Flipped Daily Archive • Calendar days reset according to UTC timezone (00:00 UTC)</p>
         </footer>
       </main>
       <Footer />

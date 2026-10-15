@@ -2,11 +2,11 @@ import { DAILY_SCHEDULE_MAP, PUBLISHED_DAILY_SCHEDULE } from "../data/daily-sche
 import { PUZZLES_BY_ID } from "../data/puzzles";
 import type { DailyPuzzleAssignment, DailyPuzzleResult } from "./mode-types";
 
-export const DEFAULT_DAILY_TIMEZONE = "Asia/Kolkata";
+export const DEFAULT_DAILY_TIMEZONE = "UTC";
 
 /**
  * Calculates the current calendar date in the configured game timezone.
- * Defaults to Asia/Kolkata (IST).
+ * Defaults to UTC.
  * Returns strict YYYY-MM-DD string.
  */
 export function getDailyDateString(

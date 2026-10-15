@@ -15,16 +15,18 @@ describe("Daily Scheduler", () => {
       expect(dateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
-    it("defaults to Asia/Kolkata timezone", () => {
-      expect(DEFAULT_DAILY_TIMEZONE).toBe("Asia/Kolkata");
+    it("defaults to UTC timezone", () => {
+      expect(DEFAULT_DAILY_TIMEZONE).toBe("UTC");
 
-      // 2026-10-12 19:00:00 UTC is 2026-10-13 00:30:00 in Asia/Kolkata (+5:30)
+      // 2026-10-12 19:00:00 UTC is 2026-10-12 in UTC and 2026-10-13 00:30:00 in Asia/Kolkata (+5:30)
       const lateUtcDate = new Date("2026-10-12T19:00:00Z");
+      const defaultDate = getDailyDateString(lateUtcDate);
       const kolkataDate = getDailyDateString(lateUtcDate, "Asia/Kolkata");
       const utcDate = getDailyDateString(lateUtcDate, "UTC");
 
-      expect(kolkataDate).toBe("2026-10-13");
+      expect(defaultDate).toBe("2026-10-12");
       expect(utcDate).toBe("2026-10-12");
+      expect(kolkataDate).toBe("2026-10-13");
     });
 
     it("falls back gracefully when an invalid timezone string is provided", () => {

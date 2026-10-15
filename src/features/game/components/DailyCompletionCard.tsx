@@ -70,12 +70,14 @@ function getPraiseText(score: number): string {
 }
 
 /**
- * Formats countdown to next midnight local time.
+ * Formats countdown to next midnight UTC time (00:00:00 UTC).
  */
 function getFormattedCountdown(): string {
   const now = new Date();
-  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  const diffMs = Math.max(0, tomorrow.getTime() - now.getTime());
+  const nextUtcMidnight = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0)
+  );
+  const diffMs = Math.max(0, nextUtcMidnight.getTime() - now.getTime());
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
@@ -256,7 +258,7 @@ export function DailyCompletionCard({
       {/* Live Countdown to Next Daily Challenge */}
       <div className="w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/30 py-3.5 px-4 text-center">
         <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
-          Next Daily Challenge In
+          Next Daily Challenge In (00:00 UTC)
         </span>
         <div className="mt-0.5 font-mono text-xl font-black text-[#32171D]">
           {countdown}

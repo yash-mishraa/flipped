@@ -1,6 +1,6 @@
 import { inMemoryDb } from "../db/client";
 
-export const DEFAULT_SERVER_TIMEZONE = "Asia/Kolkata";
+export const DEFAULT_SERVER_TIMEZONE = "UTC";
 
 export function getServerTimezone(): string {
   return process.env.APP_TIMEZONE || DEFAULT_SERVER_TIMEZONE;
