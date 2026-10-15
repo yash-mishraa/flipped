@@ -286,7 +286,7 @@ export async function resolveAuthoritativeAttempt(
           const puzzle = await getPrivilegedPuzzleById(puzzleId);
           if (puzzle) {
             const startedAt = new Date(startedAtMs);
-            const deadline = new Date(startedAtMs + 60_000);
+            const deadline = new Date(startedAtMs + 65_000);
             const recoveredAttempt: StoredAttempt = {
               id: attemptId,
               guestId,

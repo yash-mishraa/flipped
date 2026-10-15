@@ -16,17 +16,23 @@ test.describe("Journey E — Daily Challenge Restrictions & Persistence", () => 
     // Wait for initial load spinner to disappear
     await expect(page.getByText(/Loading Today/i)).not.toBeVisible({ timeout: 15000 });
 
-    const startButton = page.getByTestId("start-game-button");
     const completionCard = page.getByTestId("daily-completion-card");
 
     if (await completionCard.isVisible()) {
       // Already completed; verify read-only completion card is displayed
       await expect(completionCard).toBeVisible();
     } else {
-      // Unplayed; start round
-      await expect(startButton).toBeVisible();
-      await startButton.click();
-      await expect(page.getByText(/Round Active/i)).toBeVisible();
+      // Unplayed; verify 5-second countdown pop-up modal appears
+      const countdownModal = page.getByTestId("daily-countdown-modal");
+      if (await countdownModal.isVisible()) {
+        await expect(countdownModal).toBeVisible();
+        await expect(page.getByText(/The game will start in/i)).toBeVisible();
+        // Wait for countdown to finish (5s) and round to activate automatically without a start button
+        await expect(page.getByText(/Round Active/i)).toBeVisible({ timeout: 12000 });
+        await expect(countdownModal).not.toBeVisible();
+      } else {
+        await expect(page.getByText(/Round Active/i)).toBeVisible({ timeout: 12000 });
+      }
 
       // Seal attempt as completed in the same guest session
       await page.evaluate(async () => {

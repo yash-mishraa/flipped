@@ -84,9 +84,22 @@ export function ServerGameBoard({
     wordIndex: 0,
     letterIndex: 1,
   }));
-  const [roundStatus, setRoundStatus] = useState<"READY" | "PLAYING" | "WON" | "TIMED_OUT">(
-    "READY"
-  );
+
+  // Detect if this is a fresh daily attempt (<5s from payload.startedAt) vs an in-progress resumed attempt
+  const isFreshDaily =
+    mode === "DAILY" && Date.now() - new Date(payload.startedAt).getTime() < 5000;
+  const isResumedDaily = mode === "DAILY" && !isFreshDaily;
+
+  const [countdown, setCountdown] = useState<number | null>(() => {
+    if (!isFreshDaily) return null;
+    const elapsed = (Date.now() - new Date(payload.startedAt).getTime()) / 1000;
+    return Math.max(1, Math.min(5, Math.ceil(5 - elapsed)));
+  });
+
+  const [roundStatus, setRoundStatus] = useState<"READY" | "PLAYING" | "WON" | "TIMED_OUT">(() => {
+    if (isResumedDaily) return "PLAYING";
+    return "READY";
+  });
   const [hintsUsed, setHintsUsed] = useState<number>(payload.hintsUsed);
   const [finalizedResult, setFinalizedResult] = useState<FinalizedResultPayload | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -101,10 +114,36 @@ export function ServerGameBoard({
   // Recalculate remaining seconds
   const updateTimer = useCallback(() => {
     const now = Date.now();
-    const diff = Math.max(0, Math.ceil((deadlineMs.current - now) / 1000));
+    const diff = Math.max(0, Math.min(60, Math.ceil((deadlineMs.current - now) / 1000)));
     setRemainingSeconds(diff);
     return diff;
   }, []);
+
+  // 5-second countdown timer for daily mode: auto-starts gameplay when countdown reaches 0
+  useEffect(() => {
+    if (countdown === null) return;
+
+    if (countdown <= 0) {
+      setCountdown(null);
+      setRoundStatus("PLAYING");
+      updateTimer();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          setRoundStatus("PLAYING");
+          updateTimer();
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown, updateTimer]);
 
   // Handle server timeout
   const handleTimeout = useCallback(async () => {
@@ -132,6 +171,7 @@ export function ServerGameBoard({
 
   // Start round
   const handleStartRound = () => {
+    setCountdown(null);
     setRoundStatus("PLAYING");
     updateTimer();
   };
@@ -393,6 +433,10 @@ export function ServerGameBoard({
       return { success: false, message: "Round is already finished." };
     }
 
+    if (countdown !== null) {
+      return { success: false, message: "Countdown in progress. Game has not started yet." };
+    }
+
     if (roundStatus === "READY") {
       handleStartRound();
     }
@@ -509,6 +553,18 @@ export function ServerGameBoard({
   const urgency = getTimerUrgency(remainingSeconds);
   const isRoundOver = roundStatus === "WON" || roundStatus === "TIMED_OUT";
 
+  const isMasked = countdown !== null && countdown > 0;
+
+  // Mask grid tiles during countdown so fixed first letters are completely hidden
+  const displayedGrid: LetterGridType = isMasked
+    ? {
+        words: [
+          grid.words[0].map((tile) => ({ ...tile, letter: "" })),
+          grid.words[1].map((tile) => ({ ...tile, letter: "" })),
+        ],
+      }
+    : grid;
+
   const terminalResultView: TerminalResult = finalizedResult
     ? {
         roundId: finalizedResult.attemptId,
@@ -530,6 +586,45 @@ export function ServerGameBoard({
 
   return (
     <div className="flex w-full flex-col items-center gap-6" data-testid="server-game-board">
+      {/* 5-Second Countdown Pop-up Modal */}
+      {countdown !== null && countdown > 0 && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Daily Challenge Countdown"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in"
+          data-testid="daily-countdown-modal"
+        >
+          <div className="relative flex w-full max-w-sm flex-col items-center rounded-3xl border-2 border-[#C49A6C] bg-[#FDFBF7] p-8 text-center shadow-2xl">
+            <span className="rounded-full border border-[#C49A6C]/60 bg-[#faeee0] px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#7B1E2B]">
+              Daily Challenge
+            </span>
+
+            <h2 className="mt-4 text-2xl font-black tracking-tight text-[#32171D] sm:text-3xl">
+              The game will start in
+            </h2>
+
+            <div className="my-6 flex items-center justify-center">
+              <div
+                key={countdown}
+                data-testid="countdown-digit"
+                className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#7B1E2B] bg-[#faeee0] text-5xl font-black text-[#7B1E2B] shadow-inner transition-transform duration-300 animate-scale-in"
+              >
+                {countdown}
+              </div>
+            </div>
+
+            <p className="text-sm font-semibold text-[#6B4E55]">
+              Get ready! The clues will be revealed when the timer starts.
+            </p>
+
+            <div className="mt-4 rounded-xl border border-[#C49A6C]/40 bg-[#faeee0]/50 px-4 py-2 text-xs text-[#8C6870]">
+              60 seconds • Single attempt • Clues unlock at 0
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top HUD */}
       <GameHUD
         puzzle={safePuzzleView}
@@ -541,12 +636,14 @@ export function ServerGameBoard({
         hintsUsed={hintsUsed}
         onStartGame={handleStartRound}
         onRestart={() => {}}
+        isMasked={isMasked}
+        hideStartButton={mode === "DAILY"}
       />
 
       {/* Main Interactive Grid */}
       <section className="w-full" aria-label="Interactive Letter Grid">
         <LetterGrid
-          grid={grid}
+          grid={displayedGrid}
           selectedPosition={selectedPosition}
           isRoundOver={!Boolean(roundStatus === "PLAYING")}
           onSelectTile={handleSelectTile}

@@ -128,7 +128,7 @@ describe("Authoritative Attempt Lifecycle Service", () => {
       const start = await startDailyAttempt(guestA, "2026-10-12");
       if (start.status !== "STARTED") throw new Error("Expected started");
 
-      // Advance time by 20 seconds
+      // Advance time by 20 seconds (5s countdown grace + 15s gameplay)
       vi.advanceTimersByTime(20_000);
 
       const submit = await submitAuthoritativeAttempt(
@@ -140,9 +140,9 @@ describe("Authoritative Attempt Lifecycle Service", () => {
       expect(submit.status).toBe("WON");
       if (submit.status === "WON") {
         expect(submit.result.isWon).toBe(true);
-        expect(submit.result.elapsedSeconds).toBe(20);
-        // Base 100 - floor(20/5) = 100 - 4 = 96 pts
-        expect(submit.result.finalScore).toBe(96);
+        expect(submit.result.elapsedSeconds).toBe(15);
+        // Base 100 - floor(15/5) = 100 - 3 = 97 pts
+        expect(submit.result.finalScore).toBe(97);
         expect(submit.result.hintsUsed).toBe(0);
       }
     });
@@ -155,8 +155,8 @@ describe("Authoritative Attempt Lifecycle Service", () => {
       const start = await startDailyAttempt(guestA, "2026-10-12");
       if (start.status !== "STARTED") throw new Error("Expected started");
 
-      // Advance time past the 60s deadline
-      vi.advanceTimersByTime(60_500);
+      // Advance time past the 65s deadline (5s countdown + 60s round)
+      vi.advanceTimersByTime(65_500);
 
       // Attempt submit with correct phrase after expiration
       const submit = await submitAuthoritativeAttempt(

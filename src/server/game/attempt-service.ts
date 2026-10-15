@@ -26,6 +26,7 @@ import type { Difficulty, TileFeedback } from "@/features/game/domain/types";
 import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
 
 export const ROUND_DURATION_MS = 60_000;
+export const COUNTDOWN_DURATION_MS = 5_000;
 
 export type StartDailyAttemptResult =
   | {
@@ -237,7 +238,7 @@ export async function startDailyAttempt(
 
   // Create brand new daily attempt with self-describing ID for serverless resilience
   const startedAt = new Date();
-  const deadline = new Date(startedAt.getTime() + ROUND_DURATION_MS);
+  const deadline = new Date(startedAt.getTime() + ROUND_DURATION_MS + COUNTDOWN_DURATION_MS);
   const randSuffix = crypto.randomBytes(4).toString("hex");
 
   const newAttempt: StoredAttempt = {
@@ -427,7 +428,8 @@ export async function submitAuthoritativeAttempt(
   }
 
   // Solution is correct and before deadline!
-  const elapsedMs = Math.max(0, now - attempt.startedAt.getTime());
+  const countdownGrace = attempt.mode === "DAILY" ? COUNTDOWN_DURATION_MS : 0;
+  const elapsedMs = Math.max(0, now - attempt.startedAt.getTime() - countdownGrace);
   const elapsedSeconds = Math.min(60, Math.max(0, Math.floor(elapsedMs / 1000)));
   const finalScore = calculateScore(elapsedSeconds, attempt.hintsUsed);
 
