@@ -121,18 +121,18 @@ export function DailyAuthPromptModal({
           <SignUpButton mode="modal">
             <button
               type="button"
-              className="w-full rounded-full bg-[#7B1E2B] py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97] cursor-pointer"
+              className="w-full rounded-full bg-[#7B1E2B] py-3 text-sm font-bold font-sans tracking-tight text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97] cursor-pointer"
             >
-              Create Free Account
+              <span className="font-bold">Create Free Account</span>
             </button>
           </SignUpButton>
 
           <SignInButton mode="modal">
             <button
               type="button"
-              className="w-full rounded-full border border-[#C49A6C] bg-white py-2.5 text-xs sm:text-sm font-bold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97] cursor-pointer"
+              className="w-full rounded-full border border-[#C49A6C] bg-white py-2.5 text-xs sm:text-sm font-bold font-sans tracking-tight text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97] cursor-pointer"
             >
-              Already Have an Account? Log In
+              <span className="font-bold">Already Have an Account? Log In</span>
             </button>
           </SignInButton>
 

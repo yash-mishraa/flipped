@@ -765,17 +765,17 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignUpButton mode="modal">
                   <button
                     type="button"
-                    className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] active:scale-[0.97]"
+                    className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold font-sans tracking-tight text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] active:scale-[0.97]"
                   >
-                    Create Free Account
+                    <span className="font-bold">Create Free Account</span>
                   </button>
                 </SignUpButton>
                 <SignInButton mode="modal">
                   <button
                     type="button"
-                    className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-semibold text-[#32171D] shadow-2xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
+                    className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-bold font-sans tracking-tight text-[#32171D] shadow-2xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
                   >
-                    Log In
+                    <span className="font-bold">Log In</span>
                   </button>
                 </SignInButton>
               </div>

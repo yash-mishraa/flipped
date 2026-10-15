@@ -93,9 +93,9 @@ export default function StatisticsPage(): React.JSX.Element {
               <SignUpButton mode="modal">
                 <button
                   type="button"
-                  className="rounded-full border border-[#C49A6C] bg-white px-6 py-3 text-sm font-semibold text-[#32171D] hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer"
+                  className="rounded-full border border-[#C49A6C] bg-white px-6 py-3 text-sm font-bold font-sans tracking-tight text-[#32171D] hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer"
                 >
-                  Create Free Account
+                  <span className="font-bold">Create Free Account</span>
                 </button>
               </SignUpButton>
             </div>

@@ -6,15 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Show, UserButton } from "@clerk/nextjs";
 import { FlippedSymbol } from "@/components/FlippedLogo";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BranchedMenu, { type BranchedMenuSection } from "@/components/ui/BranchedMenu";
-
-const navItems = [
-  { href: "/daily", label: "Daily" },
-  { href: "/classic", label: "Classic" },
-  { href: "/archive", label: "Archive" },
-  { href: "/stats", label: "Statistics" },
-] as const;
 
 const branchedMenuItems: readonly BranchedMenuSection[] = [
   {
@@ -86,44 +78,6 @@ export function Header(): React.JSX.Element {
               </span>
               <span>Menu</span>
             </button>
-          </div>
-
-          {/* Desktop Navigation Bar using Tabs Component (visible on md+) */}
-          <div className="hidden md:flex items-center">
-            <Tabs value={pathname} className="mx-1">
-              <TabsList
-                variant="button"
-                shape="pill"
-                size="sm"
-                className="bg-[#faeee0]/80 p-0.5 border border-[#C49A6C]/30 flex-nowrap"
-              >
-                {navItems.map(({ href, label }) => {
-                  const isActive = pathname === href;
-                  return (
-                    <TabsTrigger
-                      key={href}
-                      value={href}
-                      asChild
-                      className={`text-xs font-semibold px-3 py-1 rounded-full transition-all duration-200 ease-out active:scale-[0.96] ${
-                        isActive
-                          ? "bg-[#7B1E2B] text-[#F7F0E5] shadow-xs"
-                          : "text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5"
-                      }`}
-                    >
-                      <Link href={href}>{label}</Link>
-                    </TabsTrigger>
-                  );
-                })}
-
-                <TabsTrigger
-                  value="how-to-play"
-                  onClick={() => setShowTutorial(true)}
-                  className="text-xs font-semibold px-3 py-1 rounded-full text-[#6B4E55] hover:text-[#32171D] hover:bg-black/5 transition-all duration-200 ease-out active:scale-[0.96] cursor-pointer"
-                >
-                  How to Play
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
           </div>
 
           {/* Right Controls: User Profile + Brand Logo Lockup */}

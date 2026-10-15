@@ -56,19 +56,19 @@ test.describe("Journey F — Responsive Viewports, Accessibility & Resilience", 
     await expect(tile02).toHaveAttribute("data-selected", "true");
   });
 
-  test("Header navigation routes between pages seamlessly", async ({ page }) => {
+  test("Header navigation routes between pages seamlessly via menu drawer", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
 
-    // Click Statistics in header nav
-    const statsLink = page.locator('header a[href="/stats"]').first();
-    await statsLink.click();
+    // Open Menu and click Player Statistics
+    await page.getByRole("button", { name: /Toggle navigation menu|Menu/i }).click();
+    await page.getByRole("button", { name: /Player Statistics/i }).click();
     await expect(page).toHaveURL(/\/stats/);
     await expect(page.getByRole("heading", { name: /Player Statistics/i })).toBeVisible();
 
-    // Click Archive in header nav
-    const archiveLink = page.locator('header a[href="/archive"]').first();
-    await archiveLink.click();
+    // Open Menu and click Challenge Archive
+    await page.getByRole("button", { name: /Toggle navigation menu|Menu/i }).click();
+    await page.getByRole("button", { name: /Challenge Archive/i }).click();
     await expect(page).toHaveURL(/\/archive/);
     await expect(page.getByRole("heading", { name: /Challenge Archive/i })).toBeVisible();
   });

@@ -97,7 +97,11 @@ a, button, [role="button"], [role="tab"], [role="radio"] {
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   transition-duration: 200ms;
 }
-button { font: inherit; }
+@layer base {
+  button, input, optgroup, select, textarea {
+    font-family: inherit;
+  }
+}
 :focus-visible {
   outline: 2px solid var(--accent) !important;
   outline-offset: 3px;
