@@ -593,7 +593,7 @@ export function ServerGameBoard({
           role="dialog"
           aria-modal="true"
           aria-label="Daily Challenge Countdown"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md p-4 animate-fade-in"
           data-testid="daily-countdown-modal"
         >
           <div className="relative flex w-full max-w-sm flex-col items-center rounded-3xl border-2 border-[#C49A6C] bg-[#FDFBF7] p-8 text-center shadow-2xl">
@@ -718,7 +718,7 @@ export function ServerGameBoard({
           role="dialog"
           aria-modal="true"
           aria-label="Victory Summary"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
         >
           <div className="relative w-full max-w-lg my-8">
             <button

@@ -147,7 +147,7 @@ export function GameBoard({
           role="dialog"
           aria-modal="true"
           aria-label="Victory Summary"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
         >
           <div className="relative w-full max-w-lg my-8">
             <button

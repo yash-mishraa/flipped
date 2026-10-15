@@ -135,7 +135,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
       role="dialog"
       aria-modal="true"
       aria-labelledby="tutorial-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs"
     >
       <div
         ref={modalRef}
