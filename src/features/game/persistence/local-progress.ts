@@ -2,6 +2,9 @@ import type { Difficulty } from "../domain/types";
 import type { DailyAttemptRecord } from "../modes/mode-types";
 
 export const STORAGE_KEY_PROGRESS = "flipped_progress_v1";
+export const STORAGE_KEY_GUEST_PROGRESS = "flipped_progress_guest_v1";
+export const STORAGE_KEY_USER_PREFIX = "flipped_progress_user_";
+export const STORAGE_KEY_ACTIVE_USER = "flipped_active_user_v1";
 
 export interface StoredProgressSchema {
   readonly version: 1;
@@ -35,6 +38,55 @@ export const INITIAL_PROGRESS_DATA: StoredProgressSchema = {
 
 // In-memory fallback for SSR and environments where localStorage is blocked
 let inMemoryStore: StoredProgressSchema = { ...INITIAL_PROGRESS_DATA };
+let currentActiveUserId: string | null | undefined = undefined;
+
+/**
+ * Sets the active user context (Clerk userId or null for guest mode).
+ */
+export function setActiveUser(userId: string | null): void {
+  currentActiveUserId = userId;
+  if (isLocalStorageAvailable()) {
+    try {
+      if (userId) {
+        window.localStorage.setItem(STORAGE_KEY_ACTIVE_USER, userId);
+      } else {
+        window.localStorage.removeItem(STORAGE_KEY_ACTIVE_USER);
+      }
+    } catch {
+      // Ignore
+    }
+  }
+}
+
+/**
+ * Gets the active user context (Clerk userId or null for guest mode).
+ */
+export function getActiveUser(): string | null {
+  if (currentActiveUserId !== undefined) {
+    return currentActiveUserId;
+  }
+  if (isLocalStorageAvailable()) {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY_ACTIVE_USER);
+      currentActiveUserId = stored || null;
+      return currentActiveUserId;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Resolves the localStorage key for the given or active user.
+ */
+export function getStorageKey(userId?: string | null): string {
+  const targetId = userId !== undefined ? userId : getActiveUser();
+  if (targetId) {
+    return `${STORAGE_KEY_USER_PREFIX}${targetId}`;
+  }
+  return STORAGE_KEY_GUEST_PROGRESS;
+}
 
 function isLocalStorageAvailable(): boolean {
   try {
@@ -51,16 +103,26 @@ function isLocalStorageAvailable(): boolean {
 }
 
 /**
- * Loads the current local progress snapshot safely.
+ * Loads the current local progress snapshot safely for the active user or guest.
  * Returns default initial state if uninitialized, corrupted, or unavailable.
  */
-export function loadProgress(): StoredProgressSchema {
+export function loadProgress(userId?: string | null): StoredProgressSchema {
   if (!isLocalStorageAvailable()) {
     return inMemoryStore;
   }
 
+  const key = getStorageKey(userId);
+
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY_PROGRESS);
+    let raw = window.localStorage.getItem(key);
+    // If guest storage is requested and empty, check legacy storage key
+    if (!raw && key === STORAGE_KEY_GUEST_PROGRESS) {
+      const legacy = window.localStorage.getItem(STORAGE_KEY_PROGRESS);
+      if (legacy) {
+        raw = legacy;
+      }
+    }
+
     if (!raw) {
       return INITIAL_PROGRESS_DATA;
     }
@@ -104,17 +166,22 @@ export function loadProgress(): StoredProgressSchema {
 }
 
 /**
- * Persists the entire progress snapshot safely.
+ * Persists the entire progress snapshot safely for the active user or guest.
  */
-export function saveProgress(data: StoredProgressSchema): void {
+export function saveProgress(data: StoredProgressSchema, userId?: string | null): void {
   inMemoryStore = data;
 
   if (!isLocalStorageAvailable()) {
     return;
   }
 
+  const key = getStorageKey(userId);
+
   try {
-    window.localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(data));
+    window.localStorage.setItem(key, JSON.stringify(data));
+    if (key === STORAGE_KEY_GUEST_PROGRESS) {
+      window.localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(data));
+    }
   } catch {
     // Ignore storage quota or security exceptions gracefully
   }
@@ -123,16 +190,16 @@ export function saveProgress(data: StoredProgressSchema): void {
 /**
  * Retrieves the daily attempt record for a given date (YYYY-MM-DD).
  */
-export function getDailyAttempt(date: string): DailyAttemptRecord | null {
-  const progress = loadProgress();
+export function getDailyAttempt(date: string, userId?: string | null): DailyAttemptRecord | null {
+  const progress = loadProgress(userId);
   return progress.daily[date] ?? null;
 }
 
 /**
- * Saves or updates a daily challenge attempt record.
+ * Saves or updates a daily challenge attempt record for the active user or guest.
  */
-export function saveDailyAttempt(record: DailyAttemptRecord): void {
-  const current = loadProgress();
+export function saveDailyAttempt(record: DailyAttemptRecord, userId?: string | null): void {
+  const current = loadProgress(userId);
   const updated: StoredProgressSchema = {
     ...current,
     daily: {
@@ -140,7 +207,7 @@ export function saveDailyAttempt(record: DailyAttemptRecord): void {
       [record.date]: record,
     },
   };
-  saveProgress(updated);
+  saveProgress(updated, userId);
 }
 
 /**
@@ -168,9 +235,10 @@ export function recordClassicGame(
   won: boolean,
   points: number = 0,
   elapsedSeconds?: number,
-  maxRecentKeep: number = 20
+  maxRecentKeep: number = 20,
+  userId?: string | null
 ): void {
-  const current = loadProgress();
+  const current = loadProgress(userId);
   const filteredRecents = current.classic.recentlyPlayedIds.filter((id) => id !== puzzleId);
   const updatedRecents = [puzzleId, ...filteredRecents].slice(0, maxRecentKeep);
 
@@ -205,17 +273,44 @@ export function recordClassicGame(
         (typeof elapsedSeconds === "number" ? elapsedSeconds : 0),
     },
   };
-  saveProgress(updated);
+  saveProgress(updated, userId);
 }
 
 /**
- * Resets all local progress (useful for testing or explicit user reset).
+ * Explicitly clears the guest progress so logged-out sessions start fresh.
  */
-export function clearProgress(): void {
+export function clearGuestProgress(): void {
+  if (isLocalStorageAvailable()) {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY_GUEST_PROGRESS);
+      window.localStorage.removeItem(STORAGE_KEY_PROGRESS);
+    } catch {
+      // Ignore
+    }
+  }
+}
+
+/**
+ * Resets local progress (useful for testing or explicit user reset).
+ */
+export function clearProgress(userId?: string | null): void {
   inMemoryStore = { ...INITIAL_PROGRESS_DATA };
   if (isLocalStorageAvailable()) {
     try {
-      window.localStorage.removeItem(STORAGE_KEY_PROGRESS);
+      if (userId === undefined) {
+        const key = getStorageKey();
+        window.localStorage.removeItem(key);
+        window.localStorage.removeItem(STORAGE_KEY_GUEST_PROGRESS);
+        window.localStorage.removeItem(STORAGE_KEY_PROGRESS);
+        window.localStorage.removeItem(STORAGE_KEY_ACTIVE_USER);
+        currentActiveUserId = null;
+      } else {
+        const key = getStorageKey(userId);
+        window.localStorage.removeItem(key);
+        if (key === STORAGE_KEY_GUEST_PROGRESS) {
+          window.localStorage.removeItem(STORAGE_KEY_PROGRESS);
+        }
+      }
     } catch {
       // Ignore
     }

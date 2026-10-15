@@ -11,7 +11,7 @@ import { FlippedSymbol } from "@/components/FlippedLogo";
 import { SplashIntro } from "@/components/SplashIntro";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
 import { ShinyButton } from "@/components/ui/shiny-button";
-import { loadProgress } from "@/features/game/persistence/local-progress";
+import { loadProgress, setActiveUser } from "@/features/game/persistence/local-progress";
 import { getDailyDateString } from "@/features/game/modes/daily-scheduler";
 import { calculateDailyStreaks } from "@/features/game/modes/statistics";
 import { syncUserProgress } from "@/features/game/persistence/user-sync";
@@ -25,12 +25,15 @@ export default function HomePage(): React.JSX.Element {
   const [isRecurringUser, setIsRecurringUser] = useState<boolean>(false);
 
   useEffect(() => {
+    const activeId = isSignedIn && user?.id ? user.id : null;
+    setActiveUser(activeId);
+
     const today = getDailyDateString();
-    const progress = loadProgress();
+    const progress = loadProgress(activeId);
     const attempt = progress.daily[today] ?? null;
     setTodayAttempt(attempt);
 
-    // Check if player has played any daily challenges in the past
+    // Check if player has played any daily challenges in the past under current identity
     const dailyAttempts = Object.values(progress.daily);
     const playedCount = dailyAttempts.length;
     const { currentStreak } = calculateDailyStreaks(progress.daily, today);
@@ -38,6 +41,9 @@ export default function HomePage(): React.JSX.Element {
     if (playedCount > 0) {
       setIsRecurringUser(true);
       setStreak(currentStreak);
+    } else {
+      setIsRecurringUser(false);
+      setStreak(0);
     }
 
     // If authenticated, sync with cloud database to guarantee up-to-date streak
@@ -48,6 +54,9 @@ export default function HomePage(): React.JSX.Element {
           if (cloudPlayed > 0) {
             setIsRecurringUser(true);
             setStreak(result.stats.daily.currentStreak);
+          } else {
+            setIsRecurringUser(false);
+            setStreak(0);
           }
           const updatedAttempt = result.progress.daily[today] ?? null;
           setTodayAttempt(updatedAttempt);

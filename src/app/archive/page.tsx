@@ -38,8 +38,9 @@ export default function ArchivePage(): React.JSX.Element {
   const [todayStr, setTodayStr] = useState<string>("");
 
   useEffect(() => {
+    const activeId = isSignedIn && user?.id ? user.id : null;
     const today = getDailyDateString();
-    const progress = loadProgress();
+    const progress = loadProgress(activeId);
     setTodayStr(today);
     setDailyAttempts(progress.daily);
     setMounted(true);

@@ -1,17 +1,24 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import HomePage from "@/app/page";
 import {
   setOnboardingCompleted,
   clearProgress,
+  clearGuestProgress,
+  setActiveUser,
   saveDailyAttempt,
 } from "@/features/game/persistence/local-progress";
+import { getDailyDateString } from "@/features/game/modes/daily-scheduler";
+import * as clerkNextjs from "@clerk/nextjs";
 
 describe("Production Home Screen (HomePage)", () => {
   beforeEach(() => {
     clearProgress();
+    clearGuestProgress();
+    setActiveUser(null);
     setOnboardingCompleted(true);
+    vi.restoreAllMocks();
   });
 
   it("renders the game title and core challenge headline", () => {
@@ -66,6 +73,71 @@ describe("Production Home Screen (HomePage)", () => {
     render(<HomePage />);
     expect(screen.getByTestId("home-daily-streak")).toBeInTheDocument();
     expect(screen.getByText("Daily Streak:")).toBeInTheDocument();
+  });
+
+  it("isolates daily streak between logged-in user and guest mode on homepage", () => {
+    const todayStr = getDailyDateString();
+    const testUserId = "user_loop_test_456";
+
+    // 1. User logs in with new account
+    vi.spyOn(clerkNextjs, "useUser").mockReturnValue({
+      isSignedIn: true,
+      user: { id: testUserId } as unknown as ReturnType<typeof clerkNextjs.useUser>["user"],
+      isLoaded: true,
+    } as ReturnType<typeof clerkNextjs.useUser>);
+
+    // User plays daily challenge and wins (daily streak = 1)
+    saveDailyAttempt(
+      {
+        date: todayStr,
+        puzzleId: "p-loop",
+        status: "WON",
+        finalScore: 100,
+        elapsedSeconds: 10,
+        hintsUsed: 0,
+        completedAt: new Date().toISOString(),
+      },
+      testUserId
+    );
+
+    const { unmount } = render(<HomePage />);
+    expect(screen.getByTestId("home-daily-streak")).toBeInTheDocument();
+    expect(screen.getByText("Daily Streak:")).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
+    unmount();
+    cleanup();
+
+    // 2. User logs out -> Active user becomes guest (isSignedIn: false, user: null)
+    vi.spyOn(clerkNextjs, "useUser").mockReturnValue({
+      isSignedIn: false,
+      user: null,
+      isLoaded: true,
+    } as ReturnType<typeof clerkNextjs.useUser>);
+
+    const { unmount: unmountGuest } = render(<HomePage />);
+    // When logged out, the user daily streak of 1 must NOT be visible in guest mode
+    expect(screen.queryByTestId("home-daily-streak")).not.toBeInTheDocument();
+    unmountGuest();
+    cleanup();
+
+    // 3. Guest plays again with guest ID without logging in and wins -> guest streak becomes 1
+    saveDailyAttempt(
+      {
+        date: todayStr,
+        puzzleId: "p-loop",
+        status: "WON",
+        finalScore: 90,
+        elapsedSeconds: 20,
+        hintsUsed: 0,
+        completedAt: new Date().toISOString(),
+      },
+      null
+    );
+
+    render(<HomePage />);
+    expect(screen.getByTestId("home-daily-streak")).toBeInTheDocument();
+    expect(screen.getByText("Daily Streak:")).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
   });
 });
 

@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Show, UserButton } from "@clerk/nextjs";
+import { Show, UserButton, useUser } from "@clerk/nextjs";
 import { FlippedSymbol } from "@/components/FlippedLogo";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
 import BranchedMenu, { type BranchedMenuSection } from "@/components/ui/BranchedMenu";
+import { setActiveUser } from "@/features/game/persistence/local-progress";
 
 const branchedMenuItems: readonly BranchedMenuSection[] = [
   {
@@ -27,10 +28,16 @@ const branchedMenuItems: readonly BranchedMenuSection[] = [
 ];
 
 export function Header(): React.JSX.Element {
+  const { isSignedIn, user } = useUser();
   const pathname = usePathname();
   const router = useRouter();
   const [showTutorial, setShowTutorial] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Sync active user identity in local progress whenever Clerk auth state changes
+  useEffect(() => {
+    setActiveUser(isSignedIn && user?.id ? user.id : null);
+  }, [isSignedIn, user?.id]);
 
   // Close menu on route change
   useEffect(() => {

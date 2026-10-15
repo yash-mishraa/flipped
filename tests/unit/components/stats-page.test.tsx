@@ -5,6 +5,7 @@ import StatisticsPage from "@/app/stats/page";
 import {
   saveProgress,
   clearProgress,
+  setActiveUser,
   INITIAL_PROGRESS_DATA,
 } from "@/features/game/persistence/local-progress";
 import * as clerkNextjs from "@clerk/nextjs";
@@ -12,6 +13,8 @@ import * as clerkNextjs from "@clerk/nextjs";
 describe("StatisticsPage Component", () => {
   beforeEach(() => {
     clearProgress();
+    clearProgress("user_test_123");
+    setActiveUser(null);
     vi.restoreAllMocks();
   });
 
@@ -43,7 +46,7 @@ describe("StatisticsPage Component", () => {
       isLoaded: true,
     } as ReturnType<typeof clerkNextjs.useUser>);
 
-    saveProgress(INITIAL_PROGRESS_DATA);
+    saveProgress(INITIAL_PROGRESS_DATA, "user_test_123");
     render(<StatisticsPage />);
 
     expect(screen.getByRole("heading", { name: "Player Statistics" })).toBeInTheDocument();
@@ -64,26 +67,29 @@ describe("StatisticsPage Component", () => {
       isLoaded: true,
     } as ReturnType<typeof clerkNextjs.useUser>);
 
-    saveProgress({
-      version: 1,
-      daily: {
-        "2026-10-12": {
-          date: "2026-10-12",
-          puzzleId: "daily-1",
-          status: "WON",
-          finalScore: 92,
-          elapsedSeconds: 18,
-          hintsUsed: 0,
-          completedAt: "2026-10-12T12:00:00Z",
+    saveProgress(
+      {
+        version: 1,
+        daily: {
+          "2026-10-12": {
+            date: "2026-10-12",
+            puzzleId: "daily-1",
+            status: "WON",
+            finalScore: 92,
+            elapsedSeconds: 18,
+            hintsUsed: 0,
+            completedAt: "2026-10-12T12:00:00Z",
+          },
+        },
+        classic: {
+          recentlyPlayedIds: ["c-1"],
+          lastDifficulty: "MEDIUM",
+          totalPlayed: 5,
+          totalWins: 4,
         },
       },
-      classic: {
-        recentlyPlayedIds: ["c-1"],
-        lastDifficulty: "MEDIUM",
-        totalPlayed: 5,
-        totalWins: 4,
-      },
-    });
+      "user_test_123"
+    );
 
     render(<StatisticsPage />);
 

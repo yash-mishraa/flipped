@@ -8,7 +8,11 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
 import { DailyCompletionCard } from "@/features/game/components/DailyCompletionCard";
-import { saveDailyAttempt, loadProgress } from "@/features/game/persistence/local-progress";
+import {
+  saveDailyAttempt,
+  loadProgress,
+  setActiveUser,
+} from "@/features/game/persistence/local-progress";
 import { syncUserProgress } from "@/features/game/persistence/user-sync";
 import { getDailyDateString, getDailyPuzzle } from "@/features/game/modes/daily-scheduler";
 import type {
@@ -78,10 +82,13 @@ function DailyPageContent(): React.JSX.Element {
     setLoading(true);
     setErrorMsg(null);
 
+    const activeId = isSignedIn && user?.id ? user.id : null;
+    setActiveUser(activeId);
+
     const targetDate = queryDate || todayStr;
 
-    // 1. Immediately check local progress for an already completed attempt
-    let progress = loadProgress();
+    // 1. Immediately check local progress for an already completed attempt under current identity
+    let progress = loadProgress(activeId);
     let localAttempt = progress.daily[targetDate];
 
     // If user is signed in and local record is not present, sync with cloud first
@@ -153,17 +160,22 @@ function DailyPageContent(): React.JSX.Element {
       if (data.status === "ALREADY_COMPLETED") {
         setCompletedResult(data.result);
         const { attempt } = convertFinalizedToCardProps(data.result);
-        saveDailyAttempt({
-          ...attempt,
-          isArchive: Boolean(queryDate && queryDate !== todayStr),
-        });
+        const activeId = isSignedIn && user?.id ? user.id : null;
+        saveDailyAttempt(
+          {
+            ...attempt,
+            isArchive: Boolean(queryDate && queryDate !== todayStr),
+          },
+          activeId
+        );
         if (isSignedIn && user?.id) {
           syncUserProgress(user.id);
         }
         setPayload(null);
       } else if (data.status === "STARTED" || data.status === "IN_PROGRESS") {
         // Final sanity check before mounting playable board
-        const recheckProgress = loadProgress();
+        const activeId = isSignedIn && user?.id ? user.id : null;
+        const recheckProgress = loadProgress(activeId);
         const recheckAttempt = recheckProgress.daily[targetDate];
         if (
           recheckAttempt &&
@@ -335,10 +347,14 @@ function DailyPageContent(): React.JSX.Element {
               onFinalized={(result) => {
                 setCompletedResult(result);
                 const { attempt } = convertFinalizedToCardProps(result);
-                saveDailyAttempt({
-                  ...attempt,
-                  isArchive: isArchiveChallenge,
-                });
+                const activeId = isSignedIn && user?.id ? user.id : null;
+                saveDailyAttempt(
+                  {
+                    ...attempt,
+                    isArchive: isArchiveChallenge,
+                  },
+                  activeId
+                );
                 if (isSignedIn && user?.id) {
                   syncUserProgress(user.id);
                 }

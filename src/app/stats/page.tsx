@@ -21,8 +21,9 @@ export default function StatisticsPage(): React.JSX.Element {
   const [hasCompletedToday, setHasCompletedToday] = useState(false);
 
   useEffect(() => {
+    const activeId = isSignedIn && user?.id ? user.id : null;
     const todayStr = getDailyDateString();
-    const progress = loadProgress();
+    const progress = loadProgress(activeId);
     const calculated = calculatePlayerStatistics(progress, todayStr);
     setStats(calculated);
     const todayAttempt = progress.daily[todayStr];
@@ -40,6 +41,8 @@ export default function StatisticsPage(): React.JSX.Element {
           Boolean(cloudAttempt && (cloudAttempt.status === "WON" || cloudAttempt.status === "TIMED_OUT"))
         );
       });
+    } else {
+      setSyncedWithCloud(false);
     }
   }, [isSignedIn, user?.id]);
 
