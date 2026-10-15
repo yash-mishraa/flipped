@@ -103,7 +103,7 @@ export function GameBoard({
   }, [state, timer.elapsedSeconds, puzzle, mode, date, onPuzzleComplete]);
 
   return (
-    <div className="flex w-full flex-col items-center gap-6" data-testid="game-board">
+    <div className="flex w-full flex-col items-center gap-4 sm:gap-6" data-testid="game-board">
       {/* Top HUD with Timer, Clues, Score, and Start Control */}
       <GameHUD
         puzzle={puzzle}

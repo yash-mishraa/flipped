@@ -4,6 +4,7 @@ import React from "react";
 import type { Puzzle, RoundStatus } from "../domain/types";
 import { GameTimer } from "./GameTimer";
 import type { TimerUrgency } from "../domain/timer-utils";
+import { cn } from "@/lib/utils";
 
 export interface GameHUDProps {
   readonly puzzle: Puzzle;
@@ -115,12 +116,34 @@ export function GameHUD({
 
       {/* Clues Transformation Surface */}
       <section
-        className="flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C49A6C]/60 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm"
+        className="flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C49A6C]/60 bg-white/80 p-4 sm:p-5 text-center shadow-sm backdrop-blur-sm"
         aria-label="Puzzle Clues"
       >
-        <span className="text-[11px] font-bold uppercase tracking-widest text-[#7B1E2B]">
-          Transform the Clues
-        </span>
+        <div className="flex w-full items-center justify-between px-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#7B1E2B]">
+            Transform the Clues
+          </span>
+
+          {/* Mobile In-Card Live Timer — visible directly above grid when actively playing on mobile */}
+          {isRunning && (
+            <div
+              data-testid="hud-card-mobile-timer"
+              className={cn(
+                "sm:hidden inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-black tabular-nums font-mono shadow-2xs transition-colors duration-200",
+                urgency === "critical"
+                  ? "border-[#7B1E2B] bg-[#faeee0] text-[#7B1E2B] animate-pulse"
+                  : urgency === "urgent"
+                    ? "border-[#C49A6C] bg-[#fbf5ec] text-[#32171D]"
+                    : "border-[#C49A6C]/60 bg-[#faeee0] text-[#32171D]"
+              )}
+              aria-label={`Time remaining: ${formattedTime}`}
+            >
+              <span className="font-mono text-xs font-black tracking-wider">
+                Timer: {formattedTime}
+              </span>
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           {puzzle.transformations.map((trans, idx) => (

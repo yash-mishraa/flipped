@@ -278,31 +278,31 @@ function DailyPageContent(): React.JSX.Element {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[#F7F0E5]">
       <Header />
-      <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-4 px-4 py-4 sm:px-8 sm:py-6">
+      <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-3 sm:gap-4 px-3.5 py-3 sm:px-8 sm:py-6">
         {/* Navigation and Top Bar */}
-        <header className="flex flex-col items-center gap-3 text-center">
-          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-3">
+        <header className="flex flex-col items-center gap-2.5 sm:gap-3 text-center">
+          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-2.5 sm:pb-3">
             <Link
               href="/"
-              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
+              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
             >
               Home
             </Link>
 
-            <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-1.5 text-xs font-semibold text-[#7B1E2B]">
+            <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-semibold text-[#7B1E2B]">
               {isArchiveChallenge ? `Archive • ${currentDateDisplay}` : `Daily • ${currentDateDisplay}`}
             </span>
 
             <Link
               href="/archive"
-              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
+              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
             >
               Archive
             </Link>
           </div>
 
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
               {isArchiveChallenge ? `Archive Challenge` : "Daily Flipped"}
             </h1>
             <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
@@ -318,7 +318,7 @@ function DailyPageContent(): React.JSX.Element {
         </header>
 
         {/* Main Interactive or Review View */}
-        <section className="my-8 w-full flex-1 flex flex-col justify-center">
+        <section className="my-2 sm:my-8 w-full flex-1 flex flex-col justify-center">
           {completedResult ? (
             (() => {
               const { puzzle, attempt } = convertFinalizedToCardProps(completedResult);

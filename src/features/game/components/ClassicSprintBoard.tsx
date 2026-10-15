@@ -789,7 +789,29 @@ export function ClassicSprintBoard(): React.JSX.Element {
   const urgency = getTimerUrgency(sprintTimeRemaining);
 
   return (
-    <div className="flex w-full flex-col items-center gap-5">
+    <div className="flex w-full flex-col items-center gap-4 sm:gap-5">
+      {/* Mobile Floating Sticky Header Timer — stays visible throughout active sprint on mobile */}
+      {gameState === "PLAYING" && (
+        <div
+          data-testid="classic-mobile-sticky-timer"
+          className="fixed top-2.5 left-1/2 -translate-x-1/2 z-50 sm:hidden pointer-events-none"
+        >
+          <div
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black tabular-nums font-mono shadow-md backdrop-blur-md transition-all duration-200 ${
+              urgency === "critical"
+                ? "border-[#7B1E2B] bg-[#7B1E2B] text-[#F7F0E5] animate-pulse shadow-red-200"
+                : urgency === "urgent"
+                  ? "border-amber-300 bg-amber-100 text-amber-900"
+                  : "border-[#C49A6C] bg-white/95 text-[#32171D]"
+            }`}
+          >
+            <span className="font-mono text-xs font-black tracking-wider">
+              ⏱ {formattedSprintTime}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Persistent Sprint HUD */}
       <div
         data-testid="game-hud"
@@ -871,9 +893,28 @@ export function ClassicSprintBoard(): React.JSX.Element {
         <div className="flex w-full flex-col items-center gap-5">
           {/* Clue Words Card */}
           <div className="flex w-full max-w-lg flex-col items-center rounded-2xl border border-[#C49A6C]/50 bg-white/80 p-4 text-center shadow-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6870]">
-              Clue Words to Flip
-            </span>
+            <div className="flex w-full items-center justify-between px-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6870]">
+                Clue Words to Flip
+              </span>
+
+              {/* Mobile In-Card Live Timer — visible directly above grid when keyboard opens */}
+              <div
+                data-testid="classic-card-mobile-timer"
+                className={`sm:hidden inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-black tabular-nums font-mono shadow-2xs transition-colors duration-200 ${
+                  urgency === "critical"
+                    ? "border-[#7B1E2B] bg-[#faeee0] text-[#7B1E2B] animate-pulse"
+                    : urgency === "urgent"
+                      ? "border-amber-300 bg-amber-50 text-amber-900"
+                      : "border-[#C49A6C]/60 bg-[#faeee0] text-[#32171D]"
+                }`}
+                aria-label={`Time remaining: ${formattedSprintTime}`}
+              >
+                <span className="font-mono text-xs font-black tracking-wider">
+                  Timer: {formattedSprintTime}
+                </span>
+              </div>
+            </div>
             <div className="mt-1 flex items-center gap-3 text-xl sm:text-2xl font-black text-[#32171D]">
               <span className="rounded-lg bg-[#faeee0] px-3 py-1 text-[#7B1E2B]">
                 {currentPayload.clueWords[0]}

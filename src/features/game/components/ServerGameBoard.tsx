@@ -20,6 +20,7 @@ import { TimeoutScreen } from "./TimeoutScreen";
 import { GameInstructions } from "./GameInstructions";
 import { formatTime, getTimerUrgency } from "../domain/timer-utils";
 import { getNextEditablePosition, getPreviousEditablePosition } from "../domain/letter-grid";
+import { cn } from "@/lib/utils";
 
 export interface ServerGameBoardProps {
   readonly payload: SafeGameplayPayload;
@@ -621,6 +622,29 @@ export function ServerGameBoard({
             <div className="mt-4 rounded-xl border border-[#C49A6C]/40 bg-[#faeee0]/50 px-4 py-2 text-xs text-[#8C6870]">
               60 seconds • Single attempt • Clues unlock at 0
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Floating Sticky Header Timer — stays visible throughout active gameplay on mobile */}
+      {roundStatus === "PLAYING" && (
+        <div
+          data-testid="mobile-sticky-timer"
+          className="fixed top-2.5 left-1/2 -translate-x-1/2 z-50 sm:hidden pointer-events-none"
+        >
+          <div
+            className={cn(
+              "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black tabular-nums font-mono shadow-md backdrop-blur-md transition-all duration-200",
+              urgency === "critical"
+                ? "border-[#7B1E2B] bg-[#7B1E2B] text-[#F7F0E5] animate-pulse shadow-red-200"
+                : urgency === "urgent"
+                  ? "border-[#C49A6C] bg-[#faeee0] text-[#7B1E2B]"
+                  : "border-[#C49A6C] bg-white/95 text-[#32171D]"
+            )}
+          >
+            <span className="font-mono text-xs font-black tracking-wider">
+              ⏱ {formattedTime}
+            </span>
           </div>
         </div>
       )}

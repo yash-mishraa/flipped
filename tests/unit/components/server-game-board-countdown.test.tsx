@@ -137,4 +137,19 @@ describe("ServerGameBoard Daily Countdown & Word Masking", () => {
     expect(screen.getByText("MEAL")).toBeInTheDocument();
     expect(screen.getByTestId("tile-0-0")).toHaveTextContent("F");
   });
+
+  it("renders mobile in-card live timer and mobile floating sticky timer during active round", () => {
+    const payload = createMockPayload(10_000); // resumed active round
+
+    render(<ServerGameBoard payload={payload} mode="DAILY" />);
+
+    // In-card mobile timer is rendered inside the Clues Card
+    const cardTimer = screen.getByTestId("hud-card-mobile-timer");
+    expect(cardTimer).toBeInTheDocument();
+    expect(cardTimer).toHaveTextContent(/Timer:/i);
+
+    // Floating sticky header timer is rendered for mobile screens
+    const stickyTimer = screen.getByTestId("mobile-sticky-timer");
+    expect(stickyTimer).toBeInTheDocument();
+  });
 });
