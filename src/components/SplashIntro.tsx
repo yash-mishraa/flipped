@@ -35,8 +35,8 @@ export function SplashIntro({
 }: SplashIntroProps): React.JSX.Element | null {
   const isAlreadySeen = (hasShownIntroThisPageLoad || isIntroSeenInSession()) && !forceShow;
 
-  const [stage, setStage] = useState<"enter" | "active" | "exit" | "done">(() =>
-    isAlreadySeen ? "done" : "enter"
+  const [stage, setStage] = useState<"active" | "exit" | "done">(() =>
+    isAlreadySeen ? "done" : "active"
   );
   const [mounted, setMounted] = useState(() => !isAlreadySeen);
 
@@ -57,7 +57,7 @@ export function SplashIntro({
     hasShownIntroThisPageLoad = true;
     markIntroSeenInSession();
 
-    // Cancel all pending timers immediately (prevents enterTimer or fadeTimer from resurfacing)
+    // Cancel all pending timers immediately
     clearAllTimers();
 
     // Start clean, smooth fade-out exit
@@ -84,22 +84,14 @@ export function SplashIntro({
       typeof window !== "undefined" &&
       (Boolean(window.navigator?.webdriver) || process.env.NODE_ENV === "test");
 
-    // 1. Initial smooth fade-in
-    const enterTimer = setTimeout(() => {
-      if (!dismissedRef.current) {
-        setStage("active");
-      }
-    }, 50);
-    timersRef.current.push(enterTimer);
-
-    // 2. Hold for ~4.2s (or 100ms in test environment), then initiate smooth exit
+    // Hold for ~4.2s (or 100ms in test environment), then initiate smooth exit
     const holdDuration = isTestEnv ? 100 : 4200;
     const fadeTimer = setTimeout(() => {
       handleDismiss();
     }, holdDuration);
     timersRef.current.push(fadeTimer);
 
-    // 3. Allow user to dismiss with any key
+    // Allow user to dismiss with any key
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
         handleDismiss();
@@ -119,7 +111,6 @@ export function SplashIntro({
   }
 
   const isExiting = stage === "exit";
-  const isActive = stage === "active";
 
   return (
     <div
@@ -128,20 +119,12 @@ export function SplashIntro({
       data-testid="splash-intro"
       onClick={handleDismiss}
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#7B1E2B] transition-opacity duration-400 ease-out cursor-pointer select-none ${
-        isExiting
-          ? "opacity-0 pointer-events-none"
-          : isActive
-            ? "opacity-100"
-            : "opacity-0"
+        isExiting ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
       <div
         className={`flex flex-col items-center text-center transition-all duration-400 ease-out ${
-          isExiting
-            ? "scale-95 opacity-0"
-            : isActive
-              ? "scale-100 opacity-100"
-              : "scale-90 opacity-0"
+          isExiting ? "scale-95 opacity-0" : "scale-100 opacity-100"
         }`}
       >
         {/* Brand Symbol in Cream White (#F7F0E5) */}
