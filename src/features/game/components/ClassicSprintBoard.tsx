@@ -548,86 +548,120 @@ export function ClassicSprintBoard(): React.JSX.Element {
     const winRate = classicPlayed > 0 ? Math.round((classicWins / classicPlayed) * 100) : 0;
 
     return (
-      <div className="mx-auto w-full max-w-2xl space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
+      <div className="mx-auto w-full max-w-xl space-y-4">
+        {/* Title & Brief Intro */}
+        <div className="text-center space-y-1">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[#32171D]">
             Classic Timed Sprint
           </h1>
-          <p className="mx-auto max-w-lg text-xs sm:text-sm text-[#6B4E55] leading-relaxed">
-            Words keep coming one after another! Choose your challenge tier and time limit. Solve as
-            many word flips as you can before the clock runs out.
+          <p className="mx-auto max-w-md text-xs sm:text-sm text-[#6B4E55] leading-relaxed">
+            Non-stop word flips against the clock. Configure your sprint and start solving!
           </p>
         </div>
 
-        {/* Stats strip */}
-        <div className="flex items-center justify-center gap-6 rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/70 py-3 px-6 text-xs text-[#6B4E55]">
-          <div>
-            <span className="font-extrabold text-[#32171D]">{classicWins}</span> Wins
+        {/* Unified Sprint Setup Stage Card */}
+        <div className="w-full rounded-3xl border border-[#C49A6C]/70 bg-white/95 p-4 sm:p-6 shadow-xl backdrop-blur-md space-y-4">
+          {/* Stats Bar */}
+          <div className="flex items-center justify-center gap-4 sm:gap-6 rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/60 py-2.5 px-4 text-xs text-[#6B4E55]">
+            <div>
+              <span className="font-extrabold text-[#7B1E2B]">{classicWins}</span> Wins
+            </div>
+            <span className="text-[#C49A6C]">•</span>
+            <div>
+              <span className="font-extrabold text-[#32171D]">{classicPlayed}</span> Solved
+            </div>
+            <span className="text-[#C49A6C]">•</span>
+            <div>
+              <span className="font-extrabold text-[#32171D]">{winRate}%</span> Win Rate
+            </div>
           </div>
-          <span className="text-[#C49A6C]">•</span>
-          <div>
-            <span className="font-extrabold text-[#32171D]">{classicPlayed}</span> Solved
+
+          {/* Section 1: Choose Difficulty */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#7B1E2B]">
+                Step 1: Choose Difficulty
+              </label>
+              <span className="text-[10px] font-semibold text-[#8C6D68]">
+                Selected: <strong>{difficulty}</strong>
+              </span>
+            </div>
+            <DifficultySelector selectedDifficulty={difficulty} onSelectDifficulty={setDifficulty} />
           </div>
-          <span className="text-[#C49A6C]">•</span>
-          <div>
-            <span className="font-extrabold text-[#32171D]">{winRate}%</span> Win Rate
+
+          {/* Section 2: Choose Duration */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#7B1E2B]">
+                Step 2: Choose Sprint Time Limit
+              </label>
+              <span className="text-[10px] font-semibold text-[#8C6D68]">
+                Selected: <strong>{durationSeconds / 60} Min</strong>
+              </span>
+            </div>
+            <ClassicDurationSelector
+              selectedDuration={durationSeconds}
+              onSelectDuration={setDurationSeconds}
+            />
           </div>
-        </div>
 
-        {/* Step 1: Select Difficulty */}
-        <div className="space-y-2.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-[#7B1E2B]">
-            Step 1: Choose Difficulty
-          </label>
-          <DifficultySelector selectedDifficulty={difficulty} onSelectDifficulty={setDifficulty} />
-        </div>
-
-        {/* Step 2: Select Duration */}
-        <div className="space-y-2.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-[#7B1E2B]">
-            Step 2: Choose Sprint Time Limit
-          </label>
-          <ClassicDurationSelector
-            selectedDuration={durationSeconds}
-            onSelectDuration={setDurationSeconds}
-          />
-        </div>
-
-        {/* Rules Card */}
-        <div className="rounded-2xl border border-[#C49A6C]/40 bg-white/90 p-4 text-xs text-[#6B4E55] space-y-2">
-          <span className="font-bold uppercase tracking-wider text-[#32171D]">Sprint Rules</span>
-          <ul className="list-disc list-inside space-y-1 text-[#6B4E55]">
-            <li>Words keep coming non-stop until the sprint timer reaches 0.</li>
-            <li>
-              Any of the 4 combinations are possible: <strong>Synonym-Antonym</strong>,{" "}
-              <strong>Antonym-Synonym</strong>, <strong>Synonym-Synonym</strong>, or{" "}
-              <strong>Antonym-Antonym</strong>.
-            </li>
-            <li>Points accumulate with every solved word based on speed and accuracy.</li>
-            <li>Stuck on a tricky word? Use the <strong>Skip</strong> button to keep your momentum going!</li>
-          </ul>
-        </div>
-
-        {errorMsg && (
-          <div className="rounded-xl border border-coral-200 bg-coral-50 p-3 text-center text-xs font-semibold text-coral-800">
-            {errorMsg}
-          </div>
-        )}
-
-        {/* Start Button */}
-        <button
-          type="button"
-          data-testid="start-game-button"
-          onClick={handleStartSprint}
-          disabled={loadingNext}
-          className="flex w-full items-center justify-center rounded-full bg-[#7B1E2B] py-3.5 text-base font-extrabold text-[#F7F0E5] shadow-lg transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-xl active:scale-[0.97] disabled:opacity-50 cursor-pointer"
-        >
-          {loadingNext ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : (
-            <span>Start {durationSeconds / 60}-Minute Sprint</span>
+          {errorMsg && (
+            <div className="rounded-xl border border-coral-200 bg-coral-50 p-2.5 text-center text-xs font-semibold text-coral-800">
+              {errorMsg}
+            </div>
           )}
-        </button>
+
+          {/* Primary Start Action */}
+          <div className="pt-1">
+            <button
+              type="button"
+              data-testid="start-game-button"
+              onClick={handleStartSprint}
+              disabled={loadingNext}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#7B1E2B] py-3.5 px-6 text-sm sm:text-base font-extrabold text-[#F7F0E5] shadow-lg transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-xl active:scale-[0.97] disabled:opacity-50 cursor-pointer"
+            >
+              {loadingNext ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <span>Start {durationSeconds / 60}-Minute Sprint ({difficulty}) →</span>
+              )}
+            </button>
+            <p className="mt-1.5 text-center text-[11px] text-[#8C6870]">
+              Instant Start • Solve as many word flips as you can before the clock runs out!
+            </p>
+          </div>
+
+          {/* Quick Rules Chips & Collapsible Details */}
+          <div className="border-t border-[#C49A6C]/30 pt-3">
+            <div className="grid grid-cols-3 gap-2 text-center text-[11px] text-[#6B4E55]">
+              <div className="rounded-xl bg-[#faeee0]/50 p-2 border border-[#C49A6C]/25">
+                <span className="block font-bold text-[#32171D]">Continuous</span>
+                <span className="text-[10px] text-[#8C6D68]">Non-stop flow</span>
+              </div>
+              <div className="rounded-xl bg-[#faeee0]/50 p-2 border border-[#C49A6C]/25">
+                <span className="block font-bold text-[#32171D]">4 Combos</span>
+                <span className="text-[10px] text-[#8C6D68]">Synonym & Antonym</span>
+              </div>
+              <div className="rounded-xl bg-[#faeee0]/50 p-2 border border-[#C49A6C]/25">
+                <span className="block font-bold text-[#32171D]">Skip Button</span>
+                <span className="text-[10px] text-[#8C6D68]">Keep momentum</span>
+              </div>
+            </div>
+
+            <details className="mt-2.5 text-xs text-[#6B4E55] group">
+              <summary className="cursor-pointer font-semibold text-[#8C6870] hover:text-[#7B1E2B] text-center list-none flex items-center justify-center gap-1 transition-colors">
+                <span>View Full Sprint Rules &amp; Tips</span>
+                <span className="text-[10px] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="mt-2 rounded-2xl border border-[#C49A6C]/30 bg-[#faeee0]/40 p-3 space-y-1.5 text-xs text-[#6B4E55] text-left">
+                <p>• Words keep coming non-stop until the sprint timer reaches 0.</p>
+                <p>• Any of the 4 combinations are possible: <strong>Synonym-Antonym</strong>, <strong>Antonym-Synonym</strong>, <strong>Synonym-Synonym</strong>, or <strong>Antonym-Antonym</strong>.</p>
+                <p>• Points accumulate with every solved word based on speed and accuracy.</p>
+                <p>• Stuck on a tricky word? Use the <strong>Skip</strong> button to keep your momentum going!</p>
+              </div>
+            </details>
+          </div>
+        </div>
       </div>
     );
   }
