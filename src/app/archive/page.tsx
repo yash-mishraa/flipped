@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/features/game/modes/daily-scheduler";
 import { PUBLIC_PUZZLES_BY_ID } from "@/features/game/data/public-puzzles";
 import { loadProgress } from "@/features/game/persistence/local-progress";
+import { syncUserProgress } from "@/features/game/persistence/user-sync";
 import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
 
 function formatFriendlyDateWithDay(dateStr: string): { dayName: string; formattedDate: string } {
@@ -30,6 +32,7 @@ function formatFriendlyDateWithDay(dateStr: string): { dayName: string; formatte
 }
 
 export default function ArchivePage(): React.JSX.Element {
+  const { isSignedIn, user } = useUser();
   const [mounted, setMounted] = useState(false);
   const [dailyAttempts, setDailyAttempts] = useState<Record<string, DailyAttemptRecord>>({});
   const [todayStr, setTodayStr] = useState<string>("");
@@ -40,7 +43,15 @@ export default function ArchivePage(): React.JSX.Element {
     setTodayStr(today);
     setDailyAttempts(progress.daily);
     setMounted(true);
-  }, []);
+
+    if (isSignedIn && user?.id) {
+      syncUserProgress(user.id).then((res) => {
+        if (res?.progress?.daily) {
+          setDailyAttempts(res.progress.daily);
+        }
+      });
+    }
+  }, [isSignedIn, user?.id]);
 
   const currentToday = todayStr || getDailyDateString();
   const published = getPublishedDailySchedule(currentToday);
@@ -173,7 +184,7 @@ export default function ArchivePage(): React.JSX.Element {
                           </span>
                         ) : attempt ? (
                           <span className="font-medium text-[#8C6D68] shrink-0">
-                            • Timed Out
+                            • Completed (Timed Out)
                           </span>
                         ) : (
                           <span className="text-[#8C6D68]/70 shrink-0">
@@ -189,12 +200,12 @@ export default function ArchivePage(): React.JSX.Element {
                     <Link
                       href={isToday ? "/daily" : `/daily?date=${assignment.date}`}
                       className={`inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-1.5 sm:py-2 text-xs font-bold shadow-xs transition-all duration-200 ease-out active:scale-[0.96] ${
-                        attempt && attempt.status === "WON"
+                        attempt
                           ? "bg-[#faeee0] border border-[#C49A6C] text-[#32171D] hover:bg-[#f4ddc5]"
                           : "bg-[#7B1E2B] text-[#F7F0E5] hover:bg-[#631722]"
                       }`}
                     >
-                      <span>{attempt ? (attempt.status === "WON" ? "View" : "Replay") : "Play"}</span>
+                      <span>{attempt ? "View" : "Play"}</span>
                     </Link>
                   </div>
                 </div>

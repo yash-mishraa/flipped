@@ -8,9 +8,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ServerGameBoard } from "@/features/game/components/ServerGameBoard";
 import { DailyCompletionCard } from "@/features/game/components/DailyCompletionCard";
-import { saveDailyAttempt } from "@/features/game/persistence/local-progress";
+import { saveDailyAttempt, loadProgress } from "@/features/game/persistence/local-progress";
 import { syncUserProgress } from "@/features/game/persistence/user-sync";
-import { getDailyDateString } from "@/features/game/modes/daily-scheduler";
+import { getDailyDateString, getDailyPuzzle } from "@/features/game/modes/daily-scheduler";
 import type {
   SafeGameplayPayload,
   FinalizedResultPayload,
@@ -77,11 +77,74 @@ function DailyPageContent(): React.JSX.Element {
     setLoading(true);
     setErrorMsg(null);
 
+    const targetDate = queryDate || todayStr;
+
+    // 1. Immediately check local progress for an already completed attempt
+    let progress = loadProgress();
+    let localAttempt = progress.daily[targetDate];
+
+    // If user is signed in and local record is not present, sync with cloud first
+    if (
+      (!localAttempt || (localAttempt.status !== "WON" && localAttempt.status !== "TIMED_OUT")) &&
+      isSignedIn &&
+      user?.id
+    ) {
+      try {
+        const syncRes = await syncUserProgress(user.id);
+        progress = syncRes.progress;
+        localAttempt = progress.daily[targetDate];
+      } catch {
+        // Continue with local progress if sync encounters network issue
+      }
+    }
+
+    // If this challenge date is already completed, strictly render the completion card and never start a playable game
+    if (localAttempt && (localAttempt.status === "WON" || localAttempt.status === "TIMED_OUT")) {
+      const puzzleResult = getDailyPuzzle(targetDate, todayStr);
+      if (puzzleResult.status === "AVAILABLE") {
+        const puzzle = puzzleResult.puzzle;
+        const finalizedResult: FinalizedResultPayload = {
+          attemptId: `att_daily_${targetDate}_${puzzle.id}_completed`,
+          mode: "DAILY",
+          date: targetDate,
+          puzzleId: puzzle.id,
+          status: localAttempt.status,
+          isWon: localAttempt.status === "WON",
+          finalScore: localAttempt.finalScore,
+          elapsedSeconds: localAttempt.elapsedSeconds,
+          hintsUsed: localAttempt.hintsUsed,
+          canonicalPhrase: puzzle.answerWords.join(" "),
+          solvedPhrase: localAttempt.solvedPhrase || puzzle.answerWords.join(" "),
+          transformations: puzzle.transformations.map((t) => ({
+            clueWord: t.clueWord,
+            answerWord: t.answerWord,
+            relationship: t.relationship,
+            explanation: t.explanation,
+          })),
+          completedAt: localAttempt.completedAt || new Date().toISOString(),
+        };
+
+        setCompletedResult(finalizedResult);
+        setPayload(null);
+        setLoading(false);
+
+        // Inform the server in the background so in-memory store and cookies stay aligned
+        fetch("/api/game/daily/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ targetDate, existingAttempt: localAttempt }),
+        }).catch(() => {});
+
+        return;
+      }
+    }
+
+    // 2. If unplayed, request authoritative attempt initialization from server
     try {
       const res = await fetch("/api/game/daily/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetDate: queryDate }),
+        body: JSON.stringify({ targetDate, existingAttempt: localAttempt }),
       });
 
       const data = await res.json();
@@ -98,10 +161,50 @@ function DailyPageContent(): React.JSX.Element {
         }
         setPayload(null);
       } else if (data.status === "STARTED" || data.status === "IN_PROGRESS") {
+        // Final sanity check before mounting playable board
+        const recheckProgress = loadProgress();
+        const recheckAttempt = recheckProgress.daily[targetDate];
+        if (
+          recheckAttempt &&
+          (recheckAttempt.status === "WON" || recheckAttempt.status === "TIMED_OUT")
+        ) {
+          const puzzleResult = getDailyPuzzle(targetDate, todayStr);
+          if (puzzleResult.status === "AVAILABLE") {
+            const puzzle = puzzleResult.puzzle;
+            setCompletedResult({
+              attemptId: `att_daily_${targetDate}_${puzzle.id}_completed`,
+              mode: "DAILY",
+              date: targetDate,
+              puzzleId: puzzle.id,
+              status: recheckAttempt.status,
+              isWon: recheckAttempt.status === "WON",
+              finalScore: recheckAttempt.finalScore,
+              elapsedSeconds: recheckAttempt.elapsedSeconds,
+              hintsUsed: recheckAttempt.hintsUsed,
+              canonicalPhrase: puzzle.answerWords.join(" "),
+              solvedPhrase: recheckAttempt.solvedPhrase || puzzle.answerWords.join(" "),
+              transformations: puzzle.transformations.map((t) => ({
+                clueWord: t.clueWord,
+                answerWord: t.answerWord,
+                relationship: t.relationship,
+                explanation: t.explanation,
+              })),
+              completedAt: recheckAttempt.completedAt || new Date().toISOString(),
+            });
+            setPayload(null);
+            return;
+          }
+        }
+
         setPayload(data.payload);
         setCompletedResult(null);
       } else if (data.status === "UNAVAILABLE") {
-        setErrorMsg(data.message || (queryDate ? `Challenge for ${queryDate} is unavailable.` : "No daily challenge is available today."));
+        setErrorMsg(
+          data.message ||
+            (queryDate
+              ? `Challenge for ${queryDate} is unavailable.`
+              : "No daily challenge is available today.")
+        );
       } else if (data.error) {
         setErrorMsg(data.error);
       } else {
@@ -203,7 +306,11 @@ function DailyPageContent(): React.JSX.Element {
               {isArchiveChallenge ? `Archive Challenge` : "Daily Flipped"}
             </h1>
             <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
-              {isArchiveChallenge
+              {completedResult
+                ? isArchiveChallenge
+                  ? `Completed archive challenge for ${currentDateDisplay}.`
+                  : `Completed official challenge for ${currentDateDisplay}.`
+                : isArchiveChallenge
                 ? `Playing previous daily challenge for ${currentDateDisplay}. Does not affect your daily streak.`
                 : "One official challenge every day. 60 seconds to deduce the phrase."}
             </p>
@@ -242,7 +349,9 @@ function DailyPageContent(): React.JSX.Element {
         {/* Footer Notice */}
         <footer className="border-t border-[#C49A6C]/40 pt-4 text-center text-xs text-[#6B4E55]">
           <p>
-            {isArchiveChallenge
+            {completedResult
+              ? "Flipped Daily Challenge • Completed • Official result preserved"
+              : isArchiveChallenge
               ? "Flipped Daily Archive • Past Challenge Practice • Streak unaffected"
               : "Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day"}
           </p>

@@ -18,18 +18,27 @@ export default function StatisticsPage(): React.JSX.Element {
   const [stats, setStats] = useState<PlayerStatistics | null>(null);
   const [activeTab, setActiveTab] = useState<"ALL" | "DAILY" | "CLASSIC">("ALL");
   const [syncedWithCloud, setSyncedWithCloud] = useState(false);
+  const [hasCompletedToday, setHasCompletedToday] = useState(false);
 
   useEffect(() => {
     const todayStr = getDailyDateString();
     const progress = loadProgress();
     const calculated = calculatePlayerStatistics(progress, todayStr);
     setStats(calculated);
+    const todayAttempt = progress.daily[todayStr];
+    setHasCompletedToday(
+      Boolean(todayAttempt && (todayAttempt.status === "WON" || todayAttempt.status === "TIMED_OUT"))
+    );
     setMounted(true);
 
     if (isSignedIn && user?.id) {
       syncUserProgress(user.id).then((result) => {
         setStats(result.stats);
         setSyncedWithCloud(result.syncedWithCloud);
+        const cloudAttempt = result.progress.daily[todayStr];
+        setHasCompletedToday(
+          Boolean(cloudAttempt && (cloudAttempt.status === "WON" || cloudAttempt.status === "TIMED_OUT"))
+        );
       });
     }
   }, [isSignedIn, user?.id]);
@@ -125,7 +134,7 @@ export default function StatisticsPage(): React.JSX.Element {
                   href="/daily"
                   className="rounded-full border border-[#C49A6C] bg-[#faeee0]/80 px-5 py-2 text-xs font-bold text-[#7B1E2B] hover:bg-[#faeee0] active:scale-[0.98] transition"
                 >
-                  Play Daily Challenge
+                  {hasCompletedToday ? "View Today's Daily" : "Play Daily Challenge"}
                 </Link>
                 <Link
                   href="/classic"
@@ -218,7 +227,7 @@ export default function StatisticsPage(): React.JSX.Element {
                     href="/daily"
                     className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 ease-out"
                   >
-                    Play Daily Challenge
+                    {hasCompletedToday ? "View Today's Daily" : "Play Daily Challenge"}
                   </Link>
                   <Link
                     href="/classic"
@@ -536,7 +545,7 @@ export default function StatisticsPage(): React.JSX.Element {
                       href="/daily"
                       className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 ease-out"
                     >
-                      Play Daily
+                      {hasCompletedToday ? "View Daily" : "Play Daily"}
                     </Link>
                     <Link
                       href="/classic"

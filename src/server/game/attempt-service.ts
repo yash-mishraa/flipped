@@ -23,6 +23,7 @@ import { calculateScore } from "@/features/game/domain/scoring";
 import { checkAnswer } from "@/features/game/domain/check-answer";
 import { splitNormalizedPhrase } from "@/features/game/domain/normalize-answer";
 import type { Difficulty, TileFeedback } from "@/features/game/domain/types";
+import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
 
 export const ROUND_DURATION_MS = 60_000;
 
@@ -94,7 +95,9 @@ export type SubmitAttemptResult =
 export async function startDailyAttempt(
   guestId: string,
   targetDate?: string,
-  request?: Request
+  request?: Request,
+  clientAttempt?: DailyAttemptRecord,
+  clerkUserId?: string
 ): Promise<StartDailyAttemptResult> {
   const dateStr = targetDate || getServerDailyDateString();
   const scheduleResult = await resolveServerDailyAssignment(dateStr);
@@ -117,16 +120,74 @@ export async function startDailyAttempt(
     };
   }
 
-  // Check existing attempt in DB for this guest on this date
+  // 1. Check existing attempt in DB for this guest on this date
   let existingAttempt = inMemoryDb.findDailyAttempt(guestId, dateStr);
 
-  // If not found in memory, check request cookie
+  // 1b. If authenticated with Clerk, check under clerkUserId
+  if (!existingAttempt && clerkUserId) {
+    existingAttempt = inMemoryDb.findDailyAttempt(clerkUserId, dateStr);
+    if (!existingAttempt) {
+      const userProgress = inMemoryDb.getUserProgress(clerkUserId);
+      const userDaily = userProgress?.daily?.[dateStr];
+      if (userDaily && (userDaily.status === "WON" || userDaily.status === "TIMED_OUT")) {
+        const storedFromUser: StoredAttempt = {
+          id: `att_daily_${dateStr}_${puzzle.id}_user_${userDaily.completedAt || "done"}`,
+          guestId: clerkUserId,
+          mode: "DAILY",
+          dailyDate: dateStr,
+          puzzleId: puzzle.id,
+          status: userDaily.status,
+          startedAt: new Date(userDaily.completedAt || Date.now()),
+          deadline: new Date(userDaily.completedAt || Date.now()),
+          endedAt: new Date(userDaily.completedAt || Date.now()),
+          elapsedSeconds: userDaily.elapsedSeconds ?? 60,
+          hintsUsed: userDaily.hintsUsed ?? 0,
+          finalScore: userDaily.finalScore ?? (userDaily.status === "WON" ? 100 : 0),
+          isWon: userDaily.status === "WON",
+          solvedPhrase: userDaily.solvedPhrase || puzzle.answerWords.join(" "),
+          createdAt: new Date(userDaily.completedAt || Date.now()),
+          updatedAt: new Date(userDaily.completedAt || Date.now()),
+        };
+        existingAttempt = persistAttempt(storedFromUser);
+      }
+    }
+  }
+
+  // 1c. If client passed a finalized attempt from localStorage/progress
+  if (
+    !existingAttempt &&
+    clientAttempt &&
+    clientAttempt.date === dateStr &&
+    (clientAttempt.status === "WON" || clientAttempt.status === "TIMED_OUT")
+  ) {
+    const storedFromClient: StoredAttempt = {
+      id: `att_daily_${dateStr}_${puzzle.id}_client_${clientAttempt.completedAt || "done"}`,
+      guestId,
+      mode: "DAILY",
+      dailyDate: dateStr,
+      puzzleId: puzzle.id,
+      status: clientAttempt.status,
+      startedAt: new Date(clientAttempt.completedAt || Date.now()),
+      deadline: new Date(clientAttempt.completedAt || Date.now()),
+      endedAt: new Date(clientAttempt.completedAt || Date.now()),
+      elapsedSeconds: clientAttempt.elapsedSeconds ?? 60,
+      hintsUsed: clientAttempt.hintsUsed ?? 0,
+      finalScore: clientAttempt.finalScore ?? (clientAttempt.status === "WON" ? 100 : 0),
+      isWon: clientAttempt.status === "WON",
+      solvedPhrase: clientAttempt.solvedPhrase || puzzle.answerWords.join(" "),
+      createdAt: new Date(clientAttempt.completedAt || Date.now()),
+      updatedAt: new Date(clientAttempt.completedAt || Date.now()),
+    };
+    existingAttempt = persistAttempt(storedFromClient);
+  }
+
+  // 1d. If not found in memory, check request cookie
   if (!existingAttempt && request) {
     const rawToken = extractCookie(request.headers.get("cookie"), ATTEMPT_COOKIE_NAME);
     const fromCookie = verifyAttemptToken(rawToken);
     if (
       fromCookie &&
-      fromCookie.guestId === guestId &&
+      (fromCookie.guestId === guestId || (clerkUserId && fromCookie.guestId === clerkUserId)) &&
       fromCookie.mode === "DAILY" &&
       fromCookie.dailyDate === dateStr
     ) {
@@ -291,6 +352,22 @@ export async function submitAuthoritativeAttempt(
       result: createFinalizedResultPayload(puzzle, attempt),
       attempt,
     };
+  }
+
+  // For daily mode, strictly enforce single attempt: check if this date already has a finalized attempt
+  if (attempt.mode === "DAILY" && attempt.dailyDate) {
+    const existing = inMemoryDb.findDailyAttempt(guestId, attempt.dailyDate);
+    if (
+      existing &&
+      existing.id !== attempt.id &&
+      (existing.status === "WON" || existing.status === "TIMED_OUT")
+    ) {
+      return {
+        status: "ALREADY_FINALIZED",
+        result: createFinalizedResultPayload(puzzle, existing),
+        attempt: existing,
+      };
+    }
   }
 
   const now = Date.now();

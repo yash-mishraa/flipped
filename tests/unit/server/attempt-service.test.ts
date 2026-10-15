@@ -67,7 +67,36 @@ describe("Authoritative Attempt Lifecycle Service", () => {
       }
     });
 
+    it("returns ALREADY_COMPLETED when clientAttempt is provided even if server memory was empty", async () => {
+      inMemoryDb.clearAttempts();
+
+      const outcome = await startDailyAttempt(
+        guestB,
+        "2026-10-14",
+        undefined,
+        {
+          date: "2026-10-14",
+          puzzleId: "wild-life",
+          status: "WON",
+          finalScore: 98,
+          elapsedSeconds: 12,
+          hintsUsed: 0,
+          solvedPhrase: "WILD LIFE",
+          completedAt: new Date().toISOString(),
+        }
+      );
+
+      expect(outcome.status).toBe("ALREADY_COMPLETED");
+      if (outcome.status === "ALREADY_COMPLETED") {
+        expect(outcome.result.finalScore).toBe(98);
+        expect(outcome.result.canonicalPhrase).toBe("WILD LIFE");
+      }
+    });
+
     it("rejects starting a daily attempt for a future scheduled date", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-10-12T10:00:00Z"));
+
       const unassigned = await startDailyAttempt(guestA, "2099-01-01");
       expect(unassigned.status).toBe("UNAVAILABLE");
 

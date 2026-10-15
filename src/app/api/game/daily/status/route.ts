@@ -18,9 +18,19 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<NextResponse> {
   const session = resolveGuestSession(request);
-  const todayStr = getServerDailyDateString();
+  let targetDate = getServerDailyDateString();
 
-  let attempt = inMemoryDb.findDailyAttempt(session.guestId, todayStr);
+  try {
+    const url = new URL(request.url);
+    const qDate = url.searchParams.get("date");
+    if (qDate && /^\d{4}-\d{2}-\d{2}$/.test(qDate)) {
+      targetDate = qDate;
+    }
+  } catch {
+    // Ignore URL parse error
+  }
+
+  let attempt = inMemoryDb.findDailyAttempt(session.guestId, targetDate);
 
   if (!attempt) {
     const rawToken = extractCookie(request.headers.get("cookie"), ATTEMPT_COOKIE_NAME);
@@ -29,7 +39,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       fromCookie &&
       fromCookie.guestId === session.guestId &&
       fromCookie.mode === "DAILY" &&
-      fromCookie.dailyDate === todayStr
+      fromCookie.dailyDate === targetDate
     ) {
       attempt = persistAttempt(fromCookie);
     }
@@ -37,7 +47,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   if (!attempt) {
     const response = NextResponse.json({
-      date: todayStr,
+      date: targetDate,
       status: "UNPLAYED",
       hasCompleted: false,
     });
@@ -61,7 +71,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const result = puzzle ? createFinalizedResultPayload(puzzle, attempt) : null;
 
     const response = NextResponse.json({
-      date: todayStr,
+      date: targetDate,
       status: "COMPLETED",
       hasCompleted: true,
       result,
@@ -72,7 +82,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   // Active in progress
   const response = NextResponse.json({
-    date: todayStr,
+    date: targetDate,
     status: "IN_PROGRESS",
     hasCompleted: false,
     attemptId: attempt.id,
