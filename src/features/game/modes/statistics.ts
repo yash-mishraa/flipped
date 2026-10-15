@@ -61,14 +61,49 @@ export function getPreviousDateString(dateStr: string): string {
 }
 
 /**
+ * Determines whether a daily attempt was completed outside its official 24-hour window
+ * (i.e. as an archive practice puzzle). Archive plays do not count towards official statistics or streaks.
+ */
+export function isArchiveDailyAttempt(
+  record: DailyAttemptRecord
+): boolean {
+  if (record.isArchive === true) {
+    return true;
+  }
+  if (record.isArchive === false) {
+    return false;
+  }
+  // If isArchive is not explicitly set, determine by completion timestamp relative to challenge date
+  if (record.completedAt) {
+    try {
+      const completedUtcDate = new Date(record.completedAt).toISOString().slice(0, 10);
+      if (completedUtcDate > record.date) {
+        return true;
+      }
+    } catch {
+      // Ignore parse failure
+    }
+  }
+  return false;
+}
+
+/**
  * Calculates the current and longest daily streaks from stored daily attempt records.
  */
 export function calculateDailyStreaks(
   dailyAttempts: Record<string, DailyAttemptRecord>,
   todayDateStr: string = getDailyDateString()
 ): { currentStreak: number; longestStreak: number } {
+  // Only evaluate official (non-archive) attempts
+  const officialAttempts: Record<string, DailyAttemptRecord> = {};
+  for (const [date, attempt] of Object.entries(dailyAttempts)) {
+    if (!isArchiveDailyAttempt(attempt)) {
+      officialAttempts[date] = attempt;
+    }
+  }
+
   // Sort distinct dates chronologically
-  const sortedDates = Object.keys(dailyAttempts)
+  const sortedDates = Object.keys(officialAttempts)
     .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
     .sort();
 
@@ -76,14 +111,14 @@ export function calculateDailyStreaks(
     return { currentStreak: 0, longestStreak: 0 };
   }
 
-  // 1. Calculate longest streak across all history (excluding archive-completed challenges)
+  // 1. Calculate longest streak across all official history
   let longestStreak = 0;
   let runningStreak = 0;
   let previousWonDate: string | null = null;
 
   for (const date of sortedDates) {
-    const attempt = dailyAttempts[date];
-    if (attempt?.status === "WON" && !attempt.isArchive) {
+    const attempt = officialAttempts[date];
+    if (attempt?.status === "WON") {
       if (previousWonDate === null) {
         runningStreak = 1;
       } else {
@@ -99,7 +134,7 @@ export function calculateDailyStreaks(
         longestStreak = runningStreak;
       }
     } else {
-      // Timeout, incomplete, or archive round resets streak
+      // Timeout or incomplete resets streak
       runningStreak = 0;
       previousWonDate = null;
     }
@@ -107,30 +142,30 @@ export function calculateDailyStreaks(
 
   // 2. Calculate current streak relative to today
   let currentStreak = 0;
-  const todayAttempt = dailyAttempts[todayDateStr];
+  const todayAttempt = officialAttempts[todayDateStr];
   const yesterdayDateStr = getPreviousDateString(todayDateStr);
 
   let checkDate: string | null = null;
 
   if (todayAttempt) {
-    if (todayAttempt.status === "WON" && !todayAttempt.isArchive) {
+    if (todayAttempt.status === "WON") {
       checkDate = todayDateStr;
     } else {
-      // Today was played and timed out -> streak is 0
+      // Today was played officially and timed out -> streak is 0
       return { currentStreak: 0, longestStreak };
     }
   } else {
-    // Today not yet played -> streak is alive if yesterday was WON
-    const yesterdayAttempt = dailyAttempts[yesterdayDateStr];
-    if (yesterdayAttempt?.status === "WON" && !yesterdayAttempt.isArchive) {
+    // Today not yet played -> streak is alive if yesterday was WON officially
+    const yesterdayAttempt = officialAttempts[yesterdayDateStr];
+    if (yesterdayAttempt?.status === "WON") {
       checkDate = yesterdayDateStr;
     } else {
       return { currentStreak: 0, longestStreak };
     }
   }
 
-  // Walk backwards counting consecutive won days (ignoring archive solves)
-  while (checkDate && dailyAttempts[checkDate]?.status === "WON" && !dailyAttempts[checkDate]?.isArchive) {
+  // Walk backwards counting consecutive won days
+  while (checkDate && officialAttempts[checkDate]?.status === "WON") {
     currentStreak += 1;
     checkDate = getPreviousDateString(checkDate);
   }
@@ -140,14 +175,18 @@ export function calculateDailyStreaks(
 
 /**
  * Computes authoritative player statistics from stored local progress.
+ * Archive daily challenge solves are strictly excluded from daily and total statistics.
  */
 export function calculatePlayerStatistics(
   progress: StoredProgressSchema,
   todayDateStr: string = getDailyDateString()
 ): PlayerStatistics {
-  const dailyRecords = Object.values(progress.daily);
-  const dailyPlayed = dailyRecords.length;
-  const dailyWins = dailyRecords.filter((r) => r.status === "WON");
+  // Only official daily challenges completed within their 24-hour window count towards stats
+  const officialDailyRecords = Object.values(progress.daily).filter(
+    (r) => !isArchiveDailyAttempt(r)
+  );
+  const dailyPlayed = officialDailyRecords.length;
+  const dailyWins = officialDailyRecords.filter((r) => r.status === "WON");
   const dailyWinCount = dailyWins.length;
   const dailyWinRate = dailyPlayed > 0 ? Math.round((dailyWinCount / dailyPlayed) * 100) : 0;
 

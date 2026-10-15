@@ -1,6 +1,7 @@
 import { inMemoryDb, type StoredAttempt } from "../db/client";
 import type { Difficulty, Puzzle } from "@/features/game/domain/types";
 import { selectClassicPuzzle } from "@/features/game/modes/classic-selector";
+import { getServerDailyDateString } from "../scheduling/daily-scheduler";
 
 /**
  * Public gameplay payload delivered to the client during active gameplay.
@@ -47,6 +48,7 @@ export interface FinalizedResultPayload {
     readonly explanation: string;
   }[];
   readonly completedAt: string;
+  readonly isArchive?: boolean;
 }
 
 /**
@@ -138,5 +140,9 @@ export function createFinalizedResultPayload(
       explanation: t.explanation,
     })),
     completedAt: (attempt.endedAt ?? attempt.updatedAt).toISOString(),
+    isArchive:
+      attempt.mode === "DAILY"
+        ? Boolean(attempt.dailyDate && attempt.dailyDate !== getServerDailyDateString())
+        : undefined,
   };
 }

@@ -55,6 +55,7 @@ function convertFinalizedToCardProps(finalized: FinalizedResultPayload): {
     hintsUsed: finalized.hintsUsed,
     solvedPhrase: finalized.solvedPhrase || finalized.canonicalPhrase,
     completedAt: finalized.completedAt,
+    isArchive: finalized.isArchive,
   };
 
   return { puzzle, attempt };
@@ -352,7 +353,7 @@ function DailyPageContent(): React.JSX.Element {
             {completedResult
               ? "Flipped Daily Challenge • Completed • Official result preserved"
               : isArchiveChallenge
-              ? "Flipped Daily Archive • Past Challenge Practice • Streak unaffected"
+              ? "Flipped Daily Archive • Past Challenge Practice • Streak & stats unaffected"
               : "Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day"}
           </p>
         </footer>

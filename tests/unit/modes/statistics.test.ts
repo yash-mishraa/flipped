@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   calculateDailyStreaks,
   calculatePlayerStatistics,
+  isArchiveDailyAttempt,
   getDaysBetween,
   getPreviousDateString,
 } from "@/features/game/modes/statistics";
@@ -314,6 +315,161 @@ describe("Statistics Engine", () => {
       expect(stats.averagePoints).toBe(Math.round(1018 / 11)); // 93
       expect(stats.classic.bestSolveTimeSeconds).toBe(8);
       expect(stats.classic.averageSolveTimeSeconds).toBe(12); // 120 / 10
+    });
+
+    it("strictly excludes archive challenge solves from official player statistics", () => {
+      // Player has:
+      // - 1 Official Daily solve on 2026-10-15 (WON, 90 pts, 20s)
+      // - 1 Official Daily solve on 2026-10-14 (WON, 85 pts, 25s)
+      // - 1 Archive Daily solve on 2026-10-13 (isArchive: true, WON, 100 pts, 10s)
+      // - 1 Archive Daily solve on 2026-10-12 (completed after 24h window on 2026-10-15, WON, 95 pts, 15s)
+      // - 1 Archive Daily solve on 2026-10-11 (isArchive: true, TIMED_OUT, 0 pts, 60s)
+      // - 2 Classic wins (180 pts)
+      const progress: StoredProgressSchema = {
+        version: 1,
+        daily: {
+          "2026-10-15": {
+            date: "2026-10-15",
+            puzzleId: "daily-today",
+            status: "WON",
+            finalScore: 90,
+            elapsedSeconds: 20,
+            hintsUsed: 0,
+            completedAt: "2026-10-15T12:00:00Z",
+            isArchive: false,
+          },
+          "2026-10-14": {
+            date: "2026-10-14",
+            puzzleId: "daily-yesterday",
+            status: "WON",
+            finalScore: 85,
+            elapsedSeconds: 25,
+            hintsUsed: 1,
+            completedAt: "2026-10-14T12:00:00Z",
+            isArchive: false,
+          },
+          "2026-10-13": {
+            date: "2026-10-13",
+            puzzleId: "daily-archive-1",
+            status: "WON",
+            finalScore: 100,
+            elapsedSeconds: 10,
+            hintsUsed: 0,
+            completedAt: "2026-10-15T14:00:00Z",
+            isArchive: true,
+          },
+          "2026-10-12": {
+            date: "2026-10-12",
+            puzzleId: "daily-archive-2",
+            status: "WON",
+            finalScore: 95,
+            elapsedSeconds: 15,
+            hintsUsed: 0,
+            completedAt: "2026-10-15T14:30:00Z", // completed days later without isArchive flag
+          },
+          "2026-10-11": {
+            date: "2026-10-11",
+            puzzleId: "daily-archive-3",
+            status: "TIMED_OUT",
+            finalScore: 0,
+            elapsedSeconds: 60,
+            hintsUsed: 2,
+            completedAt: "2026-10-15T15:00:00Z",
+            isArchive: true,
+          },
+        },
+        classic: {
+          recentlyPlayedIds: ["c1", "c2"],
+          lastDifficulty: "MEDIUM",
+          totalPlayed: 2,
+          totalWins: 2,
+          totalPoints: 180,
+          bestSolveTimeSeconds: 18,
+          totalElapsedSeconds: 40,
+        },
+      };
+
+      const stats = calculatePlayerStatistics(progress, "2026-10-15");
+
+      // Daily stats must ONLY reflect the 2 official daily solves (2026-10-15 & 2026-10-14)
+      expect(stats.daily.totalPlayed).toBe(2);
+      expect(stats.daily.totalWins).toBe(2);
+      expect(stats.daily.winRate).toBe(100);
+      expect(stats.daily.totalPoints).toBe(175); // 90 + 85 (NOT including 100 or 95 from archive!)
+      expect(stats.daily.averagePoints).toBe(88); // Math.round(175 / 2)
+      expect(stats.daily.bestSolveTimeSeconds).toBe(20); // 20s (NOT the 10s or 15s archive solves)
+      expect(stats.daily.averageSolveTimeSeconds).toBe(23); // Math.round((20 + 25) / 2)
+      expect(stats.daily.currentStreak).toBe(2);
+      expect(stats.daily.longestStreak).toBe(2);
+
+      // Total stats must ONLY combine official daily + classic:
+      // Daily: 2 played, 2 won, 175 pts
+      // Classic: 2 played, 2 won, 180 pts
+      // Combined: 4 played, 4 won, 355 pts
+      expect(stats.totalPlayed).toBe(4);
+      expect(stats.totalWins).toBe(4);
+      expect(stats.winRate).toBe(100);
+      expect(stats.totalPoints).toBe(355); // 175 + 180
+      expect(stats.averagePoints).toBe(Math.round(355 / 4)); // 89
+      expect(stats.bestSolveTimeSeconds).toBe(18); // classic was 18, daily official was 20
+    });
+  });
+
+  describe("isArchiveDailyAttempt", () => {
+    it("identifies explicit archive attempts", () => {
+      expect(
+        isArchiveDailyAttempt({
+          date: "2026-10-13",
+          puzzleId: "p1",
+          status: "WON",
+          finalScore: 100,
+          elapsedSeconds: 20,
+          hintsUsed: 0,
+          completedAt: "2026-10-15T12:00:00Z",
+          isArchive: true,
+        })
+      ).toBe(true);
+    });
+
+    it("identifies official attempts completed within the challenge date", () => {
+      expect(
+        isArchiveDailyAttempt({
+          date: "2026-10-15",
+          puzzleId: "p1",
+          status: "WON",
+          finalScore: 100,
+          elapsedSeconds: 20,
+          hintsUsed: 0,
+          completedAt: "2026-10-15T12:00:00Z",
+        })
+      ).toBe(false);
+
+      expect(
+        isArchiveDailyAttempt({
+          date: "2026-10-14",
+          puzzleId: "p1",
+          status: "WON",
+          finalScore: 100,
+          elapsedSeconds: 20,
+          hintsUsed: 0,
+          completedAt: "2026-10-14T23:59:00Z",
+          isArchive: false,
+        })
+      ).toBe(false);
+    });
+
+    it("identifies retroactively completed attempts where completedAt is on a later date", () => {
+      expect(
+        isArchiveDailyAttempt({
+          date: "2026-10-13",
+          puzzleId: "p1",
+          status: "WON",
+          finalScore: 100,
+          elapsedSeconds: 20,
+          hintsUsed: 0,
+          completedAt: "2026-10-15T10:00:00Z",
+        })
+      ).toBe(true);
     });
   });
 });

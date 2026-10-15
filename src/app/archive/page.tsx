@@ -110,7 +110,7 @@ export default function ArchivePage(): React.JSX.Element {
               Challenge Archive
             </h1>
             <p className="mt-1 text-xs text-[#6B4E55] sm:text-sm">
-              Play past daily challenges and track your history. Completing past puzzles does not affect your daily streak.
+              Play past daily challenges and track your history. Completing past puzzles does not affect your daily streak or official statistics.
             </p>
           </div>
         </header>

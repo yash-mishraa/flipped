@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { inMemoryDb } from "@/server/db/client";
 import {
   calculatePlayerStatistics,
+  isArchiveDailyAttempt,
   type PlayerStatistics,
 } from "@/features/game/modes/statistics";
 import { getServerDailyDateString } from "@/server/scheduling/daily-scheduler";
@@ -71,24 +72,32 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   if (clientProgress?.daily) {
     for (const [date, clientAttempt] of Object.entries(clientProgress.daily)) {
+      const isArchive = isArchiveDailyAttempt(clientAttempt);
+      const normalizedClientAttempt: DailyAttemptRecord = {
+        ...clientAttempt,
+        isArchive: clientAttempt.isArchive ?? isArchive,
+      };
       const serverAttempt = mergedDaily[date];
       if (!serverAttempt) {
-        mergedDaily[date] = clientAttempt;
+        mergedDaily[date] = normalizedClientAttempt;
       } else {
+        const mergedIsArchive = Boolean(serverAttempt.isArchive || normalizedClientAttempt.isArchive);
         // Prefer completed / won attempt
-        if (clientAttempt.status === "WON" && serverAttempt.status !== "WON") {
-          mergedDaily[date] = clientAttempt;
-        } else if (clientAttempt.status === "WON" && serverAttempt.status === "WON") {
+        if (normalizedClientAttempt.status === "WON" && serverAttempt.status !== "WON") {
+          mergedDaily[date] = { ...normalizedClientAttempt, isArchive: mergedIsArchive };
+        } else if (normalizedClientAttempt.status === "WON" && serverAttempt.status === "WON") {
           // Keep attempt with higher finalScore or shorter time
-          const clientScore = clientAttempt.finalScore ?? 0;
+          const clientScore = normalizedClientAttempt.finalScore ?? 0;
           const serverScore = serverAttempt.finalScore ?? 0;
           if (clientScore > serverScore) {
-            mergedDaily[date] = clientAttempt;
+            mergedDaily[date] = { ...normalizedClientAttempt, isArchive: mergedIsArchive };
           } else if (
             clientScore === serverScore &&
-            (clientAttempt.elapsedSeconds ?? 999) < (serverAttempt.elapsedSeconds ?? 999)
+            (normalizedClientAttempt.elapsedSeconds ?? 999) < (serverAttempt.elapsedSeconds ?? 999)
           ) {
-            mergedDaily[date] = clientAttempt;
+            mergedDaily[date] = { ...normalizedClientAttempt, isArchive: mergedIsArchive };
+          } else {
+            mergedDaily[date] = { ...serverAttempt, isArchive: mergedIsArchive };
           }
         }
       }
