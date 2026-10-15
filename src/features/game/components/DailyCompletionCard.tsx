@@ -11,6 +11,7 @@ import { triggerVictoryConfetti } from "../utils/confetti";
 import { calculateDailyStreaks } from "../modes/statistics";
 import { loadProgress } from "../persistence/local-progress";
 import { syncUserProgress } from "../persistence/user-sync";
+import { DailyAuthPromptModal } from "./DailyAuthPromptModal";
 
 export interface DailyCompletionCardProps {
   readonly date: string;
@@ -111,6 +112,35 @@ export function DailyCompletionCard({
 
   // Live countdown to next daily challenge
   const [countdown, setCountdown] = useState<string>(getFormattedCountdown);
+
+  // Pop-up modal prompting guest users to log in or create an account to sync progress
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      const isDismissed =
+        typeof window !== "undefined" &&
+        Boolean(window.sessionStorage?.getItem(`flipped_dismissed_auth_${date}`));
+      if (!isDismissed) {
+        // Reveal the pop-up modal smoothly after victory celebration burst
+        const timer = setTimeout(() => {
+          setShowAuthModal(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isSignedIn, date]);
+
+  const handleCloseAuthModal = () => {
+    setShowAuthModal(false);
+    try {
+      if (typeof window !== "undefined" && window.sessionStorage) {
+        window.sessionStorage.setItem(`flipped_dismissed_auth_${date}`, "true");
+      }
+    } catch {
+      // Ignore sessionStorage quota error
+    }
+  };
 
   // Trigger celebration confetti on victory and sync with cloud database
   useEffect(() => {
@@ -271,8 +301,19 @@ export function DailyCompletionCard({
           Daily streak &amp; statistics synced to your account
         </div>
       ) : (
-        <div className="w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/40 p-3 text-center text-xs text-[#6B4E55]">
-          <span className="font-bold text-[#7B1E2B]">Guest Session.</span> Sign in or create an account to preserve your daily streak across devices!
+        <div className="w-full rounded-2xl border border-[#C49A6C]/50 bg-[#faeee0]/50 p-3.5 text-center text-xs text-[#6B4E55]">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+            <span>
+              <strong className="text-[#7B1E2B]">Guest Session:</strong> Streak ({streak}) saved locally in this browser.
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowAuthModal(true)}
+              className="rounded-full bg-[#7B1E2B] px-3.5 py-1 text-xs font-bold text-[#F7F0E5] shadow-2xs hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+            >
+              Sync with Account
+            </button>
+          </div>
         </div>
       )}
 
@@ -314,6 +355,14 @@ export function DailyCompletionCard({
           Home
         </Link>
       </div>
+
+      {/* Pop-up Auth Modal prompting new/guest users to sync their progress while preserving local streak */}
+      <DailyAuthPromptModal
+        isOpen={showAuthModal && !isSignedIn}
+        onClose={handleCloseAuthModal}
+        isWon={isWon}
+        streak={streak}
+      />
     </div>
   );
 }

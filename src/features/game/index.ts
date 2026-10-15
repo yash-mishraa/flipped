@@ -43,6 +43,7 @@ export { GameFeedback } from "./components/GameFeedback";
 export { GameInstructions } from "./components/GameInstructions";
 export { DifficultySelector } from "./components/DifficultySelector";
 export { DailyCompletionCard } from "./components/DailyCompletionCard";
+export { DailyAuthPromptModal } from "./components/DailyAuthPromptModal";
 export { ShareButton } from "./components/ShareButton";
 export { TutorialModal } from "./components/TutorialModal";
 export { LetterTile as LetterTileUI } from "./components/LetterTile";
