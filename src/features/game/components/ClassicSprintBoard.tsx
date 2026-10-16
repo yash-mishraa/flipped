@@ -41,6 +41,21 @@ export interface SolvedSprintPuzzle {
   }[];
 }
 
+export interface UnfinishedSprintPuzzle {
+  readonly puzzleId: string;
+  readonly clueWords: readonly [string, string];
+  readonly wordLengths: readonly [number, number];
+  readonly userEnteredWords?: readonly [string, string];
+  readonly solutionPhrase?: string;
+  readonly transformations?: readonly {
+    readonly clueWord: string;
+    readonly answerWord: string;
+    readonly relationship: string;
+    readonly explanation: string;
+  }[];
+  readonly loading?: boolean;
+}
+
 function createSafeInitialGrid(payload: SafeGameplayPayload): LetterGridType {
   const createWordTiles = (
     firstLetter: string,
@@ -104,6 +119,8 @@ export function ClassicSprintBoard(): React.JSX.Element {
   const [sprintTimeRemaining, setSprintTimeRemaining] = useState<number>(180);
   const [totalScore, setTotalScore] = useState<number>(0);
   const [solvedList, setSolvedList] = useState<SolvedSprintPuzzle[]>([]);
+  const [unfinishedPuzzle, setUnfinishedPuzzle] = useState<UnfinishedSprintPuzzle | null>(null);
+  const [totalSprintHints, setTotalSprintHints] = useState<number>(0);
   const [celebrationToast, setCelebrationToast] = useState<string | null>(null);
 
   // Current Puzzle State
@@ -114,10 +131,18 @@ export function ClassicSprintBoard(): React.JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const puzzleStartTimestampRef = useRef<number>(Date.now());
 
-  // Sprint Global Timer Ref
+  // Sprint Global Timer & State Refs (preventing stale closures and race conditions)
   const sprintEndTimeRef = useRef<number>(0);
   const sprintTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const recentIdsRef = useRef<string[]>([]);
+  const currentPayloadRef = useRef<SafeGameplayPayload | null>(null);
+  currentPayloadRef.current = currentPayload;
+  const gridRef = useRef<LetterGridType | null>(null);
+  gridRef.current = grid;
+  const solvedListRef = useRef<SolvedSprintPuzzle[]>([]);
+  solvedListRef.current = solvedList;
+  const gameStateRef = useRef<"LOBBY" | "PLAYING" | "FINISHED">(gameState);
+  gameStateRef.current = gameState;
 
   // Load progress on mount
   useEffect(() => {
@@ -156,12 +181,73 @@ export function ClassicSprintBoard(): React.JSX.Element {
     []
   );
 
+  // Handle authoritative timeout for unfinished puzzle when sprint ends
+  const handleSprintTimeout = useCallback(async () => {
+    setGameState("FINISHED");
+
+    const activePayload = currentPayloadRef.current;
+    const currentGrid = gridRef.current;
+    const currentSolved = solvedListRef.current;
+
+    // If there is no active puzzle or it was already solved in this sprint
+    if (!activePayload || currentSolved.some((s) => s.puzzleId === activePayload.puzzleId)) {
+      setUnfinishedPuzzle(null);
+      return;
+    }
+
+    // Capture what letters the player entered on the board so far
+    let enteredWords: [string, string] | undefined = undefined;
+    if (currentGrid && currentGrid.words.length === 2) {
+      enteredWords = [
+        currentGrid.words[0].map((t) => t.letter || "_").join(""),
+        currentGrid.words[1].map((t) => t.letter || "_").join(""),
+      ];
+    }
+
+    // Set initial loading state for the unfinished puzzle card
+    setUnfinishedPuzzle({
+      puzzleId: activePayload.puzzleId,
+      clueWords: activePayload.clueWords,
+      wordLengths: activePayload.wordLengths,
+      userEnteredWords: enteredWords,
+      loading: true,
+    });
+
+    // Record classic timeout locally
+    recordClassicGame(activePayload.puzzleId, difficulty, false, 0, 0);
+
+    // Call server timeout API to reveal answer & flip deductions
+    try {
+      const res = await fetch(`/api/game/attempt/${activePayload.attemptId}/timeout`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.success && data.result) {
+        setUnfinishedPuzzle({
+          puzzleId: activePayload.puzzleId,
+          clueWords: activePayload.clueWords,
+          wordLengths: activePayload.wordLengths,
+          userEnteredWords: enteredWords,
+          solutionPhrase: data.result.canonicalPhrase || data.result.solvedPhrase,
+          transformations: data.result.transformations,
+          loading: false,
+        });
+      } else {
+        setUnfinishedPuzzle((prev) => (prev ? { ...prev, loading: false } : null));
+      }
+    } catch {
+      setUnfinishedPuzzle((prev) => (prev ? { ...prev, loading: false } : null));
+    }
+  }, [difficulty]);
+
   // Start Sprint
   const handleStartSprint = async () => {
     setErrorMsg(null);
     setLoadingNext(true);
     setTotalScore(0);
     setSolvedList([]);
+    setUnfinishedPuzzle(null);
+    setTotalSprintHints(0);
     setCelebrationToast(null);
 
     const firstPayload = await fetchPuzzle(difficulty);
@@ -202,7 +288,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
           clearInterval(sprintTimerIntervalRef.current);
           sprintTimerIntervalRef.current = null;
         }
-        setGameState("FINISHED");
+        handleSprintTimeout();
       }
     }, 250);
 
@@ -212,15 +298,19 @@ export function ClassicSprintBoard(): React.JSX.Element {
         sprintTimerIntervalRef.current = null;
       }
     };
-  }, [gameState]);
+  }, [gameState, handleSprintTimeout]);
 
   // Load next puzzle seamlessly during sprint
   const loadNextInSprint = useCallback(async () => {
+    if (gameStateRef.current !== "PLAYING" || Date.now() >= sprintEndTimeRef.current) {
+      return;
+    }
+
     setLoadingNext(true);
     setErrorMsg(null);
 
     const nextPayload = await fetchPuzzle(difficulty);
-    if (nextPayload) {
+    if (nextPayload && gameStateRef.current === "PLAYING" && Date.now() < sprintEndTimeRef.current) {
       setCurrentPayload(nextPayload);
       setGrid(createSafeInitialGrid(nextPayload));
       setSelectedPosition({ wordIndex: 0, letterIndex: 1 });
@@ -232,9 +322,15 @@ export function ClassicSprintBoard(): React.JSX.Element {
 
   // Skip puzzle handler
   const handleSkipPuzzle = async () => {
-    if (loadingNext || gameState !== "PLAYING") return;
+    if (loadingNext || gameState !== "PLAYING" || !currentPayload) return;
+    const skippedPayload = currentPayload;
     setCelebrationToast(`Skipped puzzle. Loading next word...`);
     setTimeout(() => setCelebrationToast(null), 2000);
+
+    // Finalize skipped attempt on server in background
+    fetch(`/api/game/attempt/${skippedPayload.attemptId}/timeout`, { method: "POST" }).catch(() => {});
+    recordClassicGame(skippedPayload.puzzleId, difficulty, false, 0, 0);
+
     await loadNextInSprint();
   };
 
@@ -281,6 +377,13 @@ export function ClassicSprintBoard(): React.JSX.Element {
             `+${puzzlePts} pts! "${solvedItem.solvedPhrase}" solved! Next word coming up...`
           );
           setTimeout(() => setCelebrationToast(null), 2500);
+
+          // If sprint ended while submit was processing, don't load another puzzle
+          if (Date.now() >= sprintEndTimeRef.current || gameStateRef.current === "FINISHED") {
+            setUnfinishedPuzzle(null);
+            setGameState("FINISHED");
+            return;
+          }
 
           // Immediately fetch and display next puzzle
           await loadNextInSprint();
@@ -507,6 +610,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
         updatedWords[wordIdx] = newWordTiles;
         setGrid({ words: updatedWords });
         setCurrentHintsUsed(newHintsCount);
+        setTotalSprintHints((prev) => prev + 1);
 
         // Advance cursor if current tile was revealed
         if (selectedPosition?.wordIndex === wordIdx && selectedPosition?.letterIndex === letterIdx) {
@@ -705,6 +809,89 @@ export function ClassicSprintBoard(): React.JSX.Element {
             </div>
           </div>
 
+          {/* Unfinished Word When Sprint Time Expired (Solution Revealed) */}
+          {unfinishedPuzzle && (
+            <div
+              data-testid="classic-unfinished-puzzle"
+              className="mt-6 w-full rounded-2xl border-2 border-[#E09F3E]/70 bg-gradient-to-b from-[#FFFDF9] to-[#FFF8EE] p-4 sm:p-5 text-left shadow-md"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E09F3E]/20 border border-[#E09F3E]/50 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider text-[#915B00]">
+                  <span>⌛</span>
+                  <span>Unfinished Word When Time Expired</span>
+                </span>
+                <span className="text-[10px] font-bold text-[#8C6D68]">
+                  Solution Revealed
+                </span>
+              </div>
+
+              {/* Clues */}
+              <div className="mt-3 flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#32171D]">
+                <span className="text-xs font-bold uppercase text-[#8C6870]">Clues:</span>
+                <span className="rounded-lg bg-[#faeee0] px-2.5 py-1 text-[#7B1E2B] border border-[#C49A6C]/30">
+                  {unfinishedPuzzle.clueWords[0]}
+                </span>
+                <span className="text-[#C49A6C] font-black">+</span>
+                <span className="rounded-lg bg-[#faeee0] px-2.5 py-1 text-[#7B1E2B] border border-[#C49A6C]/30">
+                  {unfinishedPuzzle.clueWords[1]}
+                </span>
+              </div>
+
+              {/* What user had entered */}
+              {unfinishedPuzzle.userEnteredWords && (
+                <div className="mt-2.5 flex items-center gap-2 text-xs text-[#6B4E55]">
+                  <span className="text-[11px] font-bold uppercase text-[#8C6870]">Your Letters:</span>
+                  <span className="font-mono font-bold tracking-wider text-[#32171D] bg-white px-2 py-0.5 rounded border border-[#C49A6C]/25">
+                    {unfinishedPuzzle.userEnteredWords[0]} {unfinishedPuzzle.userEnteredWords[1]}
+                  </span>
+                </div>
+              )}
+
+              {/* Revealed Solution */}
+              <div className="mt-3 rounded-xl border border-[#7B1E2B]/30 bg-[#faeee0]/70 p-3">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#7B1E2B]">
+                  Correct Answer
+                </div>
+                {unfinishedPuzzle.loading ? (
+                  <div className="mt-1 flex items-center gap-2 text-xs font-semibold text-[#6B4E55]">
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#7B1E2B] border-t-transparent" />
+                    <span>Revealing solution...</span>
+                  </div>
+                ) : unfinishedPuzzle.solutionPhrase ? (
+                  <p className="mt-0.5 text-lg sm:text-xl font-black text-[#32171D] tracking-wide">
+                    {unfinishedPuzzle.solutionPhrase}
+                  </p>
+                ) : null}
+
+                {/* Flip Deductions */}
+                {unfinishedPuzzle.transformations && unfinishedPuzzle.transformations.length > 0 && (
+                  <div className="mt-2.5 pt-2 border-t border-[#C49A6C]/30 space-y-1.5">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
+                      Flip Deductions
+                    </div>
+                    {unfinishedPuzzle.transformations.map((t, tIdx) => (
+                      <div key={`unfinished-trans-${tIdx}`} className="text-xs text-[#32171D]">
+                        <div className="flex items-center gap-1.5 font-semibold">
+                          <span className="text-[#7B1E2B] font-bold">{t.clueWord}</span>
+                          <span className="text-[#C49A6C]">➔</span>
+                          <span className="font-black text-[#32171D]">{t.answerWord}</span>
+                          <span className="rounded-full bg-[#faeee0] px-1.5 py-0.2 text-[9px] font-bold uppercase text-[#8C6D68] border border-[#C49A6C]/30">
+                            {t.relationship}
+                          </span>
+                        </div>
+                        {t.explanation && (
+                          <p className="mt-0.5 text-[11px] text-[#6B4E55] italic pl-2 border-l-2 border-[#C49A6C]/40">
+                            {t.explanation}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Solved Words List */}
           {solvedList.length > 0 && (
             <div className="mt-6 w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/30 p-4 text-left">
@@ -712,26 +899,57 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 Words Solved During Sprint
               </span>
               <div className="mt-3 max-h-56 space-y-2.5 overflow-y-auto pr-1">
-                {solvedList.map((item, idx) => (
+                {solvedList.map((item) => (
                   <div
-                    key={`solved-${idx}`}
-                    className="flex items-center justify-between rounded-xl bg-white p-3 border border-[#C49A6C]/30 shadow-2xs"
+                    key={item.puzzleId}
+                    className="flex flex-col rounded-xl bg-white p-3 border border-[#C49A6C]/30 shadow-2xs space-y-2"
                   >
-                    <div>
-                      <span className="font-extrabold text-[#32171D] text-sm">
-                        {item.solvedPhrase}
-                      </span>
-                      <div className="flex items-center gap-1 text-[11px] text-[#8C6D68]">
-                        <span>{item.clueWords[0]}</span>
-                        <span>+</span>
-                        <span>{item.clueWords[1]}</span>
-                        <span>•</span>
-                        <span>{item.elapsedSeconds}s</span>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-extrabold text-[#32171D] text-sm">
+                          {item.solvedPhrase}
+                        </span>
+                        <div className="flex items-center gap-1 text-[11px] text-[#8C6D68]">
+                          <span>{item.clueWords[0]}</span>
+                          <span>+</span>
+                          <span>{item.clueWords[1]}</span>
+                          <span>•</span>
+                          <span>{item.elapsedSeconds}s</span>
+                        </div>
                       </div>
+                      <span className="rounded-full bg-[#faeee0] px-2.5 py-1 text-xs font-extrabold text-[#7B1E2B]">
+                        +{item.score} pts
+                      </span>
                     </div>
-                    <span className="rounded-full bg-[#faeee0] px-2.5 py-1 text-xs font-extrabold text-[#7B1E2B]">
-                      +{item.score} pts
-                    </span>
+
+                    {/* Expandable Flip Deductions */}
+                    {item.transformations && item.transformations.length > 0 && (
+                      <details className="text-xs group border-t border-[#C49A6C]/20 pt-1.5">
+                        <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-wider text-[#8C6870] hover:text-[#7B1E2B] list-none flex items-center justify-between">
+                          <span>View Flip Deductions</span>
+                          <span className="group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+                        <div className="mt-2 space-y-1.5 pl-1">
+                          {item.transformations.map((t, tIdx) => (
+                            <div key={`solved-${item.puzzleId}-trans-${tIdx}`} className="text-xs text-[#32171D]">
+                              <div className="flex items-center gap-1.5 font-semibold">
+                                <span className="text-[#7B1E2B] font-bold">{t.clueWord}</span>
+                                <span className="text-[#C49A6C]">➔</span>
+                                <span className="font-black text-[#32171D]">{t.answerWord}</span>
+                                <span className="rounded-full bg-[#faeee0] px-1.5 py-0.2 text-[9px] font-bold uppercase text-[#8C6D68] border border-[#C49A6C]/30">
+                                  {t.relationship}
+                                </span>
+                              </div>
+                              {t.explanation && (
+                                <p className="mt-0.5 text-[11px] text-[#6B4E55] italic pl-2 border-l-2 border-[#C49A6C]/40">
+                                  {t.explanation}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
                   </div>
                 ))}
               </div>
@@ -746,7 +964,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 isWon: solvedList.length > 0,
                 score: totalScore,
                 elapsedSeconds: durationSeconds,
-                hintsUsed: solvedList.reduce((acc, i) => acc + i.hintsUsed, 0),
+                hintsUsed: totalSprintHints,
                 sprintPuzzlesSolved: solvedList.length,
               }}
             />
@@ -793,14 +1011,24 @@ export function ClassicSprintBoard(): React.JSX.Element {
             <button
               type="button"
               onClick={handleStartSprint}
-              className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97]"
+              disabled={loadingNext}
+              className="inline-flex flex-1 items-center justify-center rounded-full bg-[#7B1E2B] px-5 py-3 text-sm font-bold text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:bg-[#631722] hover:shadow-lg active:scale-[0.97] disabled:opacity-50 cursor-pointer"
             >
-              Play Again ({durationSeconds / 60}m)
+              {loadingNext ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <span>Play Again ({durationSeconds / 60}m)</span>
+              )}
             </button>
             <button
               type="button"
-              onClick={() => setGameState("LOBBY")}
-              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
+              onClick={() => {
+                setGameState("LOBBY");
+                setUnfinishedPuzzle(null);
+                setCurrentPayload(null);
+                setGrid(null);
+              }}
+              className="inline-flex items-center justify-center rounded-full border border-[#C49A6C] bg-white px-5 py-3 text-sm font-semibold text-[#32171D] shadow-sm transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97] cursor-pointer"
             >
               Change Settings
             </button>
@@ -903,6 +1131,31 @@ export function ClassicSprintBoard(): React.JSX.Element {
         >
           Skip
         </button>
+      </div>
+
+      {/* Sprint Time Progress Bar */}
+      <div className="w-full max-w-2xl px-1 -mt-2">
+        <div
+          role="progressbar"
+          aria-label="Sprint Time Remaining"
+          aria-valuenow={sprintTimeRemaining}
+          aria-valuemin={0}
+          aria-valuemax={durationSeconds}
+          className="h-1.5 w-full rounded-full bg-[#C49A6C]/25 overflow-hidden"
+        >
+          <div
+            className={`h-full transition-all duration-300 ease-linear rounded-full ${
+              urgency === "critical"
+                ? "bg-[#7B1E2B] animate-pulse"
+                : urgency === "urgent"
+                  ? "bg-[#E09F3E]"
+                  : "bg-[#7B1E2B]/80"
+            }`}
+            style={{
+              width: `${Math.max(0, Math.min(100, (sprintTimeRemaining / durationSeconds) * 100))}%`,
+            }}
+          />
+        </div>
       </div>
 
       {/* Celebration Toast */}

@@ -69,7 +69,7 @@ describe("Result Sharing System", () => {
       expect(text).not.toContain("377/100"); // Must never show 377/100
       expect(text).toContain("💡 Hints Used: 3");
       expect(text).toContain("🟩 🟩 🟩 🟩"); // Exactly 4 boxes for 4 solved puzzles
-      expect(text).toContain("flipped-sepia.vercel.app/classic");
+      expect(text).toContain("flipped.website/classic");
     });
   });
 
