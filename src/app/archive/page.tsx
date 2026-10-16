@@ -85,27 +85,7 @@ export default function ArchivePage(): React.JSX.Element {
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-4 px-4 py-4 sm:px-8 sm:py-6">
         {/* Header */}
-        <header className="flex flex-col items-center gap-3 text-center">
-          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-3">
-            <Link
-              href="/"
-              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-4 py-1.5 text-xs font-semibold text-[#32171D] shadow-xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.96]"
-            >
-              Home
-            </Link>
-
-            <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-4 py-1.5 text-xs font-semibold text-[#7B1E2B]">
-              Daily Archive
-            </span>
-
-            <Link
-              href="/daily"
-              className="rounded-full bg-[#7B1E2B] px-4 py-1.5 text-xs font-bold text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:opacity-90 hover:shadow-sm active:scale-[0.96]"
-            >
-              Today
-            </Link>
-          </div>
-
+        <header className="flex flex-col items-center gap-2 text-center pt-2 sm:pt-4">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
               Challenge Archive
@@ -214,11 +194,6 @@ export default function ArchivePage(): React.JSX.Element {
             })}
           </div>
         </section>
-
-        {/* Footer Notice */}
-        <footer className="border-t border-[#C49A6C]/30 pt-3 text-center text-xs text-[#6B4E55]">
-          <p>Flipped Daily Archive • Calendar days reset according to UTC timezone (00:00 UTC)</p>
-        </footer>
       </main>
       <Footer />
     </div>

@@ -64,11 +64,7 @@ export default function StatisticsPage(): React.JSX.Element {
 
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-4 sm:px-6 sm:py-8">
         {/* Title */}
-        <div className="text-center space-y-1.5">
-          <span className="inline-block rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-semibold text-[#7B1E2B]">
-            Stats of your account
-          </span>
-
+        <div className="text-center space-y-1.5 pt-2 sm:pt-4">
           <h1 className="text-3xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
             Player Statistics
           </h1>

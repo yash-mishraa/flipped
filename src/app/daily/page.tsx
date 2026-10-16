@@ -293,27 +293,7 @@ function DailyPageContent(): React.JSX.Element {
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-3 sm:gap-4 px-3.5 py-3 sm:px-8 sm:py-6">
         {/* Navigation and Top Bar */}
-        <header className="flex flex-col items-center gap-2.5 sm:gap-3 text-center">
-          <div className="flex w-full items-center justify-between border-b border-[#C49A6C]/30 pb-2.5 sm:pb-3">
-            <Link
-              href="/"
-              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
-            >
-              Home
-            </Link>
-
-            <span className="rounded-full border border-[#C49A6C] bg-[#faeee0] px-3.5 py-1 text-xs font-semibold text-[#7B1E2B]">
-              {isArchiveChallenge ? `Archive • ${currentDateDisplay}` : `Daily • ${currentDateDisplay}`}
-            </span>
-
-            <Link
-              href="/archive"
-              className="rounded-full border border-[#C49A6C]/60 bg-white/90 px-3.5 py-1 text-xs font-semibold text-[#32171D] shadow-xs transition hover:bg-[#faeee0] active:scale-[0.98]"
-            >
-              Archive
-            </Link>
-          </div>
-
+        <header className="flex flex-col items-center gap-2 text-center pt-2 sm:pt-4">
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-[#32171D] sm:text-4xl">
               {isArchiveChallenge ? `Archive Challenge` : "Daily Flipped"}
@@ -362,17 +342,6 @@ function DailyPageContent(): React.JSX.Element {
             />
           ) : null}
         </section>
-
-        {/* Footer Notice */}
-        <footer className="border-t border-[#C49A6C]/40 pt-4 text-center text-xs text-[#6B4E55]">
-          <p>
-            {completedResult
-              ? "Flipped Daily Challenge • Completed • Official result preserved"
-              : isArchiveChallenge
-              ? "Flipped Daily Archive • Past Challenge Practice • Streak & stats unaffected"
-              : "Flipped Daily Challenge • Authoritative Server Verification • Single attempt per day"}
-          </p>
-        </footer>
       </main>
       <Footer />
     </div>

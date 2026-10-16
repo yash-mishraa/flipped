@@ -84,7 +84,7 @@ export function Header(): React.JSX.Element {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-[#C49A6C]/25 bg-[#F7F0E5]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-40 bg-[#F7F0E5]/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-3.5 py-2 sm:px-6">
           {/* Left: Menu Trigger (Opens Drawer from Left to Right) */}
           <div className="flex items-center gap-2">

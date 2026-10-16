@@ -10,7 +10,7 @@ export function Footer(): React.JSX.Element {
 
   return (
     <>
-      <footer className="mt-auto border-t border-[#C49A6C]/30 bg-[#F7F0E5]/90 py-4 text-[#6B4E55] text-xs">
+      <footer className="mt-auto bg-[#F7F0E5]/90 py-4 text-[#6B4E55] text-xs">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             {/* Brand Lockup & Attribution */}
@@ -22,7 +22,7 @@ export function Footer(): React.JSX.Element {
                 </span>
               </div>
               <p className="text-[11px] leading-relaxed text-[#8C6D68] max-w-sm sm:max-w-md mx-auto sm:mx-0">
-                Inspired by the Times of India &ldquo;Flipped It&rdquo; puzzle &bull; 100% Free &bull; Sprints, Archive &amp; Cloud Sync
+                Inspired by the Times of India Flipped Puzzle &bull; 100% Free &bull; Sprints &amp; Daily Archive
               </p>
             </div>
 
