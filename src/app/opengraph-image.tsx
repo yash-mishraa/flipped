@@ -1,6 +1,7 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const alt = "FLIPPED — Word Deduction Puzzle";
 export const size = {
   width: 1200,
@@ -9,6 +10,11 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image(): Promise<ImageResponse> {
+  const [newsreaderBold, newsreaderSemiBold] = await Promise.all([
+    fs.readFile(path.join(process.cwd(), "src/assets/fonts/Newsreader-Bold.ttf")),
+    fs.readFile(path.join(process.cwd(), "src/assets/fonts/Newsreader-SemiBold.ttf")),
+  ]);
+
   return new ImageResponse(
     (
       <div
@@ -21,18 +27,21 @@ export default async function Image(): Promise<ImageResponse> {
           justifyContent: "center",
           backgroundColor: "#7B1E2B",
           color: "#F7F0E5",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "Newsreader, Georgia, serif",
           position: "relative",
-          padding: "60px",
+          padding: "40px",
         }}
       >
-        {/* Subtle decorative border */}
+        {/* Subtle decorative gold border frame */}
         <div
           style={{
             position: "absolute",
-            inset: "24px",
-            border: "2px solid rgba(196, 154, 108, 0.4)",
-            borderRadius: "28px",
+            top: "24px",
+            left: "24px",
+            width: "1152px",
+            height: "582px",
+            border: "2px solid #C49A6C",
+            borderRadius: "20px",
           }}
         />
 
@@ -42,12 +51,12 @@ export default async function Image(): Promise<ImageResponse> {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: "24px",
+            marginBottom: "16px",
           }}
         >
           <svg
-            width="100"
-            height="100"
+            width="88"
+            height="88"
             viewBox="0 0 64 64"
             fill="none"
           >
@@ -59,77 +68,121 @@ export default async function Image(): Promise<ImageResponse> {
           </svg>
         </div>
 
-        {/* Brand Wordmark */}
+        {/* Brand Wordmark in Editorial Serif */}
         <div
           style={{
-            fontSize: "84px",
-            fontWeight: 900,
-            letterSpacing: "-0.03em",
+            fontFamily: "Newsreader",
+            fontSize: "104px",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
             textTransform: "uppercase",
-            marginBottom: "12px",
+            marginBottom: "10px",
             color: "#F7F0E5",
+            lineHeight: 1,
           }}
         >
           FLIPPED
         </div>
 
-        {/* Subtitle / Tagline */}
+        {/* Tagline in Editorial Serif */}
         <div
           style={{
-            fontSize: "26px",
-            fontWeight: 700,
-            letterSpacing: "0.2em",
+            fontFamily: "Newsreader",
+            fontSize: "28px",
+            fontWeight: 600,
+            letterSpacing: "0.22em",
             textTransform: "uppercase",
             color: "#C49A6C",
             marginBottom: "28px",
+            lineHeight: 1.2,
           }}
         >
           Word Deduction Puzzle
         </div>
 
-        {/* Feature Pills */}
+        {/* Decorative divider rule */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
+            justifyContent: "center",
+            gap: "14px",
+            marginBottom: "32px",
           }}
         >
           <div
             style={{
-              backgroundColor: "rgba(247, 240, 229, 0.15)",
-              border: "1px solid rgba(196, 154, 108, 0.5)",
+              width: "80px",
+              height: "1px",
+              backgroundColor: "#C49A6C",
+            }}
+          />
+          <div
+            style={{
+              width: "7px",
+              height: "7px",
+              backgroundColor: "#C49A6C",
+              transform: "rotate(45deg)",
+            }}
+          />
+          <div
+            style={{
+              width: "80px",
+              height: "1px",
+              backgroundColor: "#C49A6C",
+            }}
+          />
+        </div>
+
+        {/* Feature Pills — authentic cream & wine game tiles with gold border */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "18px",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#F7F0E5",
+              border: "2px solid #C49A6C",
               borderRadius: "9999px",
-              padding: "8px 24px",
-              fontSize: "18px",
-              fontWeight: 600,
-              color: "#F7F0E5",
+              padding: "14px 30px",
+              fontSize: "21px",
+              fontWeight: 700,
+              color: "#32171D",
+              fontFamily: "Newsreader, Georgia, serif",
+              boxShadow: "0 6px 18px rgba(50, 23, 29, 0.4)",
             }}
           >
             Daily 60s Challenge
           </div>
           <div
             style={{
-              backgroundColor: "rgba(247, 240, 229, 0.15)",
-              border: "1px solid rgba(196, 154, 108, 0.5)",
+              backgroundColor: "#F7F0E5",
+              border: "2px solid #C49A6C",
               borderRadius: "9999px",
-              padding: "8px 24px",
-              fontSize: "18px",
-              fontWeight: 600,
-              color: "#F7F0E5",
+              padding: "14px 30px",
+              fontSize: "21px",
+              fontWeight: 700,
+              color: "#32171D",
+              fontFamily: "Newsreader, Georgia, serif",
+              boxShadow: "0 6px 18px rgba(50, 23, 29, 0.4)",
             }}
           >
             Classic Practice Sprints
           </div>
           <div
             style={{
-              backgroundColor: "rgba(247, 240, 229, 0.15)",
-              border: "1px solid rgba(196, 154, 108, 0.5)",
+              backgroundColor: "#32171D",
+              border: "2px solid #C49A6C",
               borderRadius: "9999px",
-              padding: "8px 24px",
-              fontSize: "18px",
-              fontWeight: 600,
+              padding: "14px 30px",
+              fontSize: "21px",
+              fontWeight: 700,
               color: "#F7F0E5",
+              fontFamily: "Newsreader, Georgia, serif",
+              boxShadow: "0 6px 18px rgba(50, 23, 29, 0.4)",
             }}
           >
             flipped.website
@@ -139,6 +192,20 @@ export default async function Image(): Promise<ImageResponse> {
     ),
     {
       ...size,
+      fonts: [
+        {
+          name: "Newsreader",
+          data: newsreaderBold,
+          style: "normal",
+          weight: 700,
+        },
+        {
+          name: "Newsreader",
+          data: newsreaderSemiBold,
+          style: "normal",
+          weight: 600,
+        },
+      ],
     }
   );
 }
