@@ -2,12 +2,22 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "FLIPPED — Word Deduction Puzzle";
 export const size = {
   width: 1200,
   height: 630,
 };
 export const contentType = "image/png";
+
+export async function generateImageMetadata() {
+  return [
+    {
+      id: "v2",
+      size,
+      contentType,
+      alt: "FLIPPED — Word Deduction Puzzle",
+    },
+  ];
+}
 
 export default async function Image(): Promise<ImageResponse> {
   const [newsreaderBold, newsreaderSemiBold] = await Promise.all([
