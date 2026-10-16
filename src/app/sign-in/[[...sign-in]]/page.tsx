@@ -1,6 +1,17 @@
+import React from "react";
+import type { Metadata } from "next";
 import { SignIn } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Sign In | FLIPPED",
+  description: "Sign in to sync your FLIPPED daily streaks and puzzle statistics across devices.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function SignInPage(): React.JSX.Element {
   return (
@@ -8,6 +19,8 @@ export default function SignInPage(): React.JSX.Element {
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl items-center justify-center p-6">
         <SignIn
+          fallbackRedirectUrl="/"
+          signUpUrl="/sign-up"
           appearance={{
             elements: {
               card: "border border-[#C49A6C]/40 shadow-md rounded-2xl bg-white",

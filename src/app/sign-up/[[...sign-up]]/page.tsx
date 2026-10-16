@@ -1,6 +1,17 @@
+import React from "react";
+import type { Metadata } from "next";
 import { SignUp } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Create Free Account | FLIPPED",
+  description: "Create a free account on FLIPPED to save your word deduction puzzle streaks and progress.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function SignUpPage(): React.JSX.Element {
   return (
@@ -8,6 +19,8 @@ export default function SignUpPage(): React.JSX.Element {
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl items-center justify-center p-6">
         <SignUp
+          fallbackRedirectUrl="/"
+          signInUrl="/sign-in"
           appearance={{
             elements: {
               card: "border border-[#C49A6C]/40 shadow-md rounded-2xl bg-white",
