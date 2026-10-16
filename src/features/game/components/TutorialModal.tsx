@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { setOnboardingCompleted } from "../persistence/local-progress";
 
 export interface TutorialModalProps {
@@ -9,6 +10,7 @@ export interface TutorialModalProps {
 }
 
 export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JSX.Element | null {
+  const [mounted, setMounted] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const [practiceWord0, setPracticeWord0] = useState<string[]>(["F", "", "", ""]);
   const [practiceWord1, setPracticeWord1] = useState<string[]>(["F", "", "", ""]);
@@ -21,15 +23,19 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Focus trap & save prior focus
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && mounted) {
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
       modalRef.current?.focus();
-    } else {
-      previouslyFocusedElement.current?.focus?.();
+    } else if (previouslyFocusedElement.current) {
+      previouslyFocusedElement.current.focus?.();
     }
-  }, [isOpen]);
+  }, [isOpen, mounted]);
 
   const handleSkip = useCallback(() => {
     setOnboardingCompleted(true);
@@ -128,19 +134,19 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
     setIsPracticeSolved(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="tutorial-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-[100] flex min-h-[100dvh] w-screen items-center justify-center p-4 sm:p-6 overflow-y-auto bg-[#32171D]/50 backdrop-blur-sm animate-fade-in"
     >
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="relative w-full max-w-lg rounded-3xl border border-[#C49A6C] bg-[#F7F0E5] p-5 sm:p-7 shadow-2xl focus:outline-none"
+        className="relative my-auto w-full max-w-[92vw] sm:max-w-lg max-h-[90dvh] overflow-y-auto rounded-3xl border border-[#C49A6C] bg-[#F7F0E5] p-5 sm:p-7 shadow-2xl focus:outline-none"
       >
         {/* Header with Close */}
         <div className="flex items-center justify-between border-b border-[#C49A6C]/40 pb-3">
@@ -393,6 +399,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

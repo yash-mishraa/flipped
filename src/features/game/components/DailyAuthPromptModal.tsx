@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { X, Flame, ShieldCheck, Trophy, Sparkles } from "lucide-react";
 
@@ -17,18 +18,23 @@ export function DailyAuthPromptModal({
   isWon = true,
   streak,
 }: DailyAuthPromptModalProps): React.JSX.Element | null {
+  const [mounted, setMounted] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Focus trap & save prior focus
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && mounted) {
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
       modalRef.current?.focus();
-    } else {
-      previouslyFocusedElement.current?.focus?.();
+    } else if (previouslyFocusedElement.current) {
+      previouslyFocusedElement.current.focus?.();
     }
-  }, [isOpen]);
+  }, [isOpen, mounted]);
 
   // Handle Escape key
   useEffect(() => {
@@ -44,21 +50,20 @@ export function DailyAuthPromptModal({
 
   // Prevent background scroll while modal is open
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && mounted) {
       const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = originalOverflow;
       };
     }
-  }, [isOpen]);
+  }, [isOpen, mounted]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6 bg-[#F7F0E5]/98 backdrop-blur-2xl animate-fade-in"
-      style={{ minHeight: "100dvh" }}
+      className="fixed inset-0 z-[100] flex min-h-[100dvh] w-screen items-center justify-center overflow-y-auto p-4 sm:p-6 bg-[#F7F0E5]/92 backdrop-blur-md animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
@@ -72,14 +77,14 @@ export function DailyAuthPromptModal({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="relative my-auto w-full max-w-sm sm:max-w-md max-h-[88dvh] overflow-y-auto rounded-3xl border-2 border-[#C49A6C]/70 bg-white p-5 sm:p-6 shadow-2xl shadow-[#32171D]/15 animate-scale-up text-center focus:outline-none ring-1 ring-[#C49A6C]/20"
+        className="relative my-auto w-full max-w-[92vw] sm:max-w-md max-h-[90dvh] overflow-y-auto rounded-3xl border-2 border-[#C49A6C]/70 bg-white p-6 sm:p-7 shadow-2xl shadow-[#32171D]/15 animate-scale-up text-center focus:outline-none ring-1 ring-[#C49A6C]/20"
       >
         {/* Prominent Visible Cross Button */}
         <button
           type="button"
           onClick={onClose}
           aria-label="Close dialog"
-          className="absolute right-3.5 top-3.5 flex h-9 w-9 items-center justify-center rounded-full bg-[#faeee0] text-[#32171D] hover:bg-[#f4ddc5] active:scale-95 border border-[#C49A6C]/60 shadow-xs transition-all duration-200 cursor-pointer z-10"
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#faeee0] text-[#32171D] hover:bg-[#f4ddc5] active:scale-95 border border-[#C49A6C]/60 shadow-xs transition-all duration-200 cursor-pointer z-10"
         >
           <X className="h-5 w-5 stroke-[2.5]" />
         </button>
@@ -94,7 +99,7 @@ export function DailyAuthPromptModal({
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#C49A6C]/60 bg-[#faeee0] px-3.5 py-1 text-xs font-black text-[#7B1E2B] uppercase tracking-wider">
             <Flame className="h-3.5 w-3.5 fill-[#7B1E2B] text-[#7B1E2B]" />
             <span>
-              {streak} Day {streak === 1 ? "Streak" : "Streak"}
+              {streak} Day Streak
             </span>
             <Sparkles className="h-3 w-3 text-[#C49A6C]" />
           </div>
@@ -157,6 +162,9 @@ export function DailyAuthPromptModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
+
+export default DailyAuthPromptModal;

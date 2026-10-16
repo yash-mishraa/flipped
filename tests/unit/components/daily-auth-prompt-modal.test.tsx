@@ -103,6 +103,25 @@ describe("DailyAuthPromptModal", () => {
       screen.queryByText("Login or create an account in order to sync and save your progress.")
     ).not.toBeInTheDocument();
   });
+
+  it("mounts directly to document.body via portal and centers within the viewport", () => {
+    render(
+      <DailyAuthPromptModal
+        isOpen={true}
+        onClose={vi.fn()}
+        isWon={true}
+        streak={2}
+      />
+    );
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+    expect(dialog.parentElement).toBe(document.body);
+    expect(dialog).toHaveClass("fixed");
+    expect(dialog).toHaveClass("inset-0");
+    expect(dialog).toHaveClass("items-center");
+    expect(dialog).toHaveClass("justify-center");
+  });
 });
 
 describe("DailyCompletionCard Guest Auth Sync Integration", () => {
