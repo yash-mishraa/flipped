@@ -16,7 +16,7 @@ import { ClassicDurationSelector } from "./ClassicDurationSelector";
 import { LetterGrid } from "./LetterGrid";
 import { HintControl } from "./HintControl";
 import { ShareButton } from "./ShareButton";
-import { formatTime, getTimerUrgency } from "../domain/timer-utils";
+import { formatTime, getTimerUrgency, type TimerUrgency } from "../domain/timer-utils";
 import { getNextEditablePosition, getPreviousEditablePosition } from "../domain/letter-grid";
 import {
   getClassicLastDifficulty,
@@ -97,6 +97,82 @@ function createSafeInitialGrid(payload: SafeGameplayPayload): LetterGridType {
   };
 }
 
+interface ClassicSprintProgressBarProps {
+  readonly durationSeconds: number;
+  readonly endTimeMs: number;
+  readonly urgency: TimerUrgency;
+  readonly ariaValueNow: number;
+}
+
+function ClassicSprintProgressBar({
+  durationSeconds,
+  endTimeMs,
+  urgency,
+  ariaValueNow,
+}: ClassicSprintProgressBarProps): React.JSX.Element {
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar || !endTimeMs || durationSeconds <= 0) return;
+
+    let rafId: number;
+    const totalMs = durationSeconds * 1000;
+
+    const update = () => {
+      const remainingMs = Math.max(0, endTimeMs - Date.now());
+      const pct = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100));
+
+      if (bar) {
+        bar.style.width = `${pct.toFixed(2)}%`;
+      }
+
+      if (remainingMs > 0) {
+        rafId = requestAnimationFrame(update);
+      }
+    };
+
+    rafId = requestAnimationFrame(update);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [durationSeconds, endTimeMs]);
+
+  const initialWidth =
+    durationSeconds > 0
+      ? `${Math.max(0, Math.min(100, (ariaValueNow / durationSeconds) * 100)).toFixed(2)}%`
+      : "100%";
+
+  return (
+    <div className="w-full max-w-2xl px-1 -mt-2">
+      <div
+        role="progressbar"
+        aria-label="Sprint Time Remaining"
+        aria-valuenow={ariaValueNow}
+        aria-valuemin={0}
+        aria-valuemax={durationSeconds}
+        className="h-1.5 w-full rounded-full bg-[#C49A6C]/25 overflow-hidden"
+      >
+        <div
+          ref={barRef}
+          className={`h-full rounded-full transition-colors duration-300 ${
+            urgency === "critical" || urgency === "expired"
+              ? "bg-[#7B1E2B] animate-pulse"
+              : urgency === "urgent"
+                ? "bg-[#E09F3E]"
+                : "bg-[#7B1E2B]/80"
+          }`}
+          style={{
+            width: initialWidth,
+            willChange: "width",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function ClassicSprintBoard(): React.JSX.Element {
   const { isSignedIn, user } = useUser();
 
@@ -117,6 +193,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
 
   // Sprint Progress
   const [sprintTimeRemaining, setSprintTimeRemaining] = useState<number>(180);
+  const [sprintEndTime, setSprintEndTime] = useState<number>(0);
   const [totalScore, setTotalScore] = useState<number>(0);
   const [solvedList, setSolvedList] = useState<SolvedSprintPuzzle[]>([]);
   const [unfinishedPuzzle, setUnfinishedPuzzle] = useState<UnfinishedSprintPuzzle | null>(null);
@@ -262,8 +339,10 @@ export function ClassicSprintBoard(): React.JSX.Element {
     setCurrentHintsUsed(0);
     puzzleStartTimestampRef.current = Date.now();
 
+    const endTime = Date.now() + durationSeconds * 1000;
     setSprintTimeRemaining(durationSeconds);
-    sprintEndTimeRef.current = Date.now() + durationSeconds * 1000;
+    sprintEndTimeRef.current = endTime;
+    setSprintEndTime(endTime);
     setGameState("PLAYING");
     setLoadingNext(false);
   };
@@ -281,7 +360,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
     sprintTimerIntervalRef.current = setInterval(() => {
       const remainingMs = sprintEndTimeRef.current - Date.now();
       const secondsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
-      setSprintTimeRemaining(secondsLeft);
+      setSprintTimeRemaining((prev) => (prev !== secondsLeft ? secondsLeft : prev));
 
       if (secondsLeft <= 0) {
         if (sprintTimerIntervalRef.current) {
@@ -290,7 +369,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
         }
         handleSprintTimeout();
       }
-    }, 250);
+    }, 100);
 
     return () => {
       if (sprintTimerIntervalRef.current) {
@@ -1134,29 +1213,12 @@ export function ClassicSprintBoard(): React.JSX.Element {
       </div>
 
       {/* Sprint Time Progress Bar */}
-      <div className="w-full max-w-2xl px-1 -mt-2">
-        <div
-          role="progressbar"
-          aria-label="Sprint Time Remaining"
-          aria-valuenow={sprintTimeRemaining}
-          aria-valuemin={0}
-          aria-valuemax={durationSeconds}
-          className="h-1.5 w-full rounded-full bg-[#C49A6C]/25 overflow-hidden"
-        >
-          <div
-            className={`h-full transition-all duration-300 ease-linear rounded-full ${
-              urgency === "critical"
-                ? "bg-[#7B1E2B] animate-pulse"
-                : urgency === "urgent"
-                  ? "bg-[#E09F3E]"
-                  : "bg-[#7B1E2B]/80"
-            }`}
-            style={{
-              width: `${Math.max(0, Math.min(100, (sprintTimeRemaining / durationSeconds) * 100))}%`,
-            }}
-          />
-        </div>
-      </div>
+      <ClassicSprintProgressBar
+        durationSeconds={durationSeconds}
+        endTimeMs={sprintEndTime}
+        urgency={urgency}
+        ariaValueNow={sprintTimeRemaining}
+      />
 
       {/* Celebration Toast */}
       {celebrationToast && (
