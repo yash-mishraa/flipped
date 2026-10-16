@@ -32,31 +32,18 @@ export default async function Image(): Promise<ImageResponse> {
           padding: "40px",
         }}
       >
-        {/* Subtle decorative gold border frame */}
-        <div
-          style={{
-            position: "absolute",
-            top: "24px",
-            left: "24px",
-            width: "1152px",
-            height: "582px",
-            border: "2px solid #C49A6C",
-            borderRadius: "20px",
-          }}
-        />
-
         {/* Brand Symbol SVG */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: "16px",
+            marginBottom: "28px",
           }}
         >
           <svg
-            width="88"
-            height="88"
+            width="108"
+            height="108"
             viewBox="0 0 64 64"
             fill="none"
           >
@@ -72,11 +59,11 @@ export default async function Image(): Promise<ImageResponse> {
         <div
           style={{
             fontFamily: "Newsreader",
-            fontSize: "104px",
+            fontSize: "120px",
             fontWeight: 700,
             letterSpacing: "-0.02em",
             textTransform: "uppercase",
-            marginBottom: "10px",
+            marginBottom: "16px",
             color: "#F7F0E5",
             lineHeight: 1,
           }}
@@ -88,105 +75,15 @@ export default async function Image(): Promise<ImageResponse> {
         <div
           style={{
             fontFamily: "Newsreader",
-            fontSize: "28px",
+            fontSize: "32px",
             fontWeight: 600,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
             color: "#C49A6C",
-            marginBottom: "28px",
             lineHeight: 1.2,
           }}
         >
           Word Deduction Puzzle
-        </div>
-
-        {/* Decorative divider rule */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "14px",
-            marginBottom: "32px",
-          }}
-        >
-          <div
-            style={{
-              width: "80px",
-              height: "1px",
-              backgroundColor: "#C49A6C",
-            }}
-          />
-          <div
-            style={{
-              width: "7px",
-              height: "7px",
-              backgroundColor: "#C49A6C",
-              transform: "rotate(45deg)",
-            }}
-          />
-          <div
-            style={{
-              width: "80px",
-              height: "1px",
-              backgroundColor: "#C49A6C",
-            }}
-          />
-        </div>
-
-        {/* Feature Pills — authentic cream & wine game tiles with gold border */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "18px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#F7F0E5",
-              border: "2px solid #C49A6C",
-              borderRadius: "9999px",
-              padding: "14px 30px",
-              fontSize: "21px",
-              fontWeight: 700,
-              color: "#32171D",
-              fontFamily: "Newsreader, Georgia, serif",
-              boxShadow: "0 6px 18px rgba(50, 23, 29, 0.4)",
-            }}
-          >
-            Daily 60s Challenge
-          </div>
-          <div
-            style={{
-              backgroundColor: "#F7F0E5",
-              border: "2px solid #C49A6C",
-              borderRadius: "9999px",
-              padding: "14px 30px",
-              fontSize: "21px",
-              fontWeight: 700,
-              color: "#32171D",
-              fontFamily: "Newsreader, Georgia, serif",
-              boxShadow: "0 6px 18px rgba(50, 23, 29, 0.4)",
-            }}
-          >
-            Classic Practice Sprints
-          </div>
-          <div
-            style={{
-              backgroundColor: "#32171D",
-              border: "2px solid #C49A6C",
-              borderRadius: "9999px",
-              padding: "14px 30px",
-              fontSize: "21px",
-              fontWeight: 700,
-              color: "#F7F0E5",
-              fontFamily: "Newsreader, Georgia, serif",
-              boxShadow: "0 6px 18px rgba(50, 23, 29, 0.4)",
-            }}
-          >
-            flipped.website
-          </div>
         </div>
       </div>
     ),
