@@ -90,12 +90,33 @@ export default function StatisticsPage(): React.JSX.Element {
             {/* Clerk Sign In / Sign Up CTAs */}
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
               <SignInButton mode="modal">
-                <ShinyButton label="Sign In to Account" cornerRadius={24} />
+                <div className="w-full sm:w-auto">
+                  <ShinyButton
+                    label="Sign In to Account"
+                    cornerRadius={24}
+                    onClick={() => {
+                      if (
+                        typeof window !== "undefined" &&
+                        !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                      ) {
+                        window.location.href = "/sign-in";
+                      }
+                    }}
+                  />
+                </div>
               </SignInButton>
 
               <SignUpButton mode="modal">
                 <button
                   type="button"
+                  onClick={() => {
+                    if (
+                      typeof window !== "undefined" &&
+                      !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                    ) {
+                      window.location.href = "/sign-up";
+                    }
+                  }}
                   className="rounded-full border border-[#C49A6C] bg-white px-6 py-3 text-sm font-bold font-sans tracking-tight text-[#32171D] hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer"
                 >
                   <span className="font-bold">Create Free Account</span>

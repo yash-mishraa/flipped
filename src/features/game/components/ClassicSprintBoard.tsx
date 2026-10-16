@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Show, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { syncUserProgress } from "../persistence/user-sync";
 import type {
   Difficulty,
@@ -1050,7 +1050,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
           </div>
 
           {/* Clerk Account Sync for Guest Players */}
-          <Show when="signed-out">
+          {!isSignedIn && (
             <div className="mt-5 w-full rounded-2xl border border-[#C49A6C] bg-[#faeee0]/70 p-4 text-center">
               <div className="text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
                 Save Your Sprint Record
@@ -1062,6 +1062,14 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignUpButton mode="modal">
                   <button
                     type="button"
+                    onClick={() => {
+                      if (
+                        typeof window !== "undefined" &&
+                        !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                      ) {
+                        window.location.href = "/sign-up";
+                      }
+                    }}
                     className="rounded-full bg-[#7B1E2B] px-4 py-2 text-xs font-bold font-sans tracking-tight text-[#F7F0E5] shadow-xs transition-all duration-200 ease-out hover:bg-[#631722] active:scale-[0.97]"
                   >
                     <span className="font-bold">Create Free Account</span>
@@ -1070,6 +1078,14 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 <SignInButton mode="modal">
                   <button
                     type="button"
+                    onClick={() => {
+                      if (
+                        typeof window !== "undefined" &&
+                        !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                      ) {
+                        window.location.href = "/sign-in";
+                      }
+                    }}
                     className="rounded-full border border-[#C49A6C] bg-white px-3.5 py-2 text-xs font-bold font-sans tracking-tight text-[#32171D] shadow-2xs transition-all duration-200 ease-out hover:bg-[#faeee0] active:scale-[0.97]"
                   >
                     <span className="font-bold">Log In</span>
@@ -1077,13 +1093,13 @@ export function ClassicSprintBoard(): React.JSX.Element {
                 </SignInButton>
               </div>
             </div>
-          </Show>
+          )}
 
-          <Show when="signed-in">
+          {isSignedIn && (
             <div className="mt-4 text-xs font-semibold text-[#7B1E2B]">
               Sprint record saved to your account
             </div>
-          </Show>
+          )}
 
           {/* Actions */}
           <div className="mt-6 flex w-full flex-col gap-2.5 sm:flex-row">

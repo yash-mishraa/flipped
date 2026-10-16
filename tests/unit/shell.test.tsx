@@ -139,5 +139,65 @@ describe("Production Home Screen (HomePage)", () => {
     expect(screen.getByText("Daily Streak:")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
   });
+
+  it("renders Log In / Create Account button and streak sync prompt for guest player who already played today", () => {
+    const todayStr = getDailyDateString();
+    saveDailyAttempt(
+      {
+        date: todayStr,
+        puzzleId: "p-today-played",
+        status: "WON",
+        finalScore: 95,
+        elapsedSeconds: 15,
+        hintsUsed: 0,
+        completedAt: new Date().toISOString(),
+      },
+      null
+    );
+
+    render(<HomePage />);
+
+    // 1. Daily streak indicator is visible
+    expect(screen.getByTestId("home-daily-streak")).toBeInTheDocument();
+
+    // 2. Button shows "View Today's Result"
+    expect(screen.getByRole("link", { name: /View Today's Result/i })).toBeInTheDocument();
+
+    // 3. How to play button is visible
+    expect(screen.getAllByRole("button", { name: /How to Play/i })[0]).toBeInTheDocument();
+
+    // 4. Guest login / create account button is STILL rendered and visible
+    expect(screen.getByRole("button", { name: /Log In \/ Create Account/i })).toBeInTheDocument();
+
+    // 5. Streak sync prompt is shown specifically for guest who played
+    expect(
+      screen.getByText(/Save your 1-day streak & sync across devices/i)
+    ).toBeInTheDocument();
+  });
+
+  it("renders Log In button in Header for signed-out visitors and UserButton when signed in", () => {
+    // 1. Signed out
+    vi.spyOn(clerkNextjs, "useUser").mockReturnValue({
+      isSignedIn: false,
+      user: null,
+      isLoaded: true,
+    } as ReturnType<typeof clerkNextjs.useUser>);
+
+    const { unmount } = render(<HomePage />);
+    expect(screen.getByRole("link", { name: "Log In" })).toBeInTheDocument();
+    unmount();
+    cleanup();
+
+    // 2. Signed in
+    vi.spyOn(clerkNextjs, "useUser").mockReturnValue({
+      isSignedIn: true,
+      user: { id: "user_logged_in_123" } as unknown as ReturnType<typeof clerkNextjs.useUser>["user"],
+      isLoaded: true,
+    } as ReturnType<typeof clerkNextjs.useUser>);
+
+    render(<HomePage />);
+    expect(screen.queryByRole("link", { name: "Log In" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("user-button")).toBeInTheDocument();
+  });
 });
 

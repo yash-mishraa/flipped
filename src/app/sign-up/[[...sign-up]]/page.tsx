@@ -19,6 +19,8 @@ export default function SignUpPage(): React.JSX.Element {
       <Header />
       <main className="mx-auto flex flex-1 w-full max-w-4xl items-center justify-center p-6">
         <SignUp
+          path="/sign-up"
+          routing="path"
           fallbackRedirectUrl="/"
           signInUrl="/sign-in"
           appearance={{

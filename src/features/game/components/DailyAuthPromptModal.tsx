@@ -138,6 +138,14 @@ export function DailyAuthPromptModal({
           <SignUpButton mode="modal">
             <button
               type="button"
+              onClick={() => {
+                if (
+                  typeof window !== "undefined" &&
+                  !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                ) {
+                  window.location.href = "/sign-up";
+                }
+              }}
               className="w-full rounded-full bg-[#7B1E2B] hover:bg-[#631722] py-3 text-sm font-bold font-sans tracking-tight text-[#F7F0E5] shadow-md transition-all duration-200 ease-out hover:shadow-lg active:scale-[0.97] cursor-pointer"
             >
               <span className="font-bold">Create Free Account</span>
@@ -147,6 +155,14 @@ export function DailyAuthPromptModal({
           <SignInButton mode="modal">
             <button
               type="button"
+              onClick={() => {
+                if (
+                  typeof window !== "undefined" &&
+                  !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                ) {
+                  window.location.href = "/sign-in";
+                }
+              }}
               className="w-full rounded-full border border-[#C49A6C] bg-white hover:bg-[#faeee0] py-2.5 text-xs sm:text-sm font-bold font-sans tracking-tight text-[#32171D] shadow-xs transition-all duration-200 ease-out active:scale-[0.97] cursor-pointer"
             >
               <span className="font-bold">Already Have an Account? Log In</span>

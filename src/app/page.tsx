@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Show, SignInButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { AcidSquares } from "@/components/AcidSquares";
 import DecryptedText from "@/components/DecryptedText";
@@ -137,22 +137,37 @@ export default function HomePage(): React.JSX.Element {
               <span className="font-bold">How to Play</span>
             </button>
 
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <div className="w-full">
-                  <ShinyButton
-                    label="Log In / Create Account"
-                    className="w-full"
-                    fillColor="#32171D"
-                    labelColor="#F7F0E5"
-                    accentColor="#C49A6C"
-                    cornerRadius={24}
-                  />
-                </div>
-              </SignInButton>
-            </Show>
+            {!isSignedIn && (
+              <div className="w-full flex flex-col items-center gap-1.5">
+                <SignInButton mode="modal">
+                  <div className="w-full">
+                    <ShinyButton
+                      label="Log In / Create Account"
+                      className="w-full"
+                      fillColor="#32171D"
+                      labelColor="#F7F0E5"
+                      accentColor="#C49A6C"
+                      cornerRadius={24}
+                      onClick={() => {
+                        if (
+                          typeof window !== "undefined" &&
+                          !(window as unknown as { Clerk?: { loaded?: boolean } }).Clerk?.loaded
+                        ) {
+                          window.location.href = "/sign-in";
+                        }
+                      }}
+                    />
+                  </div>
+                </SignInButton>
+                {todayAttempt && (
+                  <p className="text-[11px] text-[#6B4E55] font-medium text-center">
+                    Save your {streak > 0 ? `${streak}-day ` : ""}streak &amp; sync across devices
+                  </p>
+                )}
+              </div>
+            )}
 
-            <Show when="signed-in">
+            {isSignedIn && (
               <Link href="/classic" className="w-full block">
                 <ShinyButton
                   label="Play Classic Mode"
@@ -163,7 +178,7 @@ export default function HomePage(): React.JSX.Element {
                   cornerRadius={24}
                 />
               </Link>
-            </Show>
+            )}
           </div>
         </section>
       </main>

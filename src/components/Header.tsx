@@ -3,38 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Show, UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { FlippedSymbol } from "@/components/FlippedLogo";
 import { TutorialModal } from "@/features/game/components/TutorialModal";
 import BranchedMenu, { type BranchedMenuSection } from "@/components/ui/BranchedMenu";
 import { setActiveUser } from "@/features/game/persistence/local-progress";
-
-const branchedMenuItems: readonly BranchedMenuSection[] = [
-  {
-    label: "Play",
-    children: [
-      { value: "/daily", label: "Daily Challenge" },
-      { value: "/classic", label: "Classic Sprint" },
-      { value: "/archive", label: "Challenge Archive" },
-    ],
-  },
-  {
-    label: "Account & Help",
-    children: [
-      { value: "/stats", label: "Player Statistics" },
-      { value: "how-to-play", label: "How to Play" },
-      { value: "/contact", label: "Contact Us" },
-    ],
-  },
-  {
-    label: "About & Legal",
-    children: [
-      { value: "/about", label: "About FLIPPED" },
-      { value: "/privacy", label: "Privacy Policy" },
-      { value: "/terms", label: "Terms of Service" },
-    ],
-  },
-];
 
 export function Header(): React.JSX.Element {
   const { isSignedIn, user } = useUser();
@@ -74,6 +47,41 @@ export function Header(): React.JSX.Element {
     }
   };
 
+  const menuSections: readonly BranchedMenuSection[] = React.useMemo(
+    () => [
+      {
+        label: "Play",
+        children: [
+          { value: "/daily", label: "Daily Challenge" },
+          { value: "/classic", label: "Classic Sprint" },
+          { value: "/archive", label: "Challenge Archive" },
+        ],
+      },
+      {
+        label: "Account & Help",
+        children: [
+          ...(isSignedIn
+            ? [{ value: "/stats", label: "Player Statistics" }]
+            : [
+                { value: "/sign-in", label: "Log In / Sign Up" },
+                { value: "/stats", label: "Player Statistics" },
+              ]),
+          { value: "how-to-play", label: "How to Play" },
+          { value: "/contact", label: "Contact Us" },
+        ],
+      },
+      {
+        label: "About & Legal",
+        children: [
+          { value: "/about", label: "About FLIPPED" },
+          { value: "/privacy", label: "Privacy Policy" },
+          { value: "/terms", label: "Terms of Service" },
+        ],
+      },
+    ],
+    [isSignedIn]
+  );
+
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-[#C49A6C]/25 bg-[#F7F0E5]/95 backdrop-blur-md">
@@ -96,9 +104,9 @@ export function Header(): React.JSX.Element {
             </button>
           </div>
 
-          {/* Right Controls: User Profile + Brand Logo Lockup */}
+          {/* Right Controls: User Profile / Log In Pill + Brand Logo Lockup */}
           <div className="flex shrink-0 items-center gap-2.5">
-            <Show when="signed-in">
+            {isSignedIn ? (
               <UserButton
                 appearance={{
                   elements: {
@@ -106,7 +114,15 @@ export function Header(): React.JSX.Element {
                   },
                 }}
               />
-            </Show>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="inline-flex items-center rounded-full border border-[#C49A6C]/70 bg-white/90 px-3 py-1 text-xs font-bold text-[#7B1E2B] shadow-2xs hover:bg-[#faeee0] active:scale-95 transition-all duration-150"
+                aria-label="Log In"
+              >
+                Log In
+              </Link>
+            )}
 
             {/* Brand Logo Lockup on Right */}
             <Link
@@ -161,7 +177,7 @@ export function Header(): React.JSX.Element {
         {/* BranchedMenu Component Body with large readable typography and comfortable tap targets */}
         <div className="flex-1 overflow-y-auto px-5 py-5">
           <BranchedMenu
-            items={branchedMenuItems}
+            items={menuSections}
             defaultOpen={[0, 1]}
             defaultActive={pathname}
             onSelect={handleMenuSelect}
@@ -201,6 +217,16 @@ export function Header(): React.JSX.Element {
           >
             Play Daily Challenge
           </Link>
+
+          {!isSignedIn && (
+            <Link
+              href="/sign-in"
+              onClick={() => setMenuOpen(false)}
+              className="w-full flex items-center justify-center rounded-full border border-[#C49A6C] bg-white py-2 text-xs font-bold text-[#32171D] shadow-2xs hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 ease-out"
+            >
+              Log In / Create Account
+            </Link>
+          )}
         </div>
       </aside>
 
