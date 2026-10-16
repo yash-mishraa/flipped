@@ -15,7 +15,7 @@ In **FLIPPED**, players decode two transformed clue words (via antonyms or synon
 
 - **Production URL**: [https://flipped.website](https://flipped.website)
 - **Vercel Preview**: [https://flipped-sepia.vercel.app](https://flipped-sepia.vercel.app)
-- **Developer Contact**: [yashmishra1408@gmail.com](mailto:yashmishra1408@gmail.com)
+- **Developer Contact**: [flippedbyyash@gmail.com](mailto:flippedbyyash@gmail.com)
 
 ---
 
@@ -106,7 +106,7 @@ FLIPPED includes a complete technical SEO foundation out of the box:
 - **[`/archive`](file:///Users/yashmishra14/Flippedit/src/app/archive/page.tsx)**: Historical calendar of past daily challenges playable on demand.
 - **[`/stats`](file:///Users/yashmishra14/Flippedit/src/app/stats/page.tsx)**: Player dashboard tracking games played, win rate, solve times, and cloud synchronization.
 - **[`/about`](file:///Users/yashmishra14/Flippedit/src/app/about/page.tsx)**: Story, Times of India attribution, deduction mechanics, and feature comparisons.
-- **[`/contact`](file:///Users/yashmishra14/Flippedit/src/app/contact/page.tsx)**: Interactive Mailbox component connecting directly to `yashmishra1408@gmail.com`.
+- **[`/contact`](file:///Users/yashmishra14/Flippedit/src/app/contact/page.tsx)**: Interactive Mailbox component connecting directly to `flippedbyyash@gmail.com`.
 - **[`/privacy`](file:///Users/yashmishra14/Flippedit/src/app/privacy/page.tsx)**: Transparent GDPR/CCPA privacy policy detailing local storage and cloud sync.
 - **[`/terms`](file:///Users/yashmishra14/Flippedit/src/app/terms/page.tsx)**: Terms of service, fair play rules, and intellectual property notices.
 
@@ -194,5 +194,5 @@ npx playwright test
 
 - **License**: MIT
 - **Creator**: Yash Mishra
-- **Mailbox**: [yashmishra1408@gmail.com](mailto:yashmishra1408@gmail.com)
+- **Mailbox**: [flippedbyyash@gmail.com](mailto:flippedbyyash@gmail.com)
 - **Website**: [flipped.website](https://flipped.website)

@@ -106,7 +106,7 @@ const jsonLdWebsite = {
       author: {
         "@type": "Person",
         name: "Yash Mishra",
-        email: "yashmishra1408@gmail.com",
+        email: "flippedbyyash@gmail.com",
       },
       description:
         "An engaging daily word deduction puzzle where players flip opposites/synonyms of two clue words to uncover a familiar phrase within 60 seconds.",

@@ -133,7 +133,7 @@ export default function TermsPage(): React.JSX.Element {
             </p>
             <div className="rounded-xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-3 text-xs sm:text-sm">
               <p className="font-bold text-[#32171D]">Yash Mishra</p>
-              <p>Email: <a href="mailto:yashmishra1408@gmail.com" className="text-[#7B1E2B] underline font-semibold">yashmishra1408@gmail.com</a></p>
+              <p>Email: <a href="mailto:flippedbyyash@gmail.com" className="text-[#7B1E2B] underline font-semibold">flippedbyyash@gmail.com</a></p>
               <p>Online Mailbox: <Link href="/contact" className="text-[#7B1E2B] underline font-semibold">flipped.website/contact</Link></p>
             </div>
           </section>

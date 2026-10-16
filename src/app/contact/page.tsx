@@ -9,14 +9,14 @@ import { HelpCircle, Sparkles, Bug } from "lucide-react";
 export const metadata: Metadata = {
   title: "Contact Us & Feedback",
   description:
-    "Get in touch with the creator of FLIPPED. Send game feedback, report puzzle issues, or submit phrase ideas directly to yashmishra1408@gmail.com.",
+    "Get in touch with the creator of FLIPPED. Send game feedback, report puzzle issues, or submit phrase ideas directly to flippedbyyash@gmail.com.",
   alternates: {
     canonical: "https://flipped.website/contact",
   },
   openGraph: {
     title: "Contact Us & Feedback | FLIPPED",
     description:
-      "Get in touch with the creator of FLIPPED. Send game feedback, report puzzle issues, or submit phrase ideas directly to yashmishra1408@gmail.com.",
+      "Get in touch with the creator of FLIPPED. Send game feedback, report puzzle issues, or submit phrase ideas directly to flippedbyyash@gmail.com.",
     url: "https://flipped.website/contact",
   },
 };
@@ -41,7 +41,7 @@ export default function ContactPage(): React.JSX.Element {
         </div>
 
         {/* Interactive Mailbox Component */}
-        <ContactMailbox recipientEmail="yashmishra1408@gmail.com" />
+        <ContactMailbox recipientEmail="flippedbyyash@gmail.com" />
 
         {/* Quick FAQ / Common Inquiries */}
         <section

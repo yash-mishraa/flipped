@@ -11,7 +11,7 @@ export interface ContactMailboxProps {
 }
 
 export function ContactMailbox({
-  recipientEmail = "yashmishra1408@gmail.com",
+  recipientEmail = "flippedbyyash@gmail.com",
   defaultSubject = "FLIPPED Feedback & Reviews",
   className = "",
 }: ContactMailboxProps): React.JSX.Element {

@@ -134,7 +134,7 @@ export default function PrivacyPage(): React.JSX.Element {
                 <strong>Clear Local Progress:</strong> You can wipe all local guest game history at any time by clearing your browser cache and localStorage data for <code className="font-mono text-xs bg-[#faeee0] px-1 py-0.5 rounded text-[#7B1E2B]">flipped.website</code>.
               </li>
               <li>
-                <strong>Delete Cloud Account:</strong> You may request permanent deletion of your account and associated synchronized statistics by emailing us at <a href="mailto:yashmishra1408@gmail.com" className="text-[#7B1E2B] underline font-medium">yashmishra1408@gmail.com</a>. We will erase all server-side records within 3 business days.
+                <strong>Delete Cloud Account:</strong> You may request permanent deletion of your account and associated synchronized statistics by emailing us at <a href="mailto:flippedbyyash@gmail.com" className="text-[#7B1E2B] underline font-medium">flippedbyyash@gmail.com</a>. We will erase all server-side records within 3 business days.
               </li>
             </ul>
           </section>
@@ -150,7 +150,7 @@ export default function PrivacyPage(): React.JSX.Element {
             </p>
             <div className="rounded-xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-3 text-xs sm:text-sm">
               <p className="font-bold text-[#32171D]">Yash Mishra</p>
-              <p>Email: <a href="mailto:yashmishra1408@gmail.com" className="text-[#7B1E2B] underline font-semibold">yashmishra1408@gmail.com</a></p>
+              <p>Email: <a href="mailto:flippedbyyash@gmail.com" className="text-[#7B1E2B] underline font-semibold">flippedbyyash@gmail.com</a></p>
               <p>Website: <Link href="/contact" className="text-[#7B1E2B] underline font-semibold">flipped.website/contact</Link></p>
             </div>
           </section>

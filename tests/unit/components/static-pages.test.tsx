@@ -46,23 +46,23 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(
       screen.getByText("Got any feedback or reviews or need anything then click here")
     ).toBeInTheDocument();
-    expect(screen.getByText("yashmishra1408@gmail.com")).toBeInTheDocument();
+    expect(screen.getByText("flippedbyyash@gmail.com")).toBeInTheDocument();
     expect(screen.getByText("Open in Mail App")).toBeInTheDocument();
   });
 
-  it("interacts with ContactMailbox and provides mailto redirect to yashmishra1408@gmail.com", () => {
-    render(<ContactMailbox recipientEmail="yashmishra1408@gmail.com" />);
+  it("interacts with ContactMailbox and provides mailto redirect to flippedbyyash@gmail.com", () => {
+    render(<ContactMailbox recipientEmail="flippedbyyash@gmail.com" />);
 
     expect(
       screen.getByText("Got any feedback or reviews or need anything then click here")
     ).toBeInTheDocument();
-    expect(screen.getByText("yashmishra1408@gmail.com")).toBeInTheDocument();
+    expect(screen.getByText("flippedbyyash@gmail.com")).toBeInTheDocument();
 
     // Verify Mail App link has mailto href
     const mailLink = screen.getByRole("link", { name: /Open in Mail App/i });
     expect(mailLink).toHaveAttribute(
       "href",
-      expect.stringContaining("mailto:yashmishra1408@gmail.com")
+      expect.stringContaining("mailto:flippedbyyash@gmail.com")
     );
 
     // Verify Gmail Web link
@@ -84,7 +84,7 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(screen.getByRole("heading", { name: "Privacy Policy", level: 1 })).toBeInTheDocument();
     expect(screen.getByText(/Information We Collect & Store/i)).toBeInTheDocument();
     expect(screen.getByText(/Guest Mode \(No Account\)/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/yashmishra1408@gmail.com/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/flippedbyyash@gmail.com/i)[0]).toBeInTheDocument();
   });
 
   it("renders TermsPage with fair play rules and Times of India attribution notice", () => {
@@ -98,7 +98,7 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(
       screen.getByText(/Times of India.*Bennett, Coleman & Co\. Ltd\./i)
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/yashmishra1408@gmail.com/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/flippedbyyash@gmail.com/i)[0]).toBeInTheDocument();
   });
 
   it("generates robots.txt rules pointing to flipped.website sitemap", () => {
