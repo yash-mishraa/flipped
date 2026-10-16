@@ -36,36 +36,46 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders ContactPage with Mailbox card and FAQ items", () => {
+  it("renders ContactPage with BorderGlow feedback card and FAQ items", () => {
     render(<ContactPage />);
 
     expect(
       screen.getByRole("heading", { name: "Contact & Feedback", level: 1 })
     ).toBeInTheDocument();
     expect(screen.getByTestId("contact-mailbox")).toBeInTheDocument();
+    expect(
+      screen.getByText("Got any feedback or reviews or need anything then click here")
+    ).toBeInTheDocument();
     expect(screen.getByText("yashmishra1408@gmail.com")).toBeInTheDocument();
     expect(screen.getByText("Open in Mail App")).toBeInTheDocument();
   });
 
-  it("interacts with ContactMailbox and triggers mailto with recipient yashmishra1408@gmail.com", () => {
+  it("interacts with ContactMailbox and provides mailto redirect to yashmishra1408@gmail.com", () => {
     render(<ContactMailbox recipientEmail="yashmishra1408@gmail.com" />);
 
-    expect(screen.getByText("Direct Developer Mailbox")).toBeInTheDocument();
+    expect(
+      screen.getByText("Got any feedback or reviews or need anything then click here")
+    ).toBeInTheDocument();
     expect(screen.getByText("yashmishra1408@gmail.com")).toBeInTheDocument();
 
-    // Change topic
-    const select = screen.getByLabelText(/Topic/i);
-    fireEvent.change(select, { target: { value: "Bug Report / Issue" } });
-    expect(select).toHaveValue("Bug Report / Issue");
+    // Verify Mail App link has mailto href
+    const mailLink = screen.getByRole("link", { name: /Open in Mail App/i });
+    expect(mailLink).toHaveAttribute(
+      "href",
+      expect.stringContaining("mailto:yashmishra1408@gmail.com")
+    );
 
-    // Type optional note
-    const textarea = screen.getByLabelText(/Your Note/i);
-    fireEvent.change(textarea, { target: { value: "Found a puzzle glitch" } });
-    expect(textarea).toHaveValue("Found a puzzle glitch");
+    // Verify Gmail Web link
+    const gmailLink = screen.getByRole("link", { name: /Gmail Web/i });
+    expect(gmailLink).toHaveAttribute(
+      "href",
+      expect.stringContaining("mail.google.com")
+    );
 
     // Copy button
     const copyBtn = screen.getByRole("button", { name: /Copy email address/i });
     expect(copyBtn).toBeInTheDocument();
+    fireEvent.click(copyBtn);
   });
 
   it("renders PrivacyPage with GDPR/CCPA storage disclosures and contact info", () => {
