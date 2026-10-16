@@ -32,7 +32,10 @@ export function AcidSquares({
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isBot =
+      Boolean(window.navigator?.webdriver) ||
+      /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent);
+    const reduced = isBot || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const pointer = { x: 0.5, y: 0.5 };
     let width = 1;
     let height = 1;

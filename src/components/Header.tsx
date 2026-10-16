@@ -93,7 +93,7 @@ export function Header(): React.JSX.Element {
               onClick={() => setMenuOpen((prev) => !prev)}
               aria-expanded={menuOpen}
               aria-label="Toggle navigation menu"
-              className="inline-flex items-center gap-2 rounded-full border border-[#C49A6C]/50 bg-[#faeee0] px-3.5 py-1 text-xs font-bold text-[#32171D] shadow-2xs hover:bg-[#faeee0]/80 active:scale-[0.96] transition-all duration-200 ease-out cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-full border border-[#C49A6C]/50 bg-[#faeee0] px-4 py-1.5 min-h-[36px] text-xs font-bold text-[#32171D] shadow-2xs hover:bg-[#faeee0]/80 active:scale-[0.96] transition-all duration-200 ease-out cursor-pointer"
             >
               <span className="flex flex-col gap-0.5" aria-hidden="true">
                 <span className="h-0.5 w-3.5 bg-[#7B1E2B] rounded-full" />
@@ -117,7 +117,7 @@ export function Header(): React.JSX.Element {
             ) : (
               <Link
                 href="/sign-in"
-                className="inline-flex items-center rounded-full border border-[#C49A6C]/70 bg-white/90 px-3 py-1 text-xs font-bold text-[#7B1E2B] shadow-2xs hover:bg-[#faeee0] active:scale-95 transition-all duration-150"
+                className="inline-flex items-center rounded-full border border-[#C49A6C]/70 bg-white/90 px-3.5 py-1.5 min-h-[36px] text-xs font-bold text-[#7B1E2B] shadow-2xs hover:bg-[#faeee0] active:scale-95 transition-all duration-150"
                 aria-label="Log In"
               >
                 Log In
@@ -152,6 +152,7 @@ export function Header(): React.JSX.Element {
       <aside
         aria-label="Navigation Menu"
         aria-hidden={!menuOpen}
+        inert={!menuOpen ? true : undefined}
         className={`fixed inset-y-0 left-0 z-50 h-[100dvh] w-80 max-w-[85vw] bg-[#F7F0E5] border-r border-[#C49A6C]/40 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           menuOpen ? "translate-x-0" : "-translate-x-full pointer-events-none"
         }`}

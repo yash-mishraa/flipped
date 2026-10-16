@@ -220,7 +220,7 @@ export function ShinyButton({
     .${scope}::before,
     .${scope}::after {
       animation:
-        var(--animation) var(--duration),
+        var(--animation) var(--duration) paused,
         var(--animation) calc(var(--duration) / 0.4) reverse paused;
       animation-composition: add;
     }

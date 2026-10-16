@@ -30,21 +30,21 @@ export function Footer(): React.JSX.Element {
             <div className="flex flex-col items-center sm:items-end gap-1.5">
               <nav
                 aria-label="Footer Primary Navigation"
-                className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#6B4E55]"
+                className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-xs font-semibold text-[#6B4E55]"
               >
-                <Link href="/daily" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/daily" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Daily
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-                <Link href="/classic" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/classic" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Classic
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-                <Link href="/archive" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/archive" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Archive
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-                <Link href="/stats" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/stats" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Statistics
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
@@ -54,7 +54,7 @@ export function Footer(): React.JSX.Element {
                     e.preventDefault();
                     setShowTutorial(true);
                   }}
-                  className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out cursor-pointer"
+                  className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out cursor-pointer px-1.5 py-1.5 inline-block"
                 >
                   How to Play
                 </Link>
@@ -62,21 +62,21 @@ export function Footer(): React.JSX.Element {
 
               <nav
                 aria-label="Footer Legal & About Navigation"
-                className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[11px] font-medium text-[#8C6870]"
+                className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-[11px] font-medium text-[#8C6870]"
               >
-                <Link href="/about" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/about" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   About
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-                <Link href="/contact" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/contact" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Contact
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-                <Link href="/privacy" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/privacy" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Privacy
                 </Link>
                 <span className="text-[#C49A6C]/40 select-none" aria-hidden="true">•</span>
-                <Link href="/terms" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out">
+                <Link href="/terms" className="hover:text-[#7B1E2B] transition-colors duration-200 ease-out px-1.5 py-1.5 inline-block">
                   Terms
                 </Link>
               </nav>
