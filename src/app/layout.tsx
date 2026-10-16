@@ -10,10 +10,34 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "FLIPPED — Word Deduction Puzzle",
+  metadataBase: new URL("https://flipped.website"),
+  title: {
+    default: "FLIPPED — Word Deduction Puzzle",
+    template: "%s | FLIPPED",
+  },
   description:
-    "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
+    "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out. Free daily word puzzle, classic practice sprints, and challenge archive.",
   applicationName: "FLIPPED",
+  authors: [{ name: "Yash Mishra", url: "https://flipped.website" }],
+  creator: "Yash Mishra",
+  publisher: "FLIPPED",
+  keywords: [
+    "flipped",
+    "flipped game",
+    "flipped word game",
+    "word deduction puzzle",
+    "daily word game",
+    "times of india flipped it",
+    "word puzzle online",
+    "free word game",
+    "wordle alternative",
+    "brain teaser",
+    "phrase guessing puzzle",
+    "daily puzzle",
+  ],
+  alternates: {
+    canonical: "https://flipped.website",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -26,16 +50,68 @@ export const metadata: Metadata = {
   openGraph: {
     title: "FLIPPED — Word Deduction Puzzle",
     description:
-      "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
-    type: "website",
+      "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out. Play free daily challenges and classic sprints.",
+    url: "https://flipped.website",
     siteName: "FLIPPED",
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "FLIPPED — Word Deduction Puzzle",
     description:
-      "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out.",
+      "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out. Free daily challenge and classic sprints.",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
+};
+
+const jsonLdWebsite = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://flipped.website/#website",
+      url: "https://flipped.website",
+      name: "FLIPPED",
+      description: "Flip the meanings of two clue words to uncover a familiar phrase.",
+      inLanguage: "en-US",
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://flipped.website/#game",
+      url: "https://flipped.website",
+      name: "FLIPPED — Word Deduction Puzzle",
+      applicationCategory: "GameApplication",
+      genre: ["Word Game", "Puzzle Game", "Brain Teaser"],
+      operatingSystem: "All",
+      browserRequirements: "Requires modern JavaScript-enabled web browser",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      author: {
+        "@type": "Person",
+        name: "Yash Mishra",
+        email: "yashmishra1408@gmail.com",
+      },
+      description:
+        "An engaging daily word deduction puzzle where players flip opposites/synonyms of two clue words to uncover a familiar phrase within 60 seconds.",
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -49,6 +125,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
+        />
+      </head>
       <body className="min-h-screen bg-[#F7F0E5] text-[#32171D] antialiased selection:bg-[#7B1E2B] selection:text-[#F7F0E5]">
         <ClerkProvider
           publishableKey={publishableKey}

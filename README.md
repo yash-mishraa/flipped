@@ -1,76 +1,129 @@
-# Flipped — The Editorial Word Deduction Puzzle
+# FLIPPED — The Editorial Word Deduction Puzzle
 
-A production-quality word puzzle game built with Next.js 15 App Router, React 19, TypeScript strict mode, Tailwind CSS v4, Clerk Core 3 Authentication, and Prisma ORM.
+[![Production Build](https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Domain](https://img.shields.io/badge/Live-flipped.website-crimson?style=flat)](https://flipped.website)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-In **Flipped**, players decode two transformed clue words (via antonyms or synonyms) to reveal a familiar compound word or two-word phrase within a countdown timer.
+A high-polish, production-grade word deduction puzzle game built with **Next.js 15 App Router**, **React 19**, **TypeScript strict mode**, **Tailwind CSS v4**, **Clerk Core Authentication**, and **Prisma ORM**.
 
----
-
-## Origins & Inspiration
-
-**FLIPPED** was inspired by the popular *Times of India (TOI)* &ldquo;Flipped It&rdquo; word deduction puzzle. Because the original print and digital puzzle is restricted exclusively behind a paid newspaper subscription, **FLIPPED** was created as a 100% free, open-access web experience for puzzle enthusiasts worldwide.
-
-In addition to open access, **FLIPPED** introduces numerous advanced features not available in the original newspaper edition:
-- **Timed Classic Sprints**: Choose between 1, 2, 3, or 5-minute continuous solving sprints where new puzzles keep coming as you solve.
-- **Complete Daily Archive**: Replay past daily challenges anytime with calendar navigation and protected streak tracking.
-- **Clerk Authentication & Cloud Sync**: Seamlessly sync streaks, solve times, and high scores across all your devices.
-- **Real-Time Visual Feedback**: Immediate dashed crimson indicators for incorrect letters with smart backspace editing.
-- **Smooth 4-5s Brand Intro**: A polished crimson-and-cream intro animation on initial launch.
-- **4-Color Editorial Palette**: Pure Crimson (`#7B1E2B`), Cream White (`#F7F0E5`), Dark Wine (`#32171D`), and Muted Gold (`#C49A6C`).
+In **FLIPPED**, players decode two transformed clue words (via antonyms or synonyms) to uncover a familiar compound word or two-word phrase within a 60-second countdown timer.
 
 ---
 
-## Game Overview
+## Live Domain & Deployment
 
-- **Core Mechanic**: Two clue words are presented alongside their semantic transformation rules (`SYNONYM` or `ANTONYM`). Transforming each clue word and combining them forms a common two-word phrase (e.g., `COLD` [Antonym] + `WATER` [Synonym] → `HOT SPRING`).
-- **Interactive Grid**: Keyboard and touch-responsive tile grid with automatic answer detection. The first letter of each answer word is provided as a fixed clue.
-- **Scoring Engine**: Server-authoritative scoring starting at 100 points, decaying by 1 point every 5 seconds, with a 5-point deduction per hint used:
-  $$\text{Score} = \max(0, \min(100, 100 - \lfloor\text{elapsedSeconds} / 5\rfloor - (\text{hintsUsed} \times 5)))$$
-- **Game Modes**:
-  - **Daily Challenge**: One authoritative daily puzzle released at midnight `Asia/Kolkata` (IST). Strictly enforced single-attempt lock per player with persistent result review.
-  - **Classic Practice**: Unlimited practice across `Easy`, `Medium`, and `Hard` difficulty tiers with 1m, 2m, 3m, or 5m timed sprints.
-- **Player Hub**:
-  - **First-Time Onboarding**: Guided walkthrough with interactive practice sandbox (`SLOW` + `MEAL` → `FAST FOOD`).
-  - **Spoiler-Free Sharing**: Native Web Share API with clipboard fallback emitting masked emoji block grids (`🟩🟩🟩🟩 🟩🟩🟩🟩`).
-  - **Player Statistics**: Real-time streak tracking, win rates, and solve times synced to Clerk accounts.
-  - **Archive**: Historical view of past published daily challenges up to today.
+- **Production URL**: [https://flipped.website](https://flipped.website)
+- **Vercel Preview**: [https://flipped-sepia.vercel.app](https://flipped-sepia.vercel.app)
+- **Developer Contact**: [yashmishra1408@gmail.com](mailto:yashmishra1408@gmail.com)
+
+---
+
+## Origins & Attribution
+
+**FLIPPED** was inspired by the word deduction puzzle titled &ldquo;Flipped It&rdquo; originally featured in the print edition of the **Times of India (TOI)** newspaper. 
+
+Because the original game was restricted exclusively behind physical, home-delivered newspaper subscriptions in India with no digital access, **FLIPPED** was engineered from the ground up as an **open-access, 100% free digital web application** for word enthusiasts globally.
+
+### Key Innovations Over the Print Edition:
+- **Worldwide Web-First Access**: Zero subscriptions, paywalls, or app store downloads required. Playable on every mobile phone, tablet, and desktop browser.
+- **Classic Practice Sprints**: An unlimited practice mode with `Easy`, `Medium`, and `Hard` difficulty tiers and timed sprint options (1m, 2m, 3m, 5m) so players don't have to wait 24 hours between puzzles.
+- **Authoritative Daily Challenge**: Global UTC midnight synchronization so players in India, the Americas, Europe, and Asia all play the exact same puzzle on the same day.
+- **60-Second Real-Time Countdown**: Interactive adrenaline-pumping deductions with penalty-deducting hint assistance.
+- **Letter-by-Letter Real-Time Grid**: Tile input states (`fixed`, `entered`, `confirmed`) with auto-advancing cursor and backspace navigation.
+- **Cloud Sync & Guest Isolation**: Complete dual-track progress persistence—guests keep their daily streaks safely in browser `localStorage`, while signing in with Clerk enables multi-device cloud synchronization.
+- **Complete Historical Archive**: Browse and replay past daily challenges anytime without altering official daily streak statistics.
+
+---
+
+## GoDaddy Custom Domain Setup (`flipped.website`)
+
+Follow these exact steps to configure your custom domain bought through GoDaddy:
+
+### 1. Add Domain in Vercel
+1. Go to your project on the [Vercel Dashboard](https://vercel.com/dashboard).
+2. Navigate to **Settings** &rarr; **Domains**.
+3. Add `flipped.website` and select the recommended redirect (redirect `www.flipped.website` to `flipped.website` or vice-versa).
+
+### 2. Configure DNS Records in GoDaddy
+1. Log into your [GoDaddy Domain Portfolio](https://dcc.godaddy.com/manage/portfolio).
+2. Click on **`flipped.website`** and navigate to the **DNS** management tab.
+3. Add or update the following DNS records:
+
+| Type | Name / Host | Value / Target | TTL |
+| :--- | :--- | :--- | :--- |
+| **A** | `@` | `76.76.21.21` | `600 seconds` (or 1/2 hour) |
+| **CNAME** | `www` | `cname.vercel-dns.com.` | `1 hour` (or 3600s) |
+
+> [!NOTE]
+> If GoDaddy has default parking `A` records (pointing to parked IPs like `34.102.136.180`), edit or delete them so that only the Vercel `76.76.21.21` record remains for `@`.
+
+### 3. Automatic SSL Certification
+- Vercel will automatically detect the DNS configuration, verify domain ownership, and provision a free, auto-renewing Let's Encrypt Wildcard SSL certificate within 5–15 minutes.
+- Once configured, [https://flipped.website](https://flipped.website) will be live with HTTPS enforced.
+
+---
+
+## Google Search Indexing & SEO Setup
+
+FLIPPED includes a complete technical SEO foundation out of the box:
+
+### Included SEO Features
+- **Dynamic Sitemap (`/sitemap.xml`)**: Maps all canonical pages (`/`, `/daily`, `/classic`, `/archive`, `/stats`, `/about`, `/contact`, `/privacy`, `/terms`) with updated priorities and change frequencies.
+- **Crawler Directives (`/robots.txt`)**: Allows search bots (`Googlebot`, `bingbot`) while shielding private authentication and API endpoints.
+- **Social Graph Previews (`/opengraph-image`)**: Dynamically rendered 1200x630 OpenGraph and Twitter cards featuring official brand vectors and taglines.
+- **JSON-LD Structured Data**: Embedded `WebSite`, `WebApplication`, and `VideoGame` Schema.org graphs enabling rich search snippets and carousel inclusion.
+- **Canonical URLs**: Every page contains `rel="canonical"` linking strictly to `https://flipped.website/*`.
+
+### Step-by-Step Google Search Console Indexing
+1. **Open Google Search Console**: Visit [https://search.google.com/search-console](https://search.google.com/search-console).
+2. **Add Property**:
+   - Choose **Domain** property and enter `flipped.website`.
+   - Copy the verification `TXT` record provided by Google (e.g., `google-site-verification=...`).
+3. **Add TXT Record in GoDaddy**:
+   - In GoDaddy DNS Management for `flipped.website`, add:
+     - **Type**: `TXT`
+     - **Name**: `@`
+     - **Value**: `google-site-verification=...`
+     - **TTL**: `1 hour`
+   - Alternatively, add `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION="your-code"` in Vercel environment variables.
+4. **Verify in Google Search Console**: Click **Verify**.
+5. **Submit Sitemap**:
+   - In the left sidebar, click **Sitemaps**.
+   - Under *Add a new sitemap*, enter: `sitemap.xml` and click **Submit**.
+   - Status should change to **Success** within a few hours.
+6. **Request Priority Indexing**:
+   - Paste `https://flipped.website` into the top URL Inspection bar.
+   - Click **Request Indexing** to schedule Googlebot for a priority crawl. Repeat for `/daily` and `/about`.
+
+---
+
+## Site Pages & Navigation
+
+- **[`/`](file:///Users/yashmishra14/Flippedit/src/app/page.tsx)**: Production homepage with brand wordmark, Wordle-style daily streak indicator, quick actions, and tutorial launcher.
+- **[`/daily`](file:///Users/yashmishra14/Flippedit/src/app/daily/page.tsx)**: Authoritative Daily Challenge with single-attempt locking, countdown timer, hints, and victory review.
+- **[`/classic`](file:///Users/yashmishra14/Flippedit/src/app/classic/page.tsx)**: Unlimited practice sprints across Easy, Medium, and Hard tiers.
+- **[`/archive`](file:///Users/yashmishra14/Flippedit/src/app/archive/page.tsx)**: Historical calendar of past daily challenges playable on demand.
+- **[`/stats`](file:///Users/yashmishra14/Flippedit/src/app/stats/page.tsx)**: Player dashboard tracking games played, win rate, solve times, and cloud synchronization.
+- **[`/about`](file:///Users/yashmishra14/Flippedit/src/app/about/page.tsx)**: Story, Times of India attribution, deduction mechanics, and feature comparisons.
+- **[`/contact`](file:///Users/yashmishra14/Flippedit/src/app/contact/page.tsx)**: Interactive Mailbox component connecting directly to `yashmishra1408@gmail.com`.
+- **[`/privacy`](file:///Users/yashmishra14/Flippedit/src/app/privacy/page.tsx)**: Transparent GDPR/CCPA privacy policy detailing local storage and cloud sync.
+- **[`/terms`](file:///Users/yashmishra14/Flippedit/src/app/terms/page.tsx)**: Terms of service, fair play rules, and intellectual property notices.
 
 ---
 
 ## Security & Architecture
 
-1. **Zero Client Bundle Leakage**:
-   - Master solutions and approved variants are strictly isolated to server-side repositories (`src/server/puzzles/puzzle-repository.ts`).
-   - Browser client bundles receive only safe metadata (`id`, `clueWords`, `difficulty`, `wordLengths`) via `public-puzzles.ts`.
-   - Verified 0 occurrences of target answers or variants in `.next/static/` production bundles.
-2. **Server-Authoritative Evaluation**:
-   - Timers, attempt durations, and final scores are evaluated server-side against an authoritative 60-second deadline timestamp recorded in the database. Client claims are never trusted.
-3. **Cryptographically Signed Guest Sessions**:
-   - Players receive an HMAC-SHA256 signed token (`guestId.timestamp.hmac`) stored in an `HttpOnly`, `SameSite=Lax` cookie.
-   - Timing-safe verification prevents impersonation or attempt tampering.
-4. **Relational Database with Zero-Config Fallback**:
-   - Production persistence powered by Prisma ORM and PostgreSQL (`prisma/schema.prisma`).
-   - Transparent in-memory fallback adapter (`InMemoryDatabase`) allows local development and CI testing to execute seamlessly without a running database service.
-
----
-
-## Tech Stack
-
-- **Framework**: Next.js 15 (App Router, Server Actions, Route Handlers)
-- **UI Library**: React 19, Lucide React icons
-- **Styling**: Tailwind CSS v4, custom editorial design system (`#fcfbf9` warm paper, `#24272c` charcoal, `#e26d5c` coral)
-- **Database & ORM**: PostgreSQL, Prisma ORM 6
-- **Testing**:
-  - Vitest 3 with `@testing-library/react` and `jsdom` (Unit & Integration)
-  - Playwright (End-to-End browser journeys)
-- **Tooling**: TypeScript 5 (strict), ESLint 9, Prettier 3
+1. **Zero Client Solution Leakage**: Master solutions and acceptable synonyms exist exclusively in server-side repositories (`src/server/puzzles/puzzle-repository.ts`). Client bundles receive only sanitized puzzle metadata.
+2. **Server-Authoritative Evaluation**: All daily challenge submissions and timeouts are validated server-side against an authoritative start timestamp.
+3. **Cryptographically Signed Guest Sessions**: Guests receive HMAC-SHA256 signed session tokens stored in `HttpOnly`, `SameSite=Lax` cookies to prevent spoofing.
+4. **Relational Database with Zero-Config Fallback**: Built with Prisma ORM and PostgreSQL, paired with a reliable in-memory database fallback (`InMemoryDatabase`) for local development and CI testing.
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js 18.18+ or 20+
 - npm 9+
 
@@ -83,7 +136,12 @@ cd flipped
 
 # Install dependencies
 npm install
+
+# Start development server
+npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Environment Variables
 
@@ -96,43 +154,26 @@ DATABASE_URL="postgresql://user:password@localhost:5432/flipped_db?schema=public
 # Secret key for HMAC-SHA256 guest session cookies (32+ chars)
 GUEST_SESSION_SECRET="your-secure-random-secret-at-least-32-chars-long"
 
+# Clerk Authentication Keys (Optional for local dev, defaults to sandbox)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
+CLERK_SECRET_KEY="sk_test_..."
+
+# Google Search Console Verification (Optional)
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION="your-verification-code"
+
 # Node environment
 NODE_ENV="development"
 ```
 
-### Database Setup (Optional for PostgreSQL)
-
-```bash
-# Push schema to database
-npx prisma db push
-
-# Seed master puzzles and schedule
-npx prisma db seed
-```
-
-### Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
 ---
 
-## Testing & Verification
+## Verification & Testing Suite
 
-The project includes full unit, integration, security, and end-to-end test suites:
+FLIPPED contains comprehensive unit, component, security, and Playwright end-to-end browser tests:
 
 ```bash
-# Run all unit and integration tests (199 tests across 28 suites)
+# Run all unit and integration tests (272 tests across 38 suites)
 npm test
-
-# Run unit tests in watch mode
-npm run test:watch
-
-# Run Playwright End-to-End tests (12 tests across 5 suites)
-npx playwright test
 
 # Check TypeScript types
 npm run typecheck
@@ -140,61 +181,18 @@ npm run typecheck
 # Check ESLint rules
 npm run lint
 
-# Check Prettier code formatting
-npm run format:check
-
-# Auto-format codebase
-npm run format
-
 # Production build compilation
 npm run build
-```
 
-### End-to-End User Journeys (Playwright)
-
-- **Journey A (`tests/e2e/first-time-and-classic.spec.ts`)**: First-time player walkthrough, onboarding completion, navigation to Classic practice.
-- **Journey B (`tests/e2e/first-time-and-classic.spec.ts`)**: Letter entry, arrow key navigation, Backspace editing, auto-validation.
-- **Journey C (`tests/e2e/hints-and-timeout.spec.ts`)**: Hint request, 5-point deduction, revealed tile locking.
-- **Journey D (`tests/e2e/hints-and-timeout.spec.ts`)**: 60-second timeout, input locking, canonical solution reveal.
-- **Journey E (`tests/e2e/daily-restrictions.spec.ts`)**: Daily challenge single-attempt lock and reload persistence.
-- **Journey F (`tests/e2e/resilience-and-accessibility.spec.ts`)**: Responsive layouts across 320px, 390px, 768px, 1280px without horizontal overflow, keyboard roving tabindex, header routing.
-
----
-
-## Production Deployment
-
-### Option 1: Vercel
-
-1. Connect the GitHub repository `https://github.com/yash-mishraa/flipped.git` in the Vercel dashboard.
-2. Set environment variables:
-   - `GUEST_SESSION_SECRET`: Generate a 32+ character random string.
-   - `DATABASE_URL`: Add a managed PostgreSQL connection string (e.g. Vercel Postgres, Neon, Supabase).
-3. Deploy. Vercel automatically runs `prisma generate` and `next build`.
-
-### Option 2: Node.js Server / Docker
-
-```bash
-# Install production dependencies
-npm ci
-
-# Generate Prisma client
-npx prisma generate
-
-# Run database migrations
-npx prisma migrate deploy
-
-# Seed database
-npx prisma db seed
-
-# Build optimized Next.js bundle
-npm run build
-
-# Start production server
-npm start
+# Run Playwright End-to-End browser journeys
+npx playwright test
 ```
 
 ---
 
-## License
+## License & Contact
 
-MIT
+- **License**: MIT
+- **Creator**: Yash Mishra
+- **Mailbox**: [yashmishra1408@gmail.com](mailto:yashmishra1408@gmail.com)
+- **Website**: [flipped.website](https://flipped.website)

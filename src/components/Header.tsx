@@ -23,6 +23,15 @@ const branchedMenuItems: readonly BranchedMenuSection[] = [
     children: [
       { value: "/stats", label: "Player Statistics" },
       { value: "how-to-play", label: "How to Play" },
+      { value: "/contact", label: "Contact Us" },
+    ],
+  },
+  {
+    label: "About & Legal",
+    children: [
+      { value: "/about", label: "About FLIPPED" },
+      { value: "/privacy", label: "Privacy Policy" },
+      { value: "/terms", label: "Terms of Service" },
     ],
   },
 ];
