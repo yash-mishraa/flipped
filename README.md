@@ -172,7 +172,7 @@ NODE_ENV="development"
 FLIPPED contains comprehensive unit, component, security, and Playwright end-to-end browser tests:
 
 ```bash
-# Run all unit and integration tests (272 tests across 38 suites)
+# Run all unit and integration tests (291 tests across 41 suites)
 npm test
 
 # Check TypeScript types
