@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FlippedSymbol } from "@/components/FlippedLogo";
-import { Shield, Lock, HardDrive, Cookie, Mail, UserCheck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -44,9 +43,8 @@ export default function PrivacyPage(): React.JSX.Element {
         <article className="w-full rounded-3xl border border-[#C49A6C]/50 bg-white/95 p-6 sm:p-10 shadow-lg space-y-6 text-sm text-[#6B4E55] leading-relaxed">
           {/* Summary Box */}
           <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/70 p-4">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#7B1E2B] mb-1">
-              <Shield className="h-4 w-4" />
-              <span>Privacy at a Glance</span>
+            <div className="text-xs font-black uppercase tracking-wider text-[#7B1E2B] mb-1">
+              Privacy at a Glance
             </div>
             <p className="text-xs text-[#32171D] leading-relaxed">
               FLIPPED is built with a privacy-first mindset. We do not track you across the web, we do not show third-party behavioral advertisements, and we do not sell your personal information. You can play completely anonymously as a guest without creating an account.
@@ -55,10 +53,9 @@ export default function PrivacyPage(): React.JSX.Element {
 
           {/* Section 1: Information We Collect */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <HardDrive className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>1. Information We Collect &amp; Store</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              1. Information We Collect &amp; Store
+            </h2>
             <p>
               Depending on how you use <strong className="text-[#32171D]">flipped.website</strong>, we collect minimal data required to provide the game:
             </p>
@@ -77,10 +74,9 @@ export default function PrivacyPage(): React.JSX.Element {
 
           {/* Section 2: How We Use Information */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Lock className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>2. How We Use Your Information</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              2. How We Use Your Information
+            </h2>
             <p>We use stored data solely for the following operational purposes:</p>
             <ul className="list-disc pl-5 space-y-1 text-xs sm:text-sm">
               <li>To evaluate word solutions and track daily single-attempt completion status.</li>
@@ -92,10 +88,9 @@ export default function PrivacyPage(): React.JSX.Element {
 
           {/* Section 3: Cookies & Local Storage */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Cookie className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>3. Cookies &amp; Local Storage Technology</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              3. Cookies &amp; Local Storage Technology
+            </h2>
             <p>
               FLIPPED does not use third-party marketing or advertising tracking cookies. We utilize:
             </p>
@@ -111,10 +106,9 @@ export default function PrivacyPage(): React.JSX.Element {
 
           {/* Section 4: Data Security & Retention */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Shield className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>4. Data Security &amp; Retention</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              4. Data Security &amp; Retention
+            </h2>
             <p>
               All network traffic to <span className="font-semibold text-[#32171D]">flipped.website</span> is encrypted in transit using industry-standard Transport Layer Security (TLS/HTTPS). User passwords are never handled directly by our application code; authentication tokens are encrypted and managed with SOC-2 compliant infrastructure via Clerk.
             </p>
@@ -122,10 +116,9 @@ export default function PrivacyPage(): React.JSX.Element {
 
           {/* Section 5: Your Rights */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <UserCheck className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>5. Your Rights &amp; Data Deletion</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              5. Your Rights &amp; Data Deletion
+            </h2>
             <p>
               You maintain total control over your information:
             </p>
@@ -141,10 +134,9 @@ export default function PrivacyPage(): React.JSX.Element {
 
           {/* Section 6: Contact Information */}
           <section className="space-y-2 border-t border-[#C49A6C]/30 pt-4">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Mail className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>6. Contact Us</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              6. Contact Us
+            </h2>
             <p>
               If you have any questions or concerns regarding this Privacy Policy, please reach out to the developer:
             </p>

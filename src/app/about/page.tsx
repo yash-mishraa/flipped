@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FlippedSymbol } from "@/components/FlippedLogo";
-import { Newspaper, Globe, Sparkles, Zap, ShieldCheck, Heart, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About FLIPPED — Origins, Inspiration & How It Works",
@@ -45,9 +44,8 @@ export default function AboutPage(): React.JSX.Element {
           aria-label="Origins & Inspiration"
           className="w-full rounded-3xl border-2 border-[#C49A6C]/70 bg-white/95 p-6 sm:p-8 shadow-xl shadow-[#32171D]/10 backdrop-blur-md mb-8"
         >
-          <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-[#7B1E2B] mb-3">
-            <Newspaper className="h-4 w-4" />
-            <span>Origins &amp; Inspiration</span>
+          <div className="text-xs font-black uppercase tracking-wider text-[#7B1E2B] mb-3">
+            Origins &amp; Inspiration
           </div>
 
           <h2 className="text-2xl font-black text-[#32171D] tracking-tight">
@@ -72,29 +70,29 @@ export default function AboutPage(): React.JSX.Element {
               What We Added &amp; Reimagined:
             </h3>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-[#32171D]">
-              <li className="flex items-start gap-2">
-                <Globe className="h-4 w-4 text-[#7B1E2B] shrink-0 mt-0.5" />
-                <span><strong>100% Free Worldwide Access:</strong> No newspaper subscription or paywall required.</span>
+              <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">100% Free Worldwide Access</span>
+                <span className="text-[#6B4E55]">No newspaper subscription or paywall required.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <Zap className="h-4 w-4 text-[#7B1E2B] shrink-0 mt-0.5" />
-                <span><strong>Classic Practice Mode:</strong> Unlimited randomized sprint rounds across Easy, Medium, and Hard.</span>
+              <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">Classic Practice Mode</span>
+                <span className="text-[#6B4E55]">Unlimited randomized sprint rounds across Easy, Medium, and Hard.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <Sparkles className="h-4 w-4 text-[#7B1E2B] shrink-0 mt-0.5" />
-                <span><strong>60-Second Real-Time Clock:</strong> High-stakes countdown with penalty-based reveal hints.</span>
+              <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">60-Second Real-Time Clock</span>
+                <span className="text-[#6B4E55]">High-stakes countdown with penalty-based reveal hints.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <Globe className="h-4 w-4 text-[#7B1E2B] shrink-0 mt-0.5" />
-                <span><strong>UTC Midnight Reset:</strong> Every player globally gets the identical daily challenge simultaneously.</span>
+              <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">UTC Midnight Reset</span>
+                <span className="text-[#6B4E55]">Every player globally gets the identical daily challenge simultaneously.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <ShieldCheck className="h-4 w-4 text-[#7B1E2B] shrink-0 mt-0.5" />
-                <span><strong>Cloud &amp; Guest Streaks:</strong> Play as a guest with local browser streaks or sync across devices with an account.</span>
+              <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">Cloud &amp; Guest Streaks</span>
+                <span className="text-[#6B4E55]">Play as a guest with local browser streaks or sync across devices with an account.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <Heart className="h-4 w-4 text-[#7B1E2B] shrink-0 mt-0.5" />
-                <span><strong>Full Historical Archive:</strong> Replay past daily challenges at any time at your own pace.</span>
+              <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">Full Historical Archive</span>
+                <span className="text-[#6B4E55]">Replay past daily challenges at any time at your own pace.</span>
               </li>
             </ul>
           </div>
@@ -146,10 +144,9 @@ export default function AboutPage(): React.JSX.Element {
           <div className="pt-2 flex justify-center gap-3">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-[#7B1E2B] px-5 py-2.5 text-xs sm:text-sm font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-95 transition"
+              className="inline-flex items-center rounded-full bg-[#7B1E2B] px-5 py-2.5 text-xs sm:text-sm font-bold text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-95 transition"
             >
               <span>Open Mailbox</span>
-              <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/daily"

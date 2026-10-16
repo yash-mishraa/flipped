@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FlippedSymbol } from "@/components/FlippedLogo";
-import { Scale, FileText, AlertCircle, ShieldAlert, Award, Mail } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Terms of Service & Legal Notices",
@@ -44,9 +43,8 @@ export default function TermsPage(): React.JSX.Element {
         <article className="w-full rounded-3xl border border-[#C49A6C]/50 bg-white/95 p-6 sm:p-10 shadow-lg space-y-6 text-sm text-[#6B4E55] leading-relaxed">
           {/* Welcome Notice */}
           <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/70 p-4">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#7B1E2B] mb-1">
-              <FileText className="h-4 w-4" />
-              <span>Agreement to Terms</span>
+            <div className="text-xs font-black uppercase tracking-wider text-[#7B1E2B] mb-1">
+              Agreement to Terms
             </div>
             <p className="text-xs text-[#32171D] leading-relaxed">
               By accessing or playing on <strong className="text-[#32171D]">flipped.website</strong> (&ldquo;FLIPPED&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please discontinue use of the website.
@@ -55,10 +53,9 @@ export default function TermsPage(): React.JSX.Element {
 
           {/* Section 1: Gameplay & Fair Play */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Scale className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>1. Fair Play &amp; Permitted Use</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              1. Fair Play &amp; Permitted Use
+            </h2>
             <p>
               FLIPPED is a free intellectual recreation and deduction puzzle provided for personal entertainment. You agree to use the service in accordance with fair play standards:
             </p>
@@ -77,10 +74,9 @@ export default function TermsPage(): React.JSX.Element {
 
           {/* Section 2: Intellectual Property & Attribution Notice */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Award className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>2. Intellectual Property &amp; Inspiration Notice</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              2. Intellectual Property &amp; Inspiration Notice
+            </h2>
             <p>
               FLIPPED is an independent digital game developed and maintained by <strong className="text-[#32171D]">Yash Mishra</strong>.
             </p>
@@ -102,10 +98,9 @@ export default function TermsPage(): React.JSX.Element {
 
           {/* Section 3: Accounts & Security */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <ShieldAlert className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>3. User Accounts &amp; Data Synchronization</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              3. User Accounts &amp; Data Synchronization
+            </h2>
             <p>
               Account creation is entirely optional. When you register an account to sync your game statistics, you are responsible for maintaining the confidentiality of your login credentials. You agree that we may store your solve statistics and streak history in connection with your account ID as outlined in our <Link href="/privacy" className="text-[#7B1E2B] underline font-medium">Privacy Policy</Link>.
             </p>
@@ -113,10 +108,9 @@ export default function TermsPage(): React.JSX.Element {
 
           {/* Section 4: Disclaimer of Warranties */}
           <section className="space-y-2">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <AlertCircle className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>4. Disclaimer of Warranties</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              4. Disclaimer of Warranties
+            </h2>
             <p className="text-xs sm:text-sm">
               FLIPPED is provided on an &ldquo;AS IS&rdquo; and &ldquo;AS AVAILABLE&rdquo; basis without warranties of any kind, whether express or implied. While we strive for 100% puzzle accuracy and uninterrupted uptime, we do not warrant that the website will always be error-free or that service will be continuous.
             </p>
@@ -124,10 +118,9 @@ export default function TermsPage(): React.JSX.Element {
 
           {/* Section 5: Contact */}
           <section className="space-y-2 border-t border-[#C49A6C]/30 pt-4">
-            <div className="flex items-center gap-2 text-[#32171D] font-bold text-base sm:text-lg">
-              <Mail className="h-4 w-4 text-[#7B1E2B]" />
-              <h2>5. Inquiries &amp; Legal Notices</h2>
-            </div>
+            <h2 className="text-[#32171D] font-bold text-base sm:text-lg">
+              5. Inquiries &amp; Legal Notices
+            </h2>
             <p>
               For legal inquiries, copyright questions, or licensing discussions, please contact the developer directly:
             </p>
