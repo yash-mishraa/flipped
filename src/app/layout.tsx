@@ -119,9 +119,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>): React.JSX.Element {
-  const publishableKey =
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
-    "pk_test_c2FmZS1jYXQtMjI1OC5jbGVyay5hY2NvdW50cy5kZXYk";
+  let publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!publishableKey) {
+    publishableKey = "pk_test_c2FmZS1jYXQtMjI1OC5jbGVyay5hY2NvdW50cy5kZXYk";
+  } else if (publishableKey.includes("Y2xlcmsuZmxpcHBlZC1zZXBpYS52ZXJjZWwuYXBwJA")) {
+    publishableKey = "pk_live_Y2xlcmsuZmxpcHBlZC53ZWJzaXRlJA";
+  }
 
   return (
     <html lang="en">

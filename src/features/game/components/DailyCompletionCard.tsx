@@ -118,28 +118,16 @@ export function DailyCompletionCard({
 
   useEffect(() => {
     if (!isSignedIn) {
-      const isDismissed =
-        typeof window !== "undefined" &&
-        Boolean(window.sessionStorage?.getItem(`flipped_dismissed_auth_${date}`));
-      if (!isDismissed) {
-        // Reveal the pop-up modal smoothly after victory celebration burst
-        const timer = setTimeout(() => {
-          setShowAuthModal(true);
-        }, 500);
-        return () => clearTimeout(timer);
-      }
+      // Reveal the pop-up modal smoothly every time a guest user visits completed challenge
+      const timer = setTimeout(() => {
+        setShowAuthModal(true);
+      }, 400);
+      return () => clearTimeout(timer);
     }
   }, [isSignedIn, date]);
 
   const handleCloseAuthModal = () => {
     setShowAuthModal(false);
-    try {
-      if (typeof window !== "undefined" && window.sessionStorage) {
-        window.sessionStorage.setItem(`flipped_dismissed_auth_${date}`, "true");
-      }
-    } catch {
-      // Ignore sessionStorage quota error
-    }
   };
 
   // Trigger celebration confetti on victory and sync with cloud database
@@ -297,21 +285,31 @@ export function DailyCompletionCard({
 
       {/* Account Cloud Sync Status */}
       {isSignedIn ? (
-        <div className="text-xs font-semibold text-[#7B1E2B]">
+        <div className="text-xs font-semibold text-[#7B1E2B] text-center">
           Daily streak &amp; statistics synced to your account
         </div>
       ) : (
-        <div className="w-full rounded-2xl border border-[#C49A6C]/50 bg-[#faeee0]/50 p-3.5 text-center text-xs text-[#6B4E55]">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-            <span>
-              <strong className="text-[#7B1E2B]">Guest Session:</strong> Streak ({streak}) saved locally in this browser.
-            </span>
+        <div className="w-full rounded-2xl border-2 border-[#C49A6C]/70 bg-[#faeee0]/80 p-4 text-center space-y-2.5 shadow-xs">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-white border border-[#C49A6C]/60 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-[#7B1E2B]">
+            Sync &amp; Save Your Streak
+          </div>
+          <p className="text-xs text-[#6B4E55] max-w-sm mx-auto leading-relaxed">
+            <strong className="text-[#7B1E2B]">Guest Session:</strong> Streak ({streak}) saved locally in this browser. Log in or create a free account to sync across devices!
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-0.5">
             <button
               type="button"
               onClick={() => setShowAuthModal(true)}
-              className="rounded-full bg-[#7B1E2B] px-3.5 py-1 text-xs font-bold text-[#F7F0E5] shadow-2xs hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              className="rounded-full bg-[#7B1E2B] px-5 py-2 text-xs font-bold font-sans tracking-tight text-[#F7F0E5] shadow-xs hover:bg-[#631722] active:scale-[0.97] transition-all duration-200 cursor-pointer"
             >
               Sync with Account
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAuthModal(true)}
+              className="rounded-full border border-[#C49A6C] bg-white px-4 py-2 text-xs font-bold font-sans tracking-tight text-[#32171D] shadow-2xs hover:bg-[#faeee0] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+            >
+              Log In
             </button>
           </div>
         </div>

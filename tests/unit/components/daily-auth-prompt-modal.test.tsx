@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { DailyAuthPromptModal } from "@/features/game/components/DailyAuthPromptModal";
 import { DailyCompletionCard } from "@/features/game/components/DailyCompletionCard";
@@ -156,5 +156,26 @@ describe("DailyCompletionCard Guest Auth Sync Integration", () => {
     expect(
       screen.getByText("Login or create an account in order to sync and save your progress.")
     ).toBeInTheDocument();
+  });
+
+  it("automatically prompts the auth modal on mount for guest users who have completed the challenge", async () => {
+    vi.useFakeTimers();
+    render(
+      <DailyCompletionCard
+        date="2026-10-15"
+        puzzle={fastFoodPuzzle}
+        attempt={attempt}
+      />
+    );
+
+    // Fast-forward past the 400ms entrance timer
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    expect(
+      screen.getByText("Login or create an account in order to sync and save your progress.")
+    ).toBeInTheDocument();
+    vi.useRealTimers();
   });
 });
