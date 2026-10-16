@@ -107,10 +107,12 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(Array.isArray(robotRules.rules)).toBe(true);
   });
 
-  it("generates sitemap.xml with canonical flipped.website routes", () => {
+  it("generates sitemap.xml with canonical flipped.website routes and valid W3C lastModified dates", () => {
     const map = sitemap();
     const urls = map.map((entry) => entry.url);
 
+    // 1. Verify exact 9 canonical public routes
+    expect(urls).toHaveLength(9);
     expect(urls).toContain("https://flipped.website");
     expect(urls).toContain("https://flipped.website/daily");
     expect(urls).toContain("https://flipped.website/classic");
@@ -120,5 +122,23 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(urls).toContain("https://flipped.website/contact");
     expect(urls).toContain("https://flipped.website/privacy");
     expect(urls).toContain("https://flipped.website/terms");
+
+    // 2. Ensure NO duplicate URLs
+    const uniqueUrls = new Set(urls);
+    expect(uniqueUrls.size).toBe(urls.length);
+
+    // 3. Ensure strictly NO private or redirect routes
+    expect(urls).not.toContain("https://flipped.website/sign-in");
+    expect(urls).not.toContain("https://flipped.website/sign-up");
+    expect(urls).not.toContain("https://flipped.website/play");
+    expect(urls.some((u) => u.includes("/api"))).toBe(false);
+
+    // 4. Validate W3C Date format (YYYY-MM-DD) for all entries
+    for (const entry of map) {
+      expect(entry.lastModified).toBeDefined();
+      expect(String(entry.lastModified)).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(entry.priority).toBeGreaterThanOrEqual(0.1);
+      expect(entry.priority).toBeLessThanOrEqual(1.0);
+    }
   });
 });
