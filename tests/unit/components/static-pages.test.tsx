@@ -47,7 +47,10 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
       screen.getByText("Got any feedback or reviews or need anything then click here")
     ).toBeInTheDocument();
     expect(screen.getByText("flippedbyyash@gmail.com")).toBeInTheDocument();
-    expect(screen.getByText("Open in Mail App")).toBeInTheDocument();
+    expect(screen.getByText("Open in my mail app")).toBeInTheDocument();
+    expect(screen.getByText("Reporting an Incorrect Answer")).toBeInTheDocument();
+    expect(screen.getByText("Suggesting New Phrase Pairs")).toBeInTheDocument();
+    expect(screen.getByText("Account & Daily Streak Questions")).toBeInTheDocument();
   });
 
   it("interacts with ContactMailbox and provides mailto redirect to flippedbyyash@gmail.com", () => {
@@ -59,18 +62,14 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(screen.getByText("flippedbyyash@gmail.com")).toBeInTheDocument();
 
     // Verify Mail App link has mailto href
-    const mailLink = screen.getByRole("link", { name: /Open in Mail App/i });
+    const mailLink = screen.getByRole("link", { name: /Open in my mail app/i });
     expect(mailLink).toHaveAttribute(
       "href",
       expect.stringContaining("mailto:flippedbyyash@gmail.com")
     );
 
-    // Verify Gmail Web link
-    const gmailLink = screen.getByRole("link", { name: /Gmail Web/i });
-    expect(gmailLink).toHaveAttribute(
-      "href",
-      expect.stringContaining("mail.google.com")
-    );
+    // Verify Gmail Web link was removed
+    expect(screen.queryByText("Gmail Web")).not.toBeInTheDocument();
 
     // Copy button
     const copyBtn = screen.getByRole("button", { name: /Copy email address/i });

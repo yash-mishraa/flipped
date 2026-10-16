@@ -4,7 +4,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ContactMailbox } from "@/components/ContactMailbox";
 import { FlippedSymbol } from "@/components/FlippedLogo";
-import { HelpCircle, Sparkles, Bug } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact Us & Feedback",
@@ -54,9 +53,8 @@ export default function ContactPage(): React.JSX.Element {
 
           <div className="space-y-3">
             <div className="rounded-2xl border border-[#C49A6C]/40 bg-white/80 p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
-                <Bug className="h-3.5 w-3.5" />
-                <span>Reporting an Incorrect Answer</span>
+              <div className="text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
+                Reporting an Incorrect Answer
               </div>
               <p className="mt-1 text-xs text-[#6B4E55] leading-relaxed">
                 Notice an issue with a puzzle or an alternative valid synonym? Please include the puzzle date or clue words in your email so we can review the dictionary validator.
@@ -64,9 +62,8 @@ export default function ContactPage(): React.JSX.Element {
             </div>
 
             <div className="rounded-2xl border border-[#C49A6C]/40 bg-white/80 p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Suggesting New Phrase Pairs</span>
+              <div className="text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
+                Suggesting New Phrase Pairs
               </div>
               <p className="mt-1 text-xs text-[#6B4E55] leading-relaxed">
                 Have a great 2-word flipped pair in mind? Drop it in the mailbox! If selected, your idea will appear in the Classic rotation or Daily challenges.
@@ -74,9 +71,8 @@ export default function ContactPage(): React.JSX.Element {
             </div>
 
             <div className="rounded-2xl border border-[#C49A6C]/40 bg-white/80 p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
-                <HelpCircle className="h-3.5 w-3.5" />
-                <span>Account &amp; Daily Streak Questions</span>
+              <div className="text-xs font-bold text-[#7B1E2B] uppercase tracking-wider">
+                Account &amp; Daily Streak Questions
               </div>
               <p className="mt-1 text-xs text-[#6B4E55] leading-relaxed">
                 Guest streaks remain safely saved in your browser localStorage. When you sign in with a free account, streaks are seamlessly synced to the cloud across devices.
