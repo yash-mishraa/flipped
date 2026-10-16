@@ -892,81 +892,84 @@ export function ClassicSprintBoard(): React.JSX.Element {
           {unfinishedPuzzle && (
             <div
               data-testid="classic-unfinished-puzzle"
-              className="mt-6 w-full rounded-2xl border-2 border-[#E09F3E]/70 bg-gradient-to-b from-[#FFFDF9] to-[#FFF8EE] p-4 sm:p-5 text-left shadow-md"
+              className="mt-6 w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/30 p-4 sm:p-5 text-left"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E09F3E]/20 border border-[#E09F3E]/50 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider text-[#915B00]">
-                  <span>⌛</span>
-                  <span>Unfinished Word When Time Expired</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6870]">
+                  Unfinished Word When Time Expired
                 </span>
-                <span className="text-[10px] font-bold text-[#8C6D68]">
+                <span className="rounded-full bg-[#faeee0] border border-[#C49A6C]/40 px-2.5 py-0.5 text-[10px] font-bold uppercase text-[#7B1E2B]">
                   Solution Revealed
                 </span>
               </div>
 
-              {/* Clues */}
-              <div className="mt-3 flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#32171D]">
-                <span className="text-xs font-bold uppercase text-[#8C6870]">Clues:</span>
-                <span className="rounded-lg bg-[#faeee0] px-2.5 py-1 text-[#7B1E2B] border border-[#C49A6C]/30">
-                  {unfinishedPuzzle.clueWords[0]}
-                </span>
-                <span className="text-[#C49A6C] font-black">+</span>
-                <span className="rounded-lg bg-[#faeee0] px-2.5 py-1 text-[#7B1E2B] border border-[#C49A6C]/30">
-                  {unfinishedPuzzle.clueWords[1]}
-                </span>
-              </div>
-
-              {/* What user had entered */}
-              {unfinishedPuzzle.userEnteredWords && (
-                <div className="mt-2.5 flex items-center gap-2 text-xs text-[#6B4E55]">
-                  <span className="text-[11px] font-bold uppercase text-[#8C6870]">Your Letters:</span>
-                  <span className="font-mono font-bold tracking-wider text-[#32171D] bg-white px-2 py-0.5 rounded border border-[#C49A6C]/25">
-                    {unfinishedPuzzle.userEnteredWords[0]} {unfinishedPuzzle.userEnteredWords[1]}
-                  </span>
-                </div>
-              )}
-
-              {/* Revealed Solution */}
-              <div className="mt-3 rounded-xl border border-[#7B1E2B]/30 bg-[#faeee0]/70 p-3">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[#7B1E2B]">
-                  Correct Answer
-                </div>
-                {unfinishedPuzzle.loading ? (
-                  <div className="mt-1 flex items-center gap-2 text-xs font-semibold text-[#6B4E55]">
-                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#7B1E2B] border-t-transparent" />
-                    <span>Revealing solution...</span>
+              {/* White Content Card */}
+              <div className="mt-3 flex flex-col rounded-xl bg-white p-3.5 border border-[#C49A6C]/30 shadow-2xs space-y-3">
+                {/* Clues & User Progress */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-[#8C6D68]">
+                    <span className="font-semibold text-[#6B4E55]">Clues:</span>
+                    <span className="font-bold text-[#7B1E2B] bg-[#faeee0] px-2 py-0.5 rounded border border-[#C49A6C]/30">
+                      {unfinishedPuzzle.clueWords[0]}
+                    </span>
+                    <span className="text-[#C49A6C] font-black">+</span>
+                    <span className="font-bold text-[#7B1E2B] bg-[#faeee0] px-2 py-0.5 rounded border border-[#C49A6C]/30">
+                      {unfinishedPuzzle.clueWords[1]}
+                    </span>
                   </div>
-                ) : unfinishedPuzzle.solutionPhrase ? (
-                  <p className="mt-0.5 text-lg sm:text-xl font-black text-[#32171D] tracking-wide">
-                    {unfinishedPuzzle.solutionPhrase}
-                  </p>
-                ) : null}
 
-                {/* Flip Deductions */}
-                {unfinishedPuzzle.transformations && unfinishedPuzzle.transformations.length > 0 && (
-                  <div className="mt-2.5 pt-2 border-t border-[#C49A6C]/30 space-y-1.5">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
-                      Flip Deductions
+                  {unfinishedPuzzle.userEnteredWords && (
+                    <div className="flex items-center gap-1.5 text-xs text-[#8C6D68]">
+                      <span>Your letters:</span>
+                      <span className="font-mono font-bold tracking-wider text-[#32171D] bg-[#faeee0]/60 px-2 py-0.5 rounded border border-[#C49A6C]/25">
+                        {unfinishedPuzzle.userEnteredWords[0]} {unfinishedPuzzle.userEnteredWords[1]}
+                      </span>
                     </div>
-                    {unfinishedPuzzle.transformations.map((t, tIdx) => (
-                      <div key={`unfinished-trans-${tIdx}`} className="text-xs text-[#32171D]">
-                        <div className="flex items-center gap-1.5 font-semibold">
-                          <span className="text-[#7B1E2B] font-bold">{t.clueWord}</span>
-                          <span className="text-[#C49A6C]">➔</span>
-                          <span className="font-black text-[#32171D]">{t.answerWord}</span>
-                          <span className="rounded-full bg-[#faeee0] px-1.5 py-0.2 text-[9px] font-bold uppercase text-[#8C6D68] border border-[#C49A6C]/30">
-                            {t.relationship}
-                          </span>
-                        </div>
-                        {t.explanation && (
-                          <p className="mt-0.5 text-[11px] text-[#6B4E55] italic pl-2 border-l-2 border-[#C49A6C]/40">
-                            {t.explanation}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                  )}
+                </div>
+
+                {/* Revealed Answer & Deductions */}
+                <div className="border-t border-[#C49A6C]/20 pt-2.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
+                    Correct Answer
                   </div>
-                )}
+                  {unfinishedPuzzle.loading ? (
+                    <div className="mt-1 flex items-center gap-2 text-xs font-semibold text-[#6B4E55]">
+                      <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#7B1E2B] border-t-transparent" />
+                      <span>Revealing solution...</span>
+                    </div>
+                  ) : unfinishedPuzzle.solutionPhrase ? (
+                    <p className="mt-0.5 text-base sm:text-lg font-black text-[#32171D] tracking-wide">
+                      {unfinishedPuzzle.solutionPhrase}
+                    </p>
+                  ) : null}
+
+                  {/* Flip Deductions */}
+                  {unfinishedPuzzle.transformations && unfinishedPuzzle.transformations.length > 0 && (
+                    <div className="mt-2.5 space-y-1.5 border-t border-[#C49A6C]/20 pt-2">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
+                        Flip Deductions
+                      </div>
+                      {unfinishedPuzzle.transformations.map((t, tIdx) => (
+                        <div key={`unfinished-trans-${tIdx}`} className="text-xs text-[#32171D]">
+                          <div className="flex items-center gap-1.5 font-semibold">
+                            <span className="text-[#7B1E2B] font-bold">{t.clueWord}</span>
+                            <span className="text-[#C49A6C]">➔</span>
+                            <span className="font-black text-[#32171D]">{t.answerWord}</span>
+                            <span className="rounded-full bg-[#faeee0] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#8C6D68] border border-[#C49A6C]/30">
+                              {t.relationship}
+                            </span>
+                          </div>
+                          {t.explanation && (
+                            <p className="mt-0.5 text-[11px] text-[#6B4E55] italic pl-2 border-l-2 border-[#C49A6C]/40">
+                              {t.explanation}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
