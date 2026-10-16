@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   description:
     "Learn about the origins of FLIPPED. Inspired by Times of India's newspaper puzzle, reimagined as a free digital word deduction game with Classic and Daily modes.",
   alternates: {
-    canonical: "https://flipped.website/about",
+    canonical: "https://www.flipped.website/about",
   },
   openGraph: {
     title: "About FLIPPED — Origins, Inspiration & How It Works",
     description:
       "Inspired by Times of India's physical print puzzle, reimagined as a free digital word deduction game with Classic and Daily modes on flipped.website.",
-    url: "https://flipped.website/about",
+    url: "https://www.flipped.website/about",
   },
 };
 

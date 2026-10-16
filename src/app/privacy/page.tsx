@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   description:
     "FLIPPED Privacy Policy. Learn how your game progress, guest streaks, and account synchronization data are handled safely and transparently on flipped.website.",
   alternates: {
-    canonical: "https://flipped.website/privacy",
+    canonical: "https://www.flipped.website/privacy",
   },
   openGraph: {
     title: "Privacy Policy | FLIPPED",
     description:
       "Learn how your game progress, guest streaks, and account synchronization data are handled safely and transparently on flipped.website.",
-    url: "https://flipped.website/privacy",
+    url: "https://www.flipped.website/privacy",
   },
 };
 

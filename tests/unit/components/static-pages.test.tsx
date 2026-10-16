@@ -100,37 +100,37 @@ describe("Static Pages, SEO & Contact Mailbox", () => {
     expect(screen.getAllByText(/flippedbyyash@gmail.com/i)[0]).toBeInTheDocument();
   });
 
-  it("generates robots.txt rules pointing to flipped.website sitemap", () => {
+  it("generates robots.txt rules pointing to www.flipped.website sitemap", () => {
     const robotRules = robots();
-    expect(robotRules.sitemap).toBe("https://flipped.website/sitemap.xml");
-    expect(robotRules.host).toBe("https://flipped.website");
+    expect(robotRules.sitemap).toBe("https://www.flipped.website/sitemap.xml");
+    expect(robotRules.host).toBe("https://www.flipped.website");
     expect(Array.isArray(robotRules.rules)).toBe(true);
   });
 
-  it("generates sitemap.xml with canonical flipped.website routes and valid W3C lastModified dates", () => {
+  it("generates sitemap.xml with canonical www.flipped.website routes and valid W3C lastModified dates", () => {
     const map = sitemap();
     const urls = map.map((entry) => entry.url);
 
     // 1. Verify exact 9 canonical public routes
     expect(urls).toHaveLength(9);
-    expect(urls).toContain("https://flipped.website");
-    expect(urls).toContain("https://flipped.website/daily");
-    expect(urls).toContain("https://flipped.website/classic");
-    expect(urls).toContain("https://flipped.website/archive");
-    expect(urls).toContain("https://flipped.website/stats");
-    expect(urls).toContain("https://flipped.website/about");
-    expect(urls).toContain("https://flipped.website/contact");
-    expect(urls).toContain("https://flipped.website/privacy");
-    expect(urls).toContain("https://flipped.website/terms");
+    expect(urls).toContain("https://www.flipped.website");
+    expect(urls).toContain("https://www.flipped.website/daily");
+    expect(urls).toContain("https://www.flipped.website/classic");
+    expect(urls).toContain("https://www.flipped.website/archive");
+    expect(urls).toContain("https://www.flipped.website/stats");
+    expect(urls).toContain("https://www.flipped.website/about");
+    expect(urls).toContain("https://www.flipped.website/contact");
+    expect(urls).toContain("https://www.flipped.website/privacy");
+    expect(urls).toContain("https://www.flipped.website/terms");
 
     // 2. Ensure NO duplicate URLs
     const uniqueUrls = new Set(urls);
     expect(uniqueUrls.size).toBe(urls.length);
 
     // 3. Ensure strictly NO private or redirect routes
-    expect(urls).not.toContain("https://flipped.website/sign-in");
-    expect(urls).not.toContain("https://flipped.website/sign-up");
-    expect(urls).not.toContain("https://flipped.website/play");
+    expect(urls).not.toContain("https://www.flipped.website/sign-in");
+    expect(urls).not.toContain("https://www.flipped.website/sign-up");
+    expect(urls).not.toContain("https://www.flipped.website/play");
     expect(urls.some((u) => u.includes("/api"))).toBe(false);
 
     // 4. Validate W3C Date format (YYYY-MM-DD) for all entries

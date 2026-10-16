@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   description:
     "Terms of Service for FLIPPED (flipped.website). Read our terms of use, fair play policies, intellectual property notices, and attribution details.",
   alternates: {
-    canonical: "https://flipped.website/terms",
+    canonical: "https://www.flipped.website/terms",
   },
   openGraph: {
     title: "Terms of Service & Legal Notices | FLIPPED",
     description:
       "Read our terms of use, fair play policies, intellectual property notices, and attribution details on flipped.website.",
-    url: "https://flipped.website/terms",
+    url: "https://www.flipped.website/terms",
   },
 };
 

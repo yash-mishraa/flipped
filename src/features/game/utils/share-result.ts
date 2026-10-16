@@ -35,7 +35,7 @@ export function formatShareText(options: ShareResultOptions): string {
     window.location?.origin &&
     !window.location.origin.includes("localhost")
       ? window.location.origin
-      : "https://flipped.website");
+      : "https://www.flipped.website");
 
   const targetUrl = mode === "DAILY" ? `${origin}/daily` : `${origin}/classic`;
 

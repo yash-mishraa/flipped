@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://flipped.website";
+  const baseUrl = "https://www.flipped.website";
   // W3C Date format (YYYY-MM-DD) compliant with official sitemaps.org protocol
   const todayDate = new Date().toISOString().slice(0, 10);
   const staticContentDate = "2026-10-15";

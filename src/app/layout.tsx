@@ -10,7 +10,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://flipped.website"),
+  metadataBase: new URL("https://www.flipped.website"),
   title: {
     default: "FLIPPED — Word Deduction Puzzle",
     template: "%s | FLIPPED",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description:
     "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out. Free daily word puzzle, classic practice sprints, and challenge archive.",
   applicationName: "FLIPPED",
-  authors: [{ name: "Yash Mishra", url: "https://flipped.website" }],
+  authors: [{ name: "Yash Mishra", url: "https://www.flipped.website" }],
   creator: "Yash Mishra",
   publisher: "FLIPPED",
   keywords: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     "daily puzzle",
   ],
   alternates: {
-    canonical: "https://flipped.website",
+    canonical: "https://www.flipped.website",
   },
   icons: {
     icon: [
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title: "FLIPPED — Word Deduction Puzzle",
     description:
       "Flip the meanings of two clue words to uncover a familiar phrase before your 60-second timer runs out. Play free daily challenges and classic sprints.",
-    url: "https://flipped.website",
+    url: "https://www.flipped.website",
     siteName: "FLIPPED",
     locale: "en_US",
     type: "website",
@@ -83,16 +83,16 @@ const jsonLdWebsite = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://flipped.website/#website",
-      url: "https://flipped.website",
+      "@id": "https://www.flipped.website/#website",
+      url: "https://www.flipped.website",
       name: "FLIPPED",
       description: "Flip the meanings of two clue words to uncover a familiar phrase.",
       inLanguage: "en-US",
     },
     {
       "@type": "WebApplication",
-      "@id": "https://flipped.website/#game",
-      url: "https://flipped.website",
+      "@id": "https://www.flipped.website/#game",
+      url: "https://www.flipped.website",
       name: "FLIPPED — Word Deduction Puzzle",
       applicationCategory: "GameApplication",
       genre: ["Word Game", "Puzzle Game", "Brain Teaser"],

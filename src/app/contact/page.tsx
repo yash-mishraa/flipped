@@ -10,13 +10,13 @@ export const metadata: Metadata = {
   description:
     "Get in touch with the creator of FLIPPED. Send game feedback, report puzzle issues, or submit phrase ideas directly to flippedbyyash@gmail.com.",
   alternates: {
-    canonical: "https://flipped.website/contact",
+    canonical: "https://www.flipped.website/contact",
   },
   openGraph: {
     title: "Contact Us & Feedback | FLIPPED",
     description:
       "Get in touch with the creator of FLIPPED. Send game feedback, report puzzle issues, or submit phrase ideas directly to flippedbyyash@gmail.com.",
-    url: "https://flipped.website/contact",
+    url: "https://www.flipped.website/contact",
   },
 };
 
