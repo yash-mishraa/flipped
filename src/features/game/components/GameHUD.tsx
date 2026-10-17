@@ -18,6 +18,7 @@ export interface GameHUDProps {
   readonly onRestart: () => void;
   readonly isMasked?: boolean;
   readonly hideStartButton?: boolean;
+  readonly hideResetButton?: boolean;
 }
 
 /**
@@ -41,6 +42,7 @@ export function GameHUD({
   onRestart,
   isMasked = false,
   hideStartButton = false,
+  hideResetButton = false,
 }: GameHUDProps): React.JSX.Element {
   const isReady = roundStatus === "READY";
   const isRoundOver = roundStatus === "WON" || roundStatus === "TIMED_OUT";
@@ -100,7 +102,7 @@ export function GameHUD({
             isRoundOver={isRoundOver}
           />
 
-          {!isReady && !isRoundOver && (
+          {!isReady && !isRoundOver && !hideResetButton && (
             <button
               type="button"
               onClick={onRestart}

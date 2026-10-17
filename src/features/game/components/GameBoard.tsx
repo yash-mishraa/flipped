@@ -115,6 +115,7 @@ export function GameBoard({
         hintsUsed={state.hintsUsed}
         onStartGame={onStartRound}
         onRestart={onRestart}
+        hideResetButton={mode === "DAILY"}
       />
 
       {/* Main Interactive Letter Grid (Preserved on terminal states, disabled when not playing) */}

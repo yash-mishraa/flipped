@@ -662,6 +662,7 @@ export function ServerGameBoard({
         onRestart={() => {}}
         isMasked={isMasked}
         hideStartButton={mode === "DAILY"}
+        hideResetButton={mode === "DAILY"}
       />
 
       {/* Main Interactive Grid */}
