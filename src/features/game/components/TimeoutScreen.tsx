@@ -76,31 +76,34 @@ export function TimeoutScreen({
         </div>
 
         {/* Semantic Transformations Breakdown (Editorial Column) */}
-        <div className="mt-5 w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-4 sm:p-5 text-left">
-          <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#C49A6C]/30">
-            <span className="text-[11px] font-black uppercase tracking-wider text-[#7B1E2B]">
-              Transformations Explained
-            </span>
-            <span className="text-[10px] font-semibold text-[#8C6870] font-serif italic">
+        <div className="mt-5 w-full border-t border-[#C49A6C]/30 pt-5 text-left">
+          <div className="flex items-center justify-between pb-2 mb-4 border-b border-[#C49A6C]/25">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-0.5 bg-[#7B1E2B]" aria-hidden="true" />
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#7B1E2B]">
+                Transformations Explained
+              </span>
+            </div>
+            <span className="text-[11px] font-serif italic text-[#8C6870]">
               Word Deductions
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {puzzle.transformations.map((trans, idx) => (
-              <div key={`timeout-trans-${idx}`} className="flex flex-col gap-1">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-[#32171D]">
-                    <span className="font-mono uppercase">{trans.clueWord}</span>
-                    <span className="text-[#C49A6C]">→</span>
-                    <span className="font-serif font-black text-[#7B1E2B] tracking-wide">
-                      {trans.answerWord}
-                    </span>
-                  </div>
-                  <span className="rounded-full border border-[#C49A6C]/40 bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#7B1E2B]">
-                    {trans.relationship}
+              <div key={`timeout-trans-${idx}`} className="border-l-2 border-[#C49A6C]/40 pl-3.5 py-0.5">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-mono text-sm sm:text-base font-extrabold uppercase text-[#32171D]">
+                    {trans.clueWord}
+                  </span>
+                  <span className="font-serif text-xs italic text-[#8C6870]">
+                    ({trans.relationship.toLowerCase()})
+                  </span>
+                  <span className="text-[#C49A6C] font-serif">→</span>
+                  <span className="font-serif text-base sm:text-lg font-black text-[#7B1E2B] tracking-wide">
+                    {trans.answerWord}
                   </span>
                 </div>
-                <p className="text-xs text-[#6B4E55] leading-relaxed font-serif pl-0.5">
+                <p className="mt-1 text-xs sm:text-sm text-[#6B4E55] leading-relaxed font-serif">
                   {trans.explanation}
                 </p>
               </div>
@@ -109,13 +112,11 @@ export function TimeoutScreen({
         </div>
 
         {/* Performance Summary with Practice Score Distinction */}
-        <div className="mt-5 w-full rounded-2xl border border-[#C49A6C]/40 bg-white p-4 shadow-2xs text-center">
-          <div className="mb-2.5 flex items-center justify-center gap-2">
-            <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
+        <div className="mt-5 w-full border-y border-[#C49A6C]/30 py-3.5 px-2 text-center">
+          <div className="mb-2 text-center">
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#8C6870]">
               Performance
             </span>
-            <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
           </div>
 
           <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/30 text-center">

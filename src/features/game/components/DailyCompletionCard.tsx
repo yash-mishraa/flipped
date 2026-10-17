@@ -207,19 +207,18 @@ export function DailyCompletionCard({
       )}
 
       {/* Performance Summary: Celebratory 4-stat for won, Dignified warm ribbon for time expired */}
+      {/* Performance Summary: Celebratory row for won, Dignified warm ribbon for time expired */}
       {isWon ? (
-        <div className="w-full rounded-2xl border border-[#C49A6C]/60 bg-white p-4 shadow-2xs text-center">
-          <div className="mb-3 flex items-center justify-center gap-2">
-            <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
+        <div className="w-full border-y border-[#C49A6C]/30 py-3.5 px-2 text-center">
+          <div className="mb-2 text-center">
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#8C6870]">
               Statistics
             </span>
-            <span className="h-px w-6 bg-[#C49A6C]/40" aria-hidden="true" />
           </div>
 
           <div className="grid grid-cols-4 divide-x divide-[#C49A6C]/30 text-center">
             <div className="px-1">
-              <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B]">
+              <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B] font-serif">
                 {attempt.finalScore}
               </p>
               <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
@@ -228,21 +227,21 @@ export function DailyCompletionCard({
             </div>
 
             <div className="px-1">
-              <p className="text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.elapsedSeconds}s</p>
+              <p className="text-2xl sm:text-3xl font-black text-[#32171D] font-mono">{attempt.elapsedSeconds}s</p>
               <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
                 Time
               </p>
             </div>
 
             <div className="px-1">
-              <p className="text-2xl sm:text-3xl font-black text-[#32171D]">{attempt.hintsUsed}</p>
+              <p className="text-2xl sm:text-3xl font-black text-[#32171D] font-mono">{attempt.hintsUsed}</p>
               <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
                 Hints
               </p>
             </div>
 
             <div className="px-1">
-              <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B]">{streak}</p>
+              <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B] font-mono">{streak}</p>
               <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
                 Streak
               </p>
@@ -250,7 +249,7 @@ export function DailyCompletionCard({
           </div>
         </div>
       ) : (
-        <div className="w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 px-4 py-3 sm:px-6">
+        <div className="w-full border-y border-[#C49A6C]/30 py-3.5 px-2">
           <div className="flex items-center justify-around text-center divide-x divide-[#C49A6C]/30">
             <div className="px-2">
               <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
@@ -280,17 +279,17 @@ export function DailyCompletionCard({
         </div>
       )}
 
-      {/* Solved Grid Preview Framed in Inset Stage */}
+      {/* Solved Grid Preview */}
       <section
-        className="w-full flex flex-col items-center"
+        className="w-full flex flex-col items-center pt-1"
         aria-label="Solved Letter Grid Review"
       >
-        <div className="mb-2 text-center">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
+        <div className="mb-3 text-center">
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#8C6870]">
             Solution Grid
           </span>
         </div>
-        <div className="w-full rounded-2xl border border-[#C49A6C]/35 bg-[#faeee0]/35 py-4 px-2 sm:px-4 shadow-2xs">
+        <div className="w-full flex justify-center py-1">
           <LetterGrid
             grid={solvedGrid}
             selectedPosition={null}
@@ -304,31 +303,34 @@ export function DailyCompletionCard({
       </section>
 
       {/* Transformations Explanation (Editorial Newspaper Column) */}
-      <section className="w-full rounded-2xl border border-[#C49A6C]/45 bg-[#faeee0]/50 p-4 sm:p-5 text-left">
-        <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#C49A6C]/30">
-          <span className="text-[11px] font-black uppercase tracking-wider text-[#7B1E2B]">
-            Transformations Explained
-          </span>
-          <span className="text-[10px] font-semibold text-[#8C6870] font-serif italic">
+      <section className="w-full border-t border-[#C49A6C]/30 pt-5 text-left" aria-label="Transformations Explained">
+        <div className="flex items-center justify-between pb-2 mb-4 border-b border-[#C49A6C]/25">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-0.5 bg-[#7B1E2B]" aria-hidden="true" />
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#7B1E2B]">
+              Transformations Explained
+            </span>
+          </div>
+          <span className="text-[11px] font-serif italic text-[#8C6870]">
             Official Deductions
           </span>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {puzzle.transformations.map((trans, idx) => (
-            <div key={`daily-rev-trans-${idx}`} className="flex flex-col gap-1">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-[#32171D]">
-                  <span className="font-mono uppercase">{trans.clueWord}</span>
-                  <span className="text-[#C49A6C]">→</span>
-                  <span className="font-serif font-black text-[#7B1E2B] tracking-wide">
-                    {trans.answerWord}
-                  </span>
-                </div>
-                <span className="rounded-full border border-[#C49A6C]/40 bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#7B1E2B]">
-                  {trans.relationship}
+            <div key={`daily-rev-trans-${idx}`} className="border-l-2 border-[#C49A6C]/40 pl-3.5 py-0.5">
+              <div className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-sm sm:text-base font-extrabold uppercase text-[#32171D]">
+                  {trans.clueWord}
+                </span>
+                <span className="font-serif text-xs italic text-[#8C6870]">
+                  ({trans.relationship.toLowerCase()})
+                </span>
+                <span className="text-[#C49A6C] font-serif">→</span>
+                <span className="font-serif text-base sm:text-lg font-black text-[#7B1E2B] tracking-wide">
+                  {trans.answerWord}
                 </span>
               </div>
-              <p className="text-xs text-[#6B4E55] leading-relaxed font-serif pl-0.5">
+              <p className="mt-1 text-xs sm:text-sm text-[#6B4E55] leading-relaxed font-serif">
                 {trans.explanation}
               </p>
             </div>
@@ -337,13 +339,13 @@ export function DailyCompletionCard({
       </section>
 
       {/* Live Countdown to Next Daily Challenge (Arriving at Local Midnight) */}
-      <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/40 py-3.5 px-5 text-center sm:text-left">
+      <div className="w-full border-t border-b border-[#C49A6C]/30 py-3.5 px-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
         <div>
-          <span className="block text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
+          <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
             Next Daily Challenge In (Midnight)
           </span>
-          <span className="text-xs text-[#6B4E55]">
-            A brand-new daily puzzle arrives at your local midnight
+          <span className="text-xs text-[#6B4E55] font-serif italic">
+            Tomorrow&apos;s edition arrives at your local midnight
           </span>
         </div>
         <div className="font-mono text-xl font-black text-[#7B1E2B] tabular-nums tracking-wider">
@@ -357,14 +359,16 @@ export function DailyCompletionCard({
           Daily streak &amp; statistics synced to your account
         </div>
       ) : (
-        <div className="w-full rounded-2xl border border-[#C49A6C]/60 bg-[#faeee0]/80 p-4 text-center space-y-2.5 shadow-2xs">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-white border border-[#C49A6C]/60 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#7B1E2B]">
-            Sync &amp; Save Your Streak
+        <div className="w-full border-t border-[#C49A6C]/25 pt-4 text-center space-y-2">
+          <div className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#7B1E2B]">
+            <span>•</span>
+            <span>Sync &amp; Save Your Streak</span>
+            <span>•</span>
           </div>
-          <p className="text-xs text-[#6B4E55] max-w-sm mx-auto leading-relaxed">
-            <strong className="text-[#7B1E2B]">Guest Session:</strong> Streak ({streak}) saved locally in this browser. Log in or create a free account to sync across devices!
+          <p className="text-xs text-[#6B4E55] max-w-sm mx-auto leading-relaxed font-serif">
+            <strong className="text-[#32171D]">Guest Session:</strong> Streak ({streak}) saved locally in this browser. Log in or create a free account to sync across devices!
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-0.5">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             <button
               type="button"
               onClick={() => setShowAuthModal(true)}

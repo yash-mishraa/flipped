@@ -172,43 +172,45 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps): React.JS
         {/* Step Content */}
         <div className="py-5">
           {step === 1 && (
-            <div className="space-y-3.5">
-              <div className="rounded-2xl border border-[#C49A6C]/60 bg-[#faeee0] p-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#7B1E2B] block">
+            <div className="space-y-4">
+              <div className="border-l-2 border-[#7B1E2B] pl-3.5 py-1">
+                <span className="text-xs font-black uppercase tracking-wider text-[#7B1E2B] block font-serif">
                   The Core Goal
                 </span>
-                <p className="mt-1 text-sm text-[#32171D] leading-relaxed">
+                <p className="mt-1 text-sm text-[#32171D] leading-relaxed font-serif">
                   You are given <strong>two clue words</strong>. Each word undergoes a semantic
                   shift to uncover a well-known two-word phrase!
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-[#C49A6C]/40 bg-white p-4 shadow-xs">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#8C6870] block">
+              <div className="border-t border-[#C49A6C]/30 pt-4">
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#8C6870] block">
                   Example Transformation
                 </span>
-                <div className="mt-2.5 flex flex-col gap-2">
-                  <div className="flex items-center justify-between rounded-xl border border-[#C49A6C]/30 bg-[#faeee0] p-2.5">
-                    <span className="font-extrabold text-[#32171D]">SLOW</span>
-                    <span className="text-[11px] font-bold text-[#7B1E2B] bg-white px-2 py-0.5 rounded border border-[#C49A6C]/30">
-                      ANTONYM (Opposite)
-                    </span>
-                    <span className="font-extrabold text-[#7B1E2B]">FAST</span>
+                <div className="mt-3 space-y-3">
+                  <div className="border-l-2 border-[#C49A6C]/40 pl-3.5 py-1">
+                    <div className="flex flex-wrap items-baseline gap-2 font-serif">
+                      <span className="font-mono text-base font-extrabold uppercase text-[#32171D]">SLOW</span>
+                      <span className="text-xs italic text-[#7B1E2B] font-semibold">(antonym / opposite)</span>
+                      <span className="text-[#C49A6C] font-serif">→</span>
+                      <span className="font-serif font-black text-lg text-[#7B1E2B]">FAST</span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-xl border border-[#C49A6C]/30 bg-[#faeee0] p-2.5">
-                    <span className="font-extrabold text-[#32171D]">MEAL</span>
-                    <span className="text-[11px] font-bold text-[#6B4E55] bg-white px-2 py-0.5 rounded border border-[#C49A6C]/30">
-                      SYNONYM (Similar)
-                    </span>
-                    <span className="font-extrabold text-[#7B1E2B]">FOOD</span>
+                  <div className="border-l-2 border-[#C49A6C]/40 pl-3.5 py-1">
+                    <div className="flex flex-wrap items-baseline gap-2 font-serif">
+                      <span className="font-mono text-base font-extrabold uppercase text-[#32171D]">MEAL</span>
+                      <span className="text-xs italic text-[#6B4E55] font-semibold">(synonym / similar)</span>
+                      <span className="text-[#C49A6C] font-serif">→</span>
+                      <span className="font-serif font-black text-lg text-[#7B1E2B]">FOOD</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-3 text-center">
-                  <p className="text-xs font-semibold text-[#6B4E55]">
+                <div className="mt-4 pt-3 border-t border-[#C49A6C]/20 text-center font-serif">
+                  <p className="text-xs text-[#6B4E55]">
                     Combined target phrase:{" "}
-                    <strong className="text-[#32171D] text-sm font-extrabold">FAST FOOD</strong>
+                    <strong className="text-[#7B1E2B] text-base font-black">FAST FOOD</strong>
                   </p>
                 </div>
               </div>

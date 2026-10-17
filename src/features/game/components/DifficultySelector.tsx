@@ -95,16 +95,16 @@ export function DifficultySelector({
       </div>
 
       {/* Dynamic Tier Explanation Card */}
-      <div className="rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/50 p-3 text-left shadow-2xs">
+      <div className="border-t border-[#C49A6C]/30 pt-3 text-left">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <span className="font-extrabold text-[#7B1E2B] uppercase text-[11px] tracking-wider">
+          <span className="font-black text-[#7B1E2B] uppercase text-[11px] tracking-wider font-serif">
             {activeOption.label} Tier
           </span>
-          <span className="text-[10px] font-semibold text-[#8C6870]">
+          <span className="text-[10px] font-semibold text-[#8C6870] font-serif italic">
             {activeOption.vocabulary}
           </span>
         </div>
-        <p className="mt-1 text-xs text-[#6B4E55] leading-relaxed">
+        <p className="mt-1 text-xs text-[#6B4E55] leading-relaxed font-serif">
           {activeOption.description}
         </p>
       </div>

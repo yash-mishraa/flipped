@@ -121,10 +121,13 @@ export function GameHUD({
         className="flex w-full flex-col items-center gap-3 rounded-2xl border border-[#C49A6C]/60 bg-white/80 p-4 sm:p-5 text-center shadow-sm backdrop-blur-sm"
         aria-label="Puzzle Clues"
       >
-        <div className="flex w-full items-center justify-between px-1">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[#7B1E2B]">
-            Transform the Clues
-          </span>
+        <div className="flex w-full items-center justify-between px-1 border-b border-[#C49A6C]/25 pb-2">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-0.5 bg-[#7B1E2B]" aria-hidden="true" />
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#7B1E2B]">
+              Transform the Clues
+            </span>
+          </div>
 
           {/* Mobile In-Card Live Timer — visible directly above grid when actively playing on mobile */}
           {isRunning && (
@@ -147,24 +150,24 @@ export function GameHUD({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 py-1">
           {puzzle.transformations.map((trans, idx) => (
             <div key={`hud-clue-${idx}`} className="flex items-center gap-4 sm:gap-6">
               {isMasked ? (
                 <span
                   data-testid={`masked-clue-${idx}`}
                   aria-label="Clue hidden until countdown ends"
-                  className="inline-flex items-center justify-center rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/60 px-6 py-2.5 text-2xl sm:text-3xl font-extrabold tracking-widest text-[#8C6870]/60 shadow-xs select-none"
+                  className="inline-flex items-center justify-center rounded-xl border border-[#C49A6C]/40 bg-[#faeee0]/60 px-6 py-2.5 text-2xl sm:text-3xl font-mono tracking-widest text-[#8C6870]/60 shadow-xs select-none"
                 >
                   ••••••
                 </span>
               ) : (
-                <span className="rounded-2xl border border-[#C49A6C]/50 bg-[#faeee0] px-5 py-2.5 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#32171D] shadow-xs">
+                <span className="rounded-xl border-2 border-[#C49A6C]/60 bg-[#faeee0] px-5 py-2.5 text-2xl sm:text-3xl font-serif font-black tracking-wide text-[#32171D] shadow-xs">
                   {trans.clueWord}
                 </span>
               )}
               {idx < puzzle.transformations.length - 1 && (
-                <span className="text-2xl font-black text-[#C49A6C]" aria-hidden="true">
+                <span className="text-2xl font-serif font-black text-[#C49A6C]" aria-hidden="true">
                   +
                 </span>
               )}

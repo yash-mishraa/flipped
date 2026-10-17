@@ -946,22 +946,20 @@ export function ClassicSprintBoard(): React.JSX.Element {
 
                   {/* Flip Deductions */}
                   {unfinishedPuzzle.transformations && unfinishedPuzzle.transformations.length > 0 && (
-                    <div className="mt-2.5 space-y-1.5 border-t border-[#C49A6C]/20 pt-2">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
+                    <div className="mt-2.5 space-y-2 border-t border-[#C49A6C]/20 pt-2">
+                      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6870]">
                         Flip Deductions
                       </div>
                       {unfinishedPuzzle.transformations.map((t, tIdx) => (
-                        <div key={`unfinished-trans-${tIdx}`} className="text-xs text-[#32171D]">
-                          <div className="flex items-center gap-1.5 font-semibold">
-                            <span className="text-[#7B1E2B] font-bold">{t.clueWord}</span>
-                            <span className="text-[#C49A6C]">➔</span>
-                            <span className="font-black text-[#32171D]">{t.answerWord}</span>
-                            <span className="rounded-full bg-[#faeee0] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#8C6D68] border border-[#C49A6C]/30">
-                              {t.relationship}
-                            </span>
+                        <div key={`unfinished-trans-${tIdx}`} className="border-l-2 border-[#C49A6C]/40 pl-2.5 py-0.5 text-xs text-[#32171D]">
+                          <div className="flex flex-wrap items-baseline gap-1.5 font-serif">
+                            <span className="font-mono text-xs font-extrabold uppercase text-[#32171D]">{t.clueWord}</span>
+                            <span className="text-[11px] italic text-[#8C6870]">({t.relationship.toLowerCase()})</span>
+                            <span className="text-[#C49A6C]">→</span>
+                            <span className="font-black text-xs text-[#7B1E2B]">{t.answerWord}</span>
                           </div>
                           {t.explanation && (
-                            <p className="mt-0.5 text-[11px] text-[#6B4E55] italic pl-2 border-l-2 border-[#C49A6C]/40">
+                            <p className="mt-0.5 text-[11px] text-[#6B4E55] font-serif leading-relaxed">
                               {t.explanation}
                             </p>
                           )}
@@ -1013,17 +1011,15 @@ export function ClassicSprintBoard(): React.JSX.Element {
                         </summary>
                         <div className="mt-2 space-y-1.5 pl-1">
                           {item.transformations.map((t, tIdx) => (
-                            <div key={`solved-${item.puzzleId}-trans-${tIdx}`} className="text-xs text-[#32171D]">
-                              <div className="flex items-center gap-1.5 font-semibold">
-                                <span className="text-[#7B1E2B] font-bold">{t.clueWord}</span>
-                                <span className="text-[#C49A6C]">➔</span>
-                                <span className="font-black text-[#32171D]">{t.answerWord}</span>
-                                <span className="rounded-full bg-[#faeee0] px-1.5 py-0.2 text-[9px] font-bold uppercase text-[#8C6D68] border border-[#C49A6C]/30">
-                                  {t.relationship}
-                                </span>
+                            <div key={`solved-${item.puzzleId}-trans-${tIdx}`} className="border-l-2 border-[#C49A6C]/40 pl-2.5 py-0.5 text-xs text-[#32171D]">
+                              <div className="flex flex-wrap items-baseline gap-1.5 font-serif">
+                                <span className="font-mono text-xs font-extrabold uppercase text-[#32171D]">{t.clueWord}</span>
+                                <span className="text-[11px] italic text-[#8C6870]">({t.relationship.toLowerCase()})</span>
+                                <span className="text-[#C49A6C]">→</span>
+                                <span className="font-black text-xs text-[#7B1E2B]">{t.answerWord}</span>
                               </div>
                               {t.explanation && (
-                                <p className="mt-0.5 text-[11px] text-[#6B4E55] italic pl-2 border-l-2 border-[#C49A6C]/40">
+                                <p className="mt-0.5 text-[11px] text-[#6B4E55] font-serif leading-relaxed">
                                   {t.explanation}
                                 </p>
                               )}
