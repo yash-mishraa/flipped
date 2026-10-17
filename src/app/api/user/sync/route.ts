@@ -6,7 +6,11 @@ import {
   isArchiveDailyAttempt,
   type PlayerStatistics,
 } from "@/features/game/modes/statistics";
-import { getServerDailyDateString } from "@/server/scheduling/daily-scheduler";
+import {
+  getServerDailyDateString,
+  resolveRequestTimezone,
+  isValidTimezone,
+} from "@/server/scheduling/daily-scheduler";
 import {
   type StoredProgressSchema,
   INITIAL_PROGRESS_DATA,
@@ -48,7 +52,7 @@ async function resolveClerkUserId(request: Request, body?: { userId?: string }):
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
-  let body: { userId?: string; progress?: StoredProgressSchema } | undefined;
+  let body: { userId?: string; progress?: StoredProgressSchema; timezone?: string } | undefined;
   try {
     body = await request.json();
   } catch {
@@ -63,16 +67,21 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
+  const resolvedTimezone =
+    body?.timezone && isValidTimezone(body.timezone)
+      ? body.timezone
+      : resolveRequestTimezone(request);
+
   const clientProgress = body?.progress;
   const existing = inMemoryDb.getUserProgress(userId) || INITIAL_PROGRESS_DATA;
-  const todayStr = getServerDailyDateString();
+  const todayStr = getServerDailyDateString(new Date(), resolvedTimezone);
 
   // Merge daily challenge attempts
   const mergedDaily: Record<string, DailyAttemptRecord> = { ...existing.daily };
 
   if (clientProgress?.daily) {
     for (const [date, clientAttempt] of Object.entries(clientProgress.daily)) {
-      const isArchive = isArchiveDailyAttempt(clientAttempt);
+      const isArchive = isArchiveDailyAttempt(clientAttempt, resolvedTimezone);
       const normalizedClientAttempt: DailyAttemptRecord = {
         ...clientAttempt,
         isArchive: clientAttempt.isArchive ?? isArchive,
@@ -168,12 +177,20 @@ export async function POST(request: Request): Promise<NextResponse> {
   profile.classicWins = stats.classic.totalWins;
   inMemoryDb.saveGuestProfile(profile);
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     status: "SYNCED",
     userId,
     progress: mergedProgress,
     stats,
   });
+
+  response.cookies.set("flipped_tz", resolvedTimezone, {
+    path: "/",
+    maxAge: 31536000,
+    sameSite: "lax",
+  });
+
+  return response;
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -185,14 +202,23 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  const todayStr = getServerDailyDateString();
+  const timezone = resolveRequestTimezone(request);
+  const todayStr = getServerDailyDateString(new Date(), timezone);
   const progress = inMemoryDb.getUserProgress(userId) || INITIAL_PROGRESS_DATA;
   const stats = calculatePlayerStatistics(progress, todayStr);
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     status: "OK",
     userId,
     progress,
     stats,
   });
+
+  response.cookies.set("flipped_tz", timezone, {
+    path: "/",
+    maxAge: 31536000,
+    sameSite: "lax",
+  });
+
+  return response;
 }

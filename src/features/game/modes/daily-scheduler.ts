@@ -5,17 +5,50 @@ import type { DailyPuzzleAssignment, DailyPuzzleResult } from "./mode-types";
 export const DEFAULT_DAILY_TIMEZONE = "UTC";
 
 /**
- * Calculates the current calendar date in the configured game timezone.
- * Defaults to UTC.
+ * Validates whether a timezone identifier is a recognized IANA timezone string.
+ */
+export function isValidTimezone(tz: string | null | undefined): boolean {
+  if (!tz || typeof tz !== "string") return false;
+  try {
+    new Intl.DateTimeFormat(undefined, { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolves the client user's local timezone.
+ * Uses Intl.DateTimeFormat().resolvedOptions().timeZone in browser environments,
+ * falling back cleanly to DEFAULT_DAILY_TIMEZONE ("UTC").
+ */
+export function getClientTimezone(): string {
+  try {
+    if (typeof Intl !== "undefined" && typeof Intl.DateTimeFormat === "function") {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz && isValidTimezone(tz)) {
+        return tz;
+      }
+    }
+  } catch {
+    // Fallback on environment error
+  }
+  return DEFAULT_DAILY_TIMEZONE;
+}
+
+/**
+ * Calculates the current calendar date in the player's local timezone.
+ * Defaults to the player's resolved client timezone.
  * Returns strict YYYY-MM-DD string.
  */
 export function getDailyDateString(
   date: Date = new Date(),
-  timezone: string = DEFAULT_DAILY_TIMEZONE
+  timezone: string = getClientTimezone()
 ): string {
   try {
+    const tz = isValidTimezone(timezone) ? timezone : DEFAULT_DAILY_TIMEZONE;
     const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: timezone,
+      timeZone: tz,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -31,6 +64,68 @@ export function getDailyDateString(
     });
     return fallbackFormatter.format(date);
   }
+}
+
+/**
+ * Calculates milliseconds remaining until the next local midnight (00:00:00) in the specified timezone.
+ * This ensures players in every country/region receive their daily puzzle exactly at their local midnight.
+ */
+export function getMillisecondsUntilNextLocalMidnight(
+  date: Date = new Date(),
+  timezone: string = getClientTimezone()
+): number {
+  try {
+    const tz = isValidTimezone(timezone) ? timezone : DEFAULT_DAILY_TIMEZONE;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hour12: false,
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    }).formatToParts(date);
+
+    let hour = 0;
+    let minute = 0;
+    let second = 0;
+
+    for (const part of parts) {
+      if (part.type === "hour") {
+        hour = parseInt(part.value, 10);
+      } else if (part.type === "minute") {
+        minute = parseInt(part.value, 10);
+      } else if (part.type === "second") {
+        second = parseInt(part.value, 10);
+      }
+    }
+
+    if (hour === 24) hour = 0;
+
+    const secondsElapsedToday = hour * 3600 + minute * 60 + second;
+    const msElapsed = secondsElapsedToday * 1000 + date.getMilliseconds();
+    const msInDay = 86400 * 1000;
+    const diffMs = msInDay - msElapsed;
+
+    return Math.max(0, diffMs);
+  } catch {
+    const nextUtcMidnight = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1, 0, 0, 0, 0)
+    );
+    return Math.max(0, nextUtcMidnight.getTime() - date.getTime());
+  }
+}
+
+/**
+ * Formats milliseconds remaining into a HH:MM:SS countdown string.
+ */
+export function formatCountdown(diffMs: number): string {
+  const safeMs = Math.max(0, diffMs);
+  const totalSeconds = Math.floor(safeMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 /**

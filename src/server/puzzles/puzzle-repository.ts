@@ -115,11 +115,14 @@ export function createSafeGameplayPayload(
  */
 export function createFinalizedResultPayload(
   puzzle: Puzzle,
-  attempt: StoredAttempt
+  attempt: StoredAttempt,
+  referenceDate?: string
 ): FinalizedResultPayload {
   if (attempt.status === "ACTIVE") {
     throw new Error("Cannot generate finalized result for an active, incomplete attempt.");
   }
+
+  const effectiveToday = referenceDate || getServerDailyDateString();
 
   return {
     attemptId: attempt.id,
@@ -142,7 +145,7 @@ export function createFinalizedResultPayload(
     completedAt: (attempt.endedAt ?? attempt.updatedAt).toISOString(),
     isArchive:
       attempt.mode === "DAILY"
-        ? Boolean(attempt.dailyDate && attempt.dailyDate !== getServerDailyDateString())
+        ? Boolean(attempt.dailyDate && attempt.dailyDate !== effectiveToday)
         : undefined,
   };
 }

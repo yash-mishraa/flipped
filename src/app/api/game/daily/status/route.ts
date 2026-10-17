@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
-import { getServerDailyDateString } from "@/server/scheduling/daily-scheduler";
+import {
+  getServerDailyDateString,
+  resolveRequestTimezone,
+} from "@/server/scheduling/daily-scheduler";
 import { inMemoryDb } from "@/server/db/client";
 import {
   ATTEMPT_COOKIE_NAME,
@@ -18,7 +21,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<NextResponse> {
   const session = resolveGuestSession(request);
-  let targetDate = getServerDailyDateString();
+  const timezone = resolveRequestTimezone(request);
+  const serverToday = getServerDailyDateString(new Date(), timezone);
+  let targetDate = serverToday;
 
   try {
     const url = new URL(request.url);
@@ -48,8 +53,16 @@ export async function GET(request: Request): Promise<NextResponse> {
   if (!attempt) {
     const response = NextResponse.json({
       date: targetDate,
+      today: serverToday,
+      timezone,
+      serverTime: new Date().toISOString(),
       status: "UNPLAYED",
       hasCompleted: false,
+    });
+    response.cookies.set("flipped_tz", timezone, {
+      path: "/",
+      maxAge: 31536000,
+      sameSite: "lax",
     });
     return attachGuestCookie(response, session);
   }
@@ -68,13 +81,21 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     const puzzle = await getPrivilegedPuzzleById(attempt.puzzleId);
-    const result = puzzle ? createFinalizedResultPayload(puzzle, attempt) : null;
+    const result = puzzle ? createFinalizedResultPayload(puzzle, attempt, serverToday) : null;
 
     const response = NextResponse.json({
       date: targetDate,
+      today: serverToday,
+      timezone,
+      serverTime: new Date().toISOString(),
       status: "COMPLETED",
       hasCompleted: true,
       result,
+    });
+    response.cookies.set("flipped_tz", timezone, {
+      path: "/",
+      maxAge: 31536000,
+      sameSite: "lax",
     });
     const withGuest = attachGuestCookie(response, session);
     return attachAttemptCookie(withGuest, attempt);
@@ -83,10 +104,18 @@ export async function GET(request: Request): Promise<NextResponse> {
   // Active in progress
   const response = NextResponse.json({
     date: targetDate,
+    today: serverToday,
+    timezone,
+    serverTime: new Date().toISOString(),
     status: "IN_PROGRESS",
     hasCompleted: false,
     attemptId: attempt.id,
     deadline: attempt.deadline.toISOString(),
+  });
+  response.cookies.set("flipped_tz", timezone, {
+    path: "/",
+    maxAge: 31536000,
+    sameSite: "lax",
   });
   const withGuest = attachGuestCookie(response, session);
   return attachAttemptCookie(withGuest, attempt);

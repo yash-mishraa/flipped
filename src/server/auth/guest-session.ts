@@ -60,7 +60,7 @@ export function verifyGuestToken(token: string | null | undefined): string | nul
  */
 export function extractCookie(cookieHeader: string | null, name: string): string | null {
   if (!cookieHeader) return null;
-  const pairs = cookieHeader.split(";").map((p) => p.trim());
+  const pairs = cookieHeader.split(/[;,]/).map((p) => p.trim());
   for (const pair of pairs) {
     const [k, v] = pair.split("=");
     if (k === name && v) {

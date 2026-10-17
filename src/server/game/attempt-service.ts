@@ -18,6 +18,8 @@ import {
 import {
   getServerDailyDateString,
   resolveServerDailyAssignment,
+  resolveRequestTimezone,
+  getServerTimezone,
 } from "../scheduling/daily-scheduler";
 import { calculateScore } from "@/features/game/domain/scoring";
 import { checkAnswer } from "@/features/game/domain/check-answer";
@@ -92,16 +94,19 @@ export type SubmitAttemptResult =
 /**
  * Starts or recovers an authoritative Daily challenge attempt for the guest.
  * Strictly enforces single-attempt rule: multiple completed attempts on the same calendar day are rejected.
+ * Resets at exact local midnight for the player's resolved timezone.
  */
 export async function startDailyAttempt(
   guestId: string,
   targetDate?: string,
   request?: Request,
   clientAttempt?: DailyAttemptRecord,
-  clerkUserId?: string
+  clerkUserId?: string,
+  timezone?: string
 ): Promise<StartDailyAttemptResult> {
-  const dateStr = targetDate || getServerDailyDateString();
-  const scheduleResult = await resolveServerDailyAssignment(dateStr);
+  const resolvedTz = timezone || (request ? resolveRequestTimezone(request) : getServerTimezone());
+  const dateStr = targetDate || getServerDailyDateString(new Date(), resolvedTz);
+  const scheduleResult = await resolveServerDailyAssignment(dateStr, resolvedTz);
 
   if (scheduleResult.status !== "AVAILABLE") {
     return {
@@ -201,7 +206,7 @@ export async function startDailyAttempt(
     if (existingAttempt.status === "WON" || existingAttempt.status === "TIMED_OUT") {
       return {
         status: "ALREADY_COMPLETED",
-        result: createFinalizedResultPayload(puzzle, existingAttempt),
+        result: createFinalizedResultPayload(puzzle, existingAttempt, dateStr),
         attempt: existingAttempt,
       };
     }
@@ -223,7 +228,7 @@ export async function startDailyAttempt(
 
       return {
         status: "ALREADY_COMPLETED",
-        result: createFinalizedResultPayload(puzzle, timedOutAttempt),
+        result: createFinalizedResultPayload(puzzle, timedOutAttempt, dateStr),
         attempt: timedOutAttempt,
       };
     }
@@ -448,8 +453,11 @@ export async function submitAuthoritativeAttempt(
 
   // Update guest streaks/stats
   const profile = inMemoryDb.getGuestProfile(guestId);
+  const playerTz = request ? resolveRequestTimezone(request) : getServerTimezone();
+  const authoritativeToday = getServerDailyDateString(new Date(), playerTz);
+
   if (attempt.mode === "DAILY") {
-    const isToday = attempt.dailyDate === getServerDailyDateString();
+    const isToday = attempt.dailyDate === authoritativeToday;
     if (isToday) {
       const newStreak = profile.currentDailyStreak + 1;
       inMemoryDb.saveGuestProfile({
@@ -477,7 +485,7 @@ export async function submitAuthoritativeAttempt(
 
   return {
     status: "WON",
-    result: createFinalizedResultPayload(puzzle, wonAttempt),
+    result: createFinalizedResultPayload(puzzle, wonAttempt, authoritativeToday),
     tileFeedback: [wonFeedback0, wonFeedback1],
     attempt: wonAttempt,
   };
@@ -508,11 +516,14 @@ export async function finalizeAuthoritativeTimeout(
     };
   }
 
+  const playerTz = request ? resolveRequestTimezone(request) : getServerTimezone();
+  const authoritativeToday = getServerDailyDateString(new Date(), playerTz);
+
   // If already finalized, return existing result idempotently
   if (attempt.status !== "ACTIVE") {
     return {
       success: true,
-      result: createFinalizedResultPayload(puzzle, attempt),
+      result: createFinalizedResultPayload(puzzle, attempt, authoritativeToday),
       attempt,
     };
   }
@@ -546,7 +557,7 @@ export async function finalizeAuthoritativeTimeout(
 
   return {
     success: true,
-    result: createFinalizedResultPayload(puzzle, timedOutAttempt),
+    result: createFinalizedResultPayload(puzzle, timedOutAttempt, authoritativeToday),
     attempt: timedOutAttempt,
   };
 }
@@ -583,8 +594,11 @@ export async function getAttemptResultSafe(
     };
   }
 
+  const playerTz = request ? resolveRequestTimezone(request) : getServerTimezone();
+  const authoritativeToday = getServerDailyDateString(new Date(), playerTz);
+
   return {
     success: true,
-    result: createFinalizedResultPayload(puzzle, attempt),
+    result: createFinalizedResultPayload(puzzle, attempt, authoritativeToday),
   };
 }

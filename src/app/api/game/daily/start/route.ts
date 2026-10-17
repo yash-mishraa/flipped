@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { resolveGuestSession, attachGuestCookie } from "@/server/auth/guest-session";
 import { attachAttemptCookie } from "@/server/auth/attempt-session";
 import { startDailyAttempt } from "@/server/game/attempt-service";
+import { resolveRequestTimezone, isValidTimezone } from "@/server/scheduling/daily-scheduler";
 import { checkRateLimit } from "@/server/utils/rate-limit";
 import { auth } from "@clerk/nextjs/server";
 import type { DailyAttemptRecord } from "@/features/game/modes/mode-types";
@@ -22,6 +23,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   let targetDate: string | undefined = undefined;
   let existingAttempt: DailyAttemptRecord | undefined = undefined;
+  let bodyTimezone: string | undefined = undefined;
 
   // 1. Check URL query params: ?date=YYYY-MM-DD
   try {
@@ -43,9 +45,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (body?.existingAttempt && typeof body.existingAttempt === "object") {
       existingAttempt = body.existingAttempt as DailyAttemptRecord;
     }
+    if (body?.timezone && isValidTimezone(body.timezone)) {
+      bodyTimezone = body.timezone;
+    }
   } catch {
     // Body is empty or non-JSON
   }
+
+  // Authoritative timezone resolution
+  const resolvedTimezone = bodyTimezone || resolveRequestTimezone(request);
 
   // Check Clerk user authentication if configured
   let clerkUserId: string | undefined = undefined;
@@ -65,11 +73,19 @@ export async function POST(request: Request): Promise<NextResponse> {
     targetDate,
     request,
     existingAttempt,
-    clerkUserId
+    clerkUserId,
+    resolvedTimezone
   );
 
   const response = NextResponse.json(result, {
     status: result.status === "UNAVAILABLE" ? 503 : 200,
+  });
+
+  // Preserve player's resolved timezone cookie for future requests
+  response.cookies.set("flipped_tz", resolvedTimezone, {
+    path: "/",
+    maxAge: 31536000,
+    sameSite: "lax",
   });
 
   const withGuest = attachGuestCookie(response, session);

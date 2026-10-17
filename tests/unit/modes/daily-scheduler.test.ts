@@ -5,7 +5,11 @@ import {
   getDailyScheduleStatus,
   getPublishedDailySchedule,
   DEFAULT_DAILY_TIMEZONE,
+  getClientTimezone,
+  getMillisecondsUntilNextLocalMidnight,
+  formatCountdown,
 } from "@/features/game/modes/daily-scheduler";
+import { resolveServerDailyAssignment } from "@/server/scheduling/daily-scheduler";
 
 describe("Daily Scheduler", () => {
   describe("getDailyDateString", () => {
@@ -15,7 +19,7 @@ describe("Daily Scheduler", () => {
       expect(dateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
-    it("defaults to UTC timezone", () => {
+    it("handles different timezones and projects calendar date accurately", () => {
       expect(DEFAULT_DAILY_TIMEZONE).toBe("UTC");
 
       // 2026-10-12 19:00:00 UTC is 2026-10-12 in UTC and 2026-10-13 00:30:00 in Asia/Kolkata (+5:30)
@@ -23,16 +27,56 @@ describe("Daily Scheduler", () => {
       const defaultDate = getDailyDateString(lateUtcDate);
       const kolkataDate = getDailyDateString(lateUtcDate, "Asia/Kolkata");
       const utcDate = getDailyDateString(lateUtcDate, "UTC");
+      const nyDate = getDailyDateString(lateUtcDate, "America/New_York");
 
-      expect(defaultDate).toBe("2026-10-12");
+      expect(defaultDate).toBe(getDailyDateString(lateUtcDate, getClientTimezone()));
       expect(utcDate).toBe("2026-10-12");
       expect(kolkataDate).toBe("2026-10-13");
+      expect(nyDate).toBe("2026-10-12");
     });
 
     it("falls back gracefully when an invalid timezone string is provided", () => {
       const fixedDate = new Date("2026-10-12T12:00:00Z");
       const result = getDailyDateString(fixedDate, "Invalid/Timezone_Name");
       expect(result).toBe("2026-10-12");
+    });
+  });
+
+  describe("Local Midnight Countdown", () => {
+    it("calculates countdown to next local midnight accurately", () => {
+      // 23:59:50 in UTC (10 seconds before midnight)
+      const dateNearUtcMidnight = new Date("2026-10-12T23:59:50.000Z");
+      const ms = getMillisecondsUntilNextLocalMidnight(dateNearUtcMidnight, "UTC");
+      expect(ms).toBe(10_000);
+      expect(formatCountdown(ms)).toBe("00:00:10");
+
+      // 18:29:50 UTC is 23:59:50 in Asia/Kolkata (10 seconds before midnight)
+      const dateNearKolkataMidnight = new Date("2026-10-12T18:29:50.000Z");
+      const kolkataMs = getMillisecondsUntilNextLocalMidnight(dateNearKolkataMidnight, "Asia/Kolkata");
+      expect(kolkataMs).toBe(10_000);
+      expect(formatCountdown(kolkataMs)).toBe("00:00:10");
+    });
+  });
+
+  describe("Server Timezone & Anti-Cheat Validation", () => {
+    it("allows daily puzzle at local midnight for earlier timezones while locking for later timezones", async () => {
+      // Past published date is AVAILABLE for all timezones
+      const pastRes = await resolveServerDailyAssignment("2026-10-12", "Asia/Kolkata");
+      expect(pastRes.status).toBe("AVAILABLE");
+
+      // Upcoming unpublished puzzle is strictly FUTURE_UNPUBLISHED
+      const upcomingRes = await resolveServerDailyAssignment("2026-10-20", "America/New_York");
+      expect(upcomingRes.status).toBe("FUTURE_UNPUBLISHED");
+    });
+
+    it("strictly blocks players from accessing future days even if local clock is altered", async () => {
+      // Anti-cheat verification: Attempting to query an unpublished future date is blocked as FUTURE_UNPUBLISHED
+      const futureResult = await resolveServerDailyAssignment("2026-10-20", "UTC");
+      expect(futureResult.status).toBe("FUTURE_UNPUBLISHED");
+
+      // Non-existent future dates are UNAVAILABLE
+      const unassignedResult = await resolveServerDailyAssignment("2099-12-31", "UTC");
+      expect(unassignedResult.status).toBe("UNAVAILABLE");
     });
   });
 

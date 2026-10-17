@@ -9,7 +9,7 @@ import {
   calculatePlayerStatistics,
   type PlayerStatistics,
 } from "../modes/statistics";
-import { getDailyDateString } from "../modes/daily-scheduler";
+import { getDailyDateString, getClientTimezone } from "../modes/daily-scheduler";
 
 export interface SyncResult {
   progress: StoredProgressSchema;
@@ -59,10 +59,14 @@ export async function syncUserProgress(userId: string): Promise<SyncResult> {
   const progressToUpload: StoredProgressSchema = activeUserProgress;
 
   try {
+    const tz = getClientTimezone();
     const res = await fetch("/api/user/sync", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, progress: progressToUpload }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-timezone": tz,
+      },
+      body: JSON.stringify({ userId, progress: progressToUpload, timezone: tz }),
     });
 
     if (res.ok) {

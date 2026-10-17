@@ -14,7 +14,11 @@ import {
   setActiveUser,
 } from "@/features/game/persistence/local-progress";
 import { syncUserProgress } from "@/features/game/persistence/user-sync";
-import { getDailyDateString, getDailyPuzzle } from "@/features/game/modes/daily-scheduler";
+import {
+  getDailyDateString,
+  getDailyPuzzle,
+  getClientTimezone,
+} from "@/features/game/modes/daily-scheduler";
 import type {
   SafeGameplayPayload,
   FinalizedResultPayload,
@@ -75,7 +79,8 @@ function DailyPageContent(): React.JSX.Element {
   const [payload, setPayload] = useState<SafeGameplayPayload | null>(null);
   const [completedResult, setCompletedResult] = useState<FinalizedResultPayload | null>(null);
 
-  const todayStr = getDailyDateString();
+  const [currentDate, setCurrentDate] = useState<string>(() => getDailyDateString());
+  const todayStr = currentDate;
   const isArchiveChallenge = Boolean(queryDate && queryDate !== todayStr);
 
   const fetchDailyChallenge = useCallback(async () => {
@@ -139,8 +144,15 @@ function DailyPageContent(): React.JSX.Element {
         // Inform the server in the background so in-memory store and cookies stay aligned
         fetch("/api/game/daily/start", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ targetDate, existingAttempt: localAttempt }),
+          headers: {
+            "Content-Type": "application/json",
+            "x-timezone": getClientTimezone(),
+          },
+          body: JSON.stringify({
+            targetDate,
+            existingAttempt: localAttempt,
+            timezone: getClientTimezone(),
+          }),
         }).catch(() => {});
 
         return;
@@ -151,8 +163,15 @@ function DailyPageContent(): React.JSX.Element {
     try {
       const res = await fetch("/api/game/daily/start", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetDate, existingAttempt: localAttempt }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-timezone": getClientTimezone(),
+        },
+        body: JSON.stringify({
+          targetDate,
+          existingAttempt: localAttempt,
+          timezone: getClientTimezone(),
+        }),
       });
 
       const data = await res.json();
@@ -233,6 +252,23 @@ function DailyPageContent(): React.JSX.Element {
   useEffect(() => {
     fetchDailyChallenge();
   }, [fetchDailyChallenge]);
+
+  // Set player timezone cookie and detect local midnight rollover
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const tz = getClientTimezone();
+      document.cookie = `flipped_tz=${encodeURIComponent(tz)}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+
+    const interval = setInterval(() => {
+      const nowStr = getDailyDateString();
+      if (nowStr !== currentDate) {
+        setCurrentDate(nowStr);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [currentDate]);
 
   if (loading) {
     return (

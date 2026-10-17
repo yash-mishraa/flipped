@@ -1,6 +1,6 @@
 import type { StoredProgressSchema } from "../persistence/local-progress";
 import type { DailyAttemptRecord } from "./mode-types";
-import { getDailyDateString } from "./daily-scheduler";
+import { getDailyDateString, getClientTimezone } from "./daily-scheduler";
 
 export interface PlayerStatistics {
   readonly totalPlayed: number;
@@ -63,9 +63,11 @@ export function getPreviousDateString(dateStr: string): string {
 /**
  * Determines whether a daily attempt was completed outside its official 24-hour window
  * (i.e. as an archive practice puzzle). Archive plays do not count towards official statistics or streaks.
+ * Evaluates completion calendar date in the player's local timezone.
  */
 export function isArchiveDailyAttempt(
-  record: DailyAttemptRecord
+  record: DailyAttemptRecord,
+  timezone: string = getClientTimezone()
 ): boolean {
   if (record.isArchive === true) {
     return true;
@@ -76,8 +78,8 @@ export function isArchiveDailyAttempt(
   // If isArchive is not explicitly set, determine by completion timestamp relative to challenge date
   if (record.completedAt) {
     try {
-      const completedUtcDate = new Date(record.completedAt).toISOString().slice(0, 10);
-      if (completedUtcDate > record.date) {
+      const completedLocalDate = getDailyDateString(new Date(record.completedAt), timezone);
+      if (completedLocalDate > record.date) {
         return true;
       }
     } catch {

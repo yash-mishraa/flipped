@@ -70,21 +70,17 @@ function getPraiseText(score: number): string {
   return "Solved!";
 }
 
+import {
+  getMillisecondsUntilNextLocalMidnight,
+  formatCountdown,
+} from "../modes/daily-scheduler";
+
 /**
- * Formats countdown to next midnight UTC time (00:00:00 UTC).
+ * Formats countdown to next local midnight time (00:00:00 local time).
  */
 function getFormattedCountdown(): string {
-  const now = new Date();
-  const nextUtcMidnight = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0)
-  );
-  const diffMs = Math.max(0, nextUtcMidnight.getTime() - now.getTime());
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  const diffMs = getMillisecondsUntilNextLocalMidnight();
+  return formatCountdown(diffMs);
 }
 
 /**
@@ -276,7 +272,7 @@ export function DailyCompletionCard({
       {/* Live Countdown to Next Daily Challenge */}
       <div className="w-full rounded-2xl border border-[#C49A6C]/40 bg-[#faeee0]/30 py-3.5 px-4 text-center">
         <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C6870]">
-          Next Daily Challenge In (00:00 UTC)
+          Next Daily Challenge In (Midnight)
         </span>
         <div className="mt-0.5 font-mono text-xl font-black text-[#32171D]">
           {countdown}
