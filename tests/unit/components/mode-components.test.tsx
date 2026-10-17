@@ -59,6 +59,9 @@ describe("Mode Components", () => {
         "/archive"
       );
       expect(screen.getByRole("link", { name: /Home/i })).toHaveAttribute("href", "/");
+
+      // Verify local midnight countdown title
+      expect(screen.getByText(/Next Daily Challenge In \(Midnight\)/i)).toBeInTheDocument();
     });
   });
 });

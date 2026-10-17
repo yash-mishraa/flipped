@@ -79,6 +79,7 @@ export function getMillisecondsUntilNextLocalMidnight(
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: tz,
       hour12: false,
+      hourCycle: "h23",
       hour: "numeric",
       minute: "numeric",
       second: "numeric",
