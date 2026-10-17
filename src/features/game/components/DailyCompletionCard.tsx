@@ -216,7 +216,7 @@ export function DailyCompletionCard({
             </span>
           </div>
 
-          <div className="grid grid-cols-4 divide-x divide-[#C49A6C]/30 text-center">
+          <div className="grid grid-cols-4 text-center">
             <div className="px-1">
               <p className="text-2xl sm:text-3xl font-black text-[#7B1E2B] font-serif">
                 {attempt.finalScore}
@@ -250,7 +250,7 @@ export function DailyCompletionCard({
         </div>
       ) : (
         <div className="w-full border-y border-[#C49A6C]/30 py-3.5 px-2">
-          <div className="flex items-center justify-around text-center divide-x divide-[#C49A6C]/30">
+          <div className="grid grid-cols-3 text-center">
             <div className="px-2">
               <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
                 Time Taken

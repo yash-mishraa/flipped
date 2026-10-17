@@ -119,7 +119,7 @@ export function TimeoutScreen({
             </span>
           </div>
 
-          <div className="grid grid-cols-3 divide-x divide-[#C49A6C]/30 text-center">
+          <div className="grid grid-cols-3 text-center">
             <div className="px-1">
               <p className="text-2xl sm:text-3xl font-black text-[#32171D] font-mono">{displayPracticeScore}</p>
               <p className="mt-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#8C6870]">
