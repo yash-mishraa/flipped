@@ -28,7 +28,7 @@ Because the original game was restricted exclusively behind physical, home-deliv
 
 - **Worldwide Web-First Access**: Zero subscriptions, paywalls, or app store downloads required. Playable on every mobile phone, tablet, and desktop browser.
 - **Classic Practice Sprints**: An unlimited practice mode with `Easy`, `Medium`, and `Hard` difficulty tiers and timed sprint options (1m, 2m, 3m, 5m) so players don't have to wait 24 hours between puzzles.
-- **Authoritative Daily Challenge**: Global UTC midnight synchronization so players around the world all play the exact same puzzle on the same day.
+- **Authoritative Daily Challenge**: Local midnight synchronization so every player receives a brand new daily puzzle at exact 12:00:00 AM in their own country/timezone, backed by server-authoritative anti-cheat validation.
 - **60-Second Real-Time Countdown**: Interactive deductions with penalty-deducting hint assistance.
 - **Letter-by-Letter Real-Time Grid**: Tile input states (`fixed`, `entered`, `confirmed`) with auto-advancing cursor and backspace navigation.
 - **Cloud Sync & Guest Isolation**: Complete dual-track progress persistence—guests keep their daily streaks safely in browser `localStorage`, while signing in with Clerk enables multi-device cloud synchronization.
@@ -38,7 +38,7 @@ Because the original game was restricted exclusively behind physical, home-deliv
 
 ## Game Modes & Features
 
-- **Daily Challenge (`/daily`)**: The flagship daily puzzle reset every midnight UTC. Features single-attempt locking, countdown timer, hints, and victory review.
+- **Daily Challenge (`/daily`)**: The flagship daily puzzle reset every midnight in the player's local timezone. Features single-attempt locking, live countdown to local midnight, hints, anti-cheat clock validation, and celebratory victory review.
 - **Classic Mode (`/classic`)**: Unlimited practice sprints with custom timers and difficulty tiers (Easy, Medium, Hard).
 - **Challenge Archive (`/archive`)**: Historical calendar of all past daily challenges playable on demand.
 - **Player Statistics (`/stats`)**: Personal performance dashboard tracking games played, win rate, current/max streaks, and solve time distributions.
@@ -116,7 +116,7 @@ NODE_ENV="development"
 FLIPPED contains comprehensive unit, component, security, and Playwright end-to-end browser tests:
 
 ```bash
-# Run all unit and integration tests (291 tests across 41 suites)
+# Run all unit and integration tests (294 tests across 41 suites)
 npm test
 
 # Check TypeScript types

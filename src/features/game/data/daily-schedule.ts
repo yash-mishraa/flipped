@@ -2,7 +2,7 @@ import type { DailyPuzzleAssignment } from "../modes/mode-types";
 
 /**
  * Curated calendar schedule for Flipped Daily challenges.
- * Explicit date strings represent days in UTC timezone (YYYY-MM-DD).
+ * Explicit date strings represent calendar days (YYYY-MM-DD).
  */
 export const PUBLISHED_DAILY_SCHEDULE: readonly DailyPuzzleAssignment[] = [
   {

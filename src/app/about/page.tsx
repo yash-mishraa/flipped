@@ -83,8 +83,8 @@ export default function AboutPage(): React.JSX.Element {
                 <span className="text-[#6B4E55]">High-stakes countdown with penalty-based reveal hints.</span>
               </li>
               <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
-                <span className="block font-bold text-[#7B1E2B] mb-0.5">UTC Midnight Reset</span>
-                <span className="text-[#6B4E55]">Every player globally gets the identical daily challenge simultaneously.</span>
+                <span className="block font-bold text-[#7B1E2B] mb-0.5">Local Midnight Reset</span>
+                <span className="text-[#6B4E55]">A fresh daily challenge unlocks at exact 12:00:00 AM in your local timezone.</span>
               </li>
               <li className="rounded-xl border border-[#C49A6C]/30 bg-white/70 p-3">
                 <span className="block font-bold text-[#7B1E2B] mb-0.5">Cloud &amp; Guest Streaks</span>

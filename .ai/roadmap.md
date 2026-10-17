@@ -100,7 +100,7 @@ This document outlines the multi-stage implementation plan for the Flipped word 
 - **Status**: **Completed (Verified)**
 - **Dependencies**: Part 4.
 - **Deliverables**:
-  - Daily mode deterministic scheduling using `Asia/Kolkata` (IST) reference timezone.
+  - Daily mode deterministic scheduling resetting at local midnight with anti-cheat validation.
   - Published daily schedule and past challenge archive (`/archive`).
   - Classic mode repetition-free puzzle selector by difficulty tier (`EASY`, `MEDIUM`, `HARD`).
   - Versioned local progress persistence (`flipped_progress_v1`) with single-attempt daily lock.

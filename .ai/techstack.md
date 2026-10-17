@@ -114,7 +114,7 @@ Documented in `.env.example`:
 | :--------------------- | :------------------------------------ | :------------------------------------------------------------- |
 | `DATABASE_URL`         | `postgresql://postgres:postgres@...`  | PostgreSQL connection string. When unset, memory store is used |
 | `GUEST_SESSION_SECRET` | `development-guest-secret-key-at-...` | HMAC-SHA256 secret key for signing guest cookies               |
-| `APP_TIMEZONE`         | `Asia/Kolkata`                        | Authoritative game clock reference timezone                    |
+| `APP_TIMEZONE`         | `UTC`                                 | Server default fallback timezone (player local midnight is detected dynamically) |
 
 ---
 

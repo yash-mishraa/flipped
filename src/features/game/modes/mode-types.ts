@@ -5,7 +5,7 @@ export type GameMode = "DAILY" | "CLASSIC";
 export type PublicationStatus = "PUBLISHED" | "UNPUBLISHED";
 
 export interface DailyPuzzleAssignment {
-  readonly date: string; // YYYY-MM-DD in UTC
+  readonly date: string; // YYYY-MM-DD calendar date
   readonly puzzleId: string;
   readonly publicationStatus: PublicationStatus;
   readonly note?: string;

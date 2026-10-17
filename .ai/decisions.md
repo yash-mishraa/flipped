@@ -196,19 +196,20 @@ This document records architectural decisions, their context, alternatives consi
 
 ---
 
-## ADR-015: Deterministic Calendar Daily Scheduling via Asia/Kolkata Timezone
+## ADR-015: Local-Midnight Daily Challenge Scheduling with Server-Authoritative Anti-Cheat
 
-- **Date**: 2026-10-12
+- **Date**: 2026-10-12 (Updated 2026-10-17)
 - **Status**: Accepted
-- **Context**: The Daily challenge requires assigning exactly one curated puzzle per calendar day, resetting at midnight. A universal reference timezone is necessary to avoid client device clock tampering and inconsistent date boundaries across players.
+- **Context**: The Daily challenge requires resetting at exact local midnight (12:00:00 AM) in each player's local timezone so that players receive a fresh puzzle at the start of their calendar date, while strictly preventing device clock tampering from unlocking future challenges.
 - **Decision**:
-  1. Standardize on `Asia/Kolkata` (IST, UTC+5:30) as the authoritative game timezone using `Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" })` to produce strict `YYYY-MM-DD` strings.
-  2. Map calendar dates deterministically against the curated published schedule (`PUBLISHED_DAILY_SCHEDULE`).
-  3. Reject unpublished future puzzles with `status: "FUTURE_UNPUBLISHED"` to prevent client-side answer leakage.
+  1. Resolve player timezone dynamically (`Intl.DateTimeFormat().resolvedOptions().timeZone` on client, `x-vercel-ip-timezone` edge reverse proxy header, `x-timezone` header, and `flipped_tz` cookie on server).
+  2. Compute calendar date (`YYYY-MM-DD`) projected into the player's resolved timezone using `Intl.DateTimeFormat("en-CA", { timeZone })`.
+  3. Server-Authoritative Anti-Cheat: Validate requested date against `new Date()` (server atomic clock) projected to player's timezone. Reject requests where `targetDate > maxAllowedDate` with `status: "FUTURE_UNPUBLISHED"`.
+  4. Real-Time Local Midnight Countdown: Compute live remaining milliseconds to next local midnight (`00:00:00`) in `DailyCompletionCard`.
 - **Rationale**:
-  - `en-CA` locale consistently outputs ISO `YYYY-MM-DD` across Node.js, V8, and browser runtimes.
-  - Consistent timezone ensures all players share the exact same daily puzzle globally.
-  - Clear separation between published archive entries and future unpublished dates protects game integrity.
+  - Provides a natural, country-specific reset at midnight for every player worldwide.
+  - Server atomic clock projection makes device clock tampering completely impossible.
+  - Streak tracking, statistics, and archive availability seamlessly respect the player's local calendar day.
 
 ---
 

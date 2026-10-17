@@ -35,8 +35,8 @@ As words are evaluated, individual cells transition through clear tactile states
 
 ### A. Daily Mode
 
-- **Universal Synchronization**: A single canonical puzzle generated or scheduled per UTC calendar day.
-- **Equal Constraints**: All players worldwide receive the identical starting layout and target word constraints.
+- **Local Midnight Synchronization**: Daily challenge unlocks at exact 12:00:00 AM (midnight) in each player's local timezone.
+- **Equal Constraints**: All players worldwide receive the identical starting layout and target word constraints for each calendar day.
 - **Streak & Performance Tracking**: Players get one official attempt per day. Solves and attempt counts contribute to ongoing player streaks and percentile statistics.
 - **Server-Authoritative Validation**: In later backend stages, Daily challenge seeds and results are verified against a secure server endpoint to ensure leaderboard integrity.
 
@@ -188,7 +188,7 @@ The round follows a strict, irreversible state progression:
 
 ### Daily Challenge Mechanics (`/daily`)
 
-- **Deterministic Assignment**: Deterministically maps the calendar day string (`YYYY-MM-DD`) using the `Asia/Kolkata` reference timezone to a curated master puzzle.
+- **Deterministic Assignment**: Deterministically maps the calendar day string (`YYYY-MM-DD`) projected into the player's local timezone to a curated master puzzle.
 - **Single-Attempt Enforcement**:
   - Only one official attempt is permitted per calendar date.
   - Both `WON` and `TIMED_OUT` outcomes consume the daily attempt and persist a `DailyAttemptRecord`.
@@ -242,7 +242,7 @@ Client-supplied timers, scores, and status flags are strictly untrusted:
 1. **Attempt Initiation (`/api/game/daily/start`, `/api/game/classic/start`)**:
    - Computes authoritative `startedAt = Date.now()` and `deadline = startedAt + 60,000ms`.
    - Persists the attempt in PostgreSQL / memory store.
-   - For Daily mode, resolves the date via `Asia/Kolkata` timezone and checks for existing attempts. If an attempt is active, returns the existing attempt; if completed, returns the finalized result.
+   - For Daily mode, resolves the date via the player's resolved local timezone and checks for existing attempts. If an attempt is active, returns the existing attempt; if completed, returns the finalized result.
 2. **Authoritative Submission (`/api/game/attempt/[id]/submit`)**:
    - Accepts player candidate phrase.
    - Evaluates elapsed time against authoritative server `deadline`.
@@ -316,7 +316,7 @@ Statistics are computed purely from persisted records without fabrication or moc
 - **Core Metrics**: Total games played, games won, win percentage, total score, average solve time, fastest solve time.
 - **Continuous Calendar Streak Walking**:
   - Walks Daily attempt history chronologically.
-  - Accounts for consecutive calendar days in `Asia/Kolkata` timezone.
+  - Accounts for consecutive calendar days in the player's local timezone.
   - Correctly breaks streaks on missed calendar days.
   - Preserves active streak if today's challenge is already played and won, or if yesterday was won and today has not yet been attempted.
 - **Classic Tier Performance**: Tracks attempts, wins, and average scores broken down by difficulty (`EASY`, `MEDIUM`, `HARD`).

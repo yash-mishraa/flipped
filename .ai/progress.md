@@ -156,7 +156,8 @@
 ### Stage 5 (Daily and Classic Game Modes, Calendar Scheduling & Local Persistence) — Completed
 
 1. **Deterministic Daily Calendar Scheduling (`src/features/game/modes/daily-scheduler.ts`, `data/daily-schedule.ts`)**:
-   - `getDailyDateString`: standardizes on `Asia/Kolkata` (IST) timezone, reliably returning `YYYY-MM-DD` strings.
+   - `getDailyDateString`: resolves date in the player's local timezone (falling back to UTC), reliably returning `YYYY-MM-DD` strings.
+   - `getMillisecondsUntilNextLocalMidnight`: calculates exact countdown to local midnight (00:00:00).
    - `getDailyPuzzle`: deterministically retrieves the published daily challenge or safely reports `FUTURE_UNPUBLISHED` or `UNAVAILABLE` without leaking puzzle data.
    - `getPublishedDailySchedule`: chronologically enumerates all published challenges for the archive.
 
