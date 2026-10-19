@@ -198,18 +198,20 @@ This document records architectural decisions, their context, alternatives consi
 
 ## ADR-015: Local-Midnight Daily Challenge Scheduling with Server-Authoritative Anti-Cheat
 
-- **Date**: 2026-10-12 (Updated 2026-10-17)
+- **Date**: 2026-10-12 (Updated 2026-10-20)
 - **Status**: Accepted
 - **Context**: The Daily challenge requires resetting at exact local midnight (12:00:00 AM) in each player's local timezone so that players receive a fresh puzzle at the start of their calendar date, while strictly preventing device clock tampering from unlocking future challenges.
 - **Decision**:
-  1. Resolve player timezone dynamically (`Intl.DateTimeFormat().resolvedOptions().timeZone` on client, `x-vercel-ip-timezone` edge reverse proxy header, `x-timezone` header, and `flipped_tz` cookie on server).
-  2. Compute calendar date (`YYYY-MM-DD`) projected into the player's resolved timezone using `Intl.DateTimeFormat("en-CA", { timeZone })`.
+  1. Resolve player timezone dynamically (`Intl.DateTimeFormat().resolvedOptions().timeZone` on client; `x-timezone`, `flipped_tz` cookie, then `x-vercel-ip-timezone` edge header on server). The device timezone wins over IP geolocation so VPN users and travellers still roll over at their real local midnight.
+  2. Compute calendar date (`YYYY-MM-DD`) by reading `formatToParts` for the player's resolved timezone. Never force a hard-coded UTC timezone; if no IANA zone is available, use the runtime's local calendar fields.
   3. Server-Authoritative Anti-Cheat: Validate requested date against `new Date()` (server atomic clock) projected to player's timezone. Reject requests where `targetDate > maxAllowedDate` with `status: "FUTURE_UNPUBLISHED"`.
-  4. Real-Time Local Midnight Countdown: Compute live remaining milliseconds to next local midnight (`00:00:00`) in `DailyCompletionCard`.
+  4. Real-Time Local Midnight Countdown: Find the exact next instant at which the player's local calendar date changes (binary search over real timestamps), so 23-hour and 25-hour DST days are handled correctly.
+  5. Always-On Schedule: Curated dates are published explicitly, and every other date after launch is deterministically auto-assigned from the puzzle corpus. An `UNPUBLISHED` or stale schedule row falls through to auto-scheduling so the daily challenge can never go offline.
 - **Rationale**:
   - Provides a natural, country-specific reset at midnight for every player worldwide.
   - Server atomic clock projection makes device clock tampering completely impossible.
   - Streak tracking, statistics, and archive availability seamlessly respect the player's local calendar day.
+  - The daily calendar can never run out, even if nobody updates the static schedule.
 
 ---
 

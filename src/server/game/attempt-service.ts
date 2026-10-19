@@ -105,7 +105,8 @@ export async function startDailyAttempt(
   timezone?: string
 ): Promise<StartDailyAttemptResult> {
   const resolvedTz = timezone || (request ? resolveRequestTimezone(request) : getServerTimezone());
-  const dateStr = targetDate || getServerDailyDateString(new Date(), resolvedTz);
+  const todayStr = getServerDailyDateString(new Date(), resolvedTz);
+  const dateStr = targetDate || todayStr;
   const scheduleResult = await resolveServerDailyAssignment(dateStr, resolvedTz);
 
   if (scheduleResult.status !== "AVAILABLE") {
@@ -206,7 +207,7 @@ export async function startDailyAttempt(
     if (existingAttempt.status === "WON" || existingAttempt.status === "TIMED_OUT") {
       return {
         status: "ALREADY_COMPLETED",
-        result: createFinalizedResultPayload(puzzle, existingAttempt, dateStr),
+        result: createFinalizedResultPayload(puzzle, existingAttempt, todayStr),
         attempt: existingAttempt,
       };
     }
@@ -228,7 +229,7 @@ export async function startDailyAttempt(
 
       return {
         status: "ALREADY_COMPLETED",
-        result: createFinalizedResultPayload(puzzle, timedOutAttempt, dateStr),
+        result: createFinalizedResultPayload(puzzle, timedOutAttempt, todayStr),
         attempt: timedOutAttempt,
       };
     }
@@ -351,11 +352,16 @@ export async function submitAuthoritativeAttempt(
     };
   }
 
+  // Resolve the player's local date once so archive/streak calculations never
+  // depend on the server runtime's timezone.
+  const playerTz = request ? resolveRequestTimezone(request) : getServerTimezone();
+  const authoritativeToday = getServerDailyDateString(new Date(), playerTz);
+
   // Idempotent check: if already finalized, return stable result
   if (attempt.status !== "ACTIVE") {
     return {
       status: "ALREADY_FINALIZED",
-      result: createFinalizedResultPayload(puzzle, attempt),
+      result: createFinalizedResultPayload(puzzle, attempt, authoritativeToday),
       attempt,
     };
   }
@@ -370,7 +376,7 @@ export async function submitAuthoritativeAttempt(
     ) {
       return {
         status: "ALREADY_FINALIZED",
-        result: createFinalizedResultPayload(puzzle, existing),
+        result: createFinalizedResultPayload(puzzle, existing, authoritativeToday),
         attempt: existing,
       };
     }
@@ -394,7 +400,7 @@ export async function submitAuthoritativeAttempt(
 
     return {
       status: "TIMED_OUT",
-      result: createFinalizedResultPayload(puzzle, timedOutAttempt),
+      result: createFinalizedResultPayload(puzzle, timedOutAttempt, authoritativeToday),
       attempt: timedOutAttempt,
     };
   }
@@ -453,8 +459,6 @@ export async function submitAuthoritativeAttempt(
 
   // Update guest streaks/stats
   const profile = inMemoryDb.getGuestProfile(guestId);
-  const playerTz = request ? resolveRequestTimezone(request) : getServerTimezone();
-  const authoritativeToday = getServerDailyDateString(new Date(), playerTz);
 
   if (attempt.mode === "DAILY") {
     const isToday = attempt.dailyDate === authoritativeToday;
@@ -498,7 +502,12 @@ export async function finalizeAuthoritativeTimeout(
   attemptId: string,
   guestId: string,
   request?: Request
-): Promise<{ success: boolean; result?: FinalizedResultPayload; message?: string; attempt?: StoredAttempt }> {
+): Promise<{
+  success: boolean;
+  result?: FinalizedResultPayload;
+  message?: string;
+  attempt?: StoredAttempt;
+}> {
   const attempt = await resolveAuthoritativeAttempt(attemptId, guestId, request);
 
   if (!attempt || attempt.guestId !== guestId) {

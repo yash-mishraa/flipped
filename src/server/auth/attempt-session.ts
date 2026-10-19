@@ -6,6 +6,8 @@ import { inMemoryDb, type StoredAttempt } from "@/server/db/client";
 import { getPrivilegedPuzzleById } from "@/server/puzzles/puzzle-repository";
 import {
   getServerDailyDateString,
+  getServerTimezone,
+  resolveRequestTimezone,
   resolveServerDailyAssignment,
 } from "@/server/scheduling/daily-scheduler";
 import { extractCookie } from "@/server/auth/guest-session";
@@ -314,8 +316,9 @@ export async function resolveAuthoritativeAttempt(
 
   // Tier 5: Daily Challenge Fallback
   // If request failed to match attemptId directly, but is for an active Daily challenge today
-  const today = getServerDailyDateString();
-  const scheduleResult = await resolveServerDailyAssignment(today);
+  const playerTimezone = request ? resolveRequestTimezone(request) : getServerTimezone();
+  const today = getServerDailyDateString(new Date(), playerTimezone);
+  const scheduleResult = await resolveServerDailyAssignment(today, playerTimezone);
   if (scheduleResult.status === "AVAILABLE") {
     const puzzle = await getPrivilegedPuzzleById(scheduleResult.puzzleId);
     if (puzzle) {

@@ -156,10 +156,11 @@
 ### Stage 5 (Daily and Classic Game Modes, Calendar Scheduling & Local Persistence) — Completed
 
 1. **Deterministic Daily Calendar Scheduling (`src/features/game/modes/daily-scheduler.ts`, `data/daily-schedule.ts`)**:
-   - `getDailyDateString`: resolves date in the player's local timezone (falling back to UTC), reliably returning `YYYY-MM-DD` strings.
-   - `getMillisecondsUntilNextLocalMidnight`: calculates exact countdown to local midnight (00:00:00).
+   - `getDailyDateString`: resolves date in the player's local timezone (falling back to the runtime's local timezone, never a hard-coded UTC), reliably returning `YYYY-MM-DD` strings.
+   - `getMillisecondsUntilNextLocalMidnight`: finds the exact next instant when the player's local calendar date changes, including 23-hour/25-hour DST days.
    - `getDailyPuzzle`: deterministically retrieves the published daily challenge or safely reports `FUTURE_UNPUBLISHED` or `UNAVAILABLE` without leaking puzzle data.
    - `getPublishedDailySchedule`: chronologically enumerates all published challenges for the archive.
+   - `getAssignmentForDate`: deterministically auto-schedules every date after launch from the corpus, so the daily calendar can never run out.
 
 2. **Repetition-Free Classic Mode Selector (`src/features/game/modes/classic-selector.ts`)**:
    - `selectClassicPuzzle`: filters curated puzzle bank strictly by requested difficulty (`EASY`, `MEDIUM`, `HARD`).
@@ -238,7 +239,7 @@
    - High-contrast editorial palette: warm paper canvas (`#fcfbf9`), charcoal (`#24272c`), and coral accents (`#e26d5c`).
    - `Header.tsx`: Sticky navigation bar with wordmark, desktop nav links, and accessible mobile drawer.
    - `Footer.tsx`: Editorial footer with keyboard navigation guide, security badges, and "How to Play" trigger.
-   - Home Screen (`src/app/page.tsx`): Live IST midnight countdown, real daily status, difficulty puzzle counts, "How Flipped Works" visual cards, and quick links.
+   - Home Screen (`src/app/page.tsx`): Live local-midnight countdown, real daily status, difficulty puzzle counts, "How Flipped Works" visual cards, and quick links.
 
 2. **Interactive First-Time Onboarding (`TutorialModal.tsx`)**:
    - 3-step walkthrough explaining core two-word transformation mechanics.
@@ -411,6 +412,7 @@ Every development script was executed and verified directly:
 ## 5. Visual System Modernization & Dark/Light Mode Removal (2026-10-14)
 
 ### 1. Unified 4-Color Editorial Palette
+
 - **Palette**:
   - Crimson: `#7B1E2B` (accent, selections, primary CTAs, streak flames)
   - Cream white: `#F7F0E5` (canvas background, tile text, primary surfaces)
@@ -423,6 +425,7 @@ Every development script was executed and verified directly:
 ## 6. Official Brand Identity System Implementation (2026-10-14)
 
 ### 1. Specification Compliance
+
 - **Geometry**: Extracted mathematical specification of split-F symbol: 64 × 64 source grid, 16-unit spine, 8-unit open seam, 45° diagonal cuts, separate middle tile.
 - **Favicons & PWA Assets**: Built `scripts/generate-brand-assets.mjs` generating:
   - `favicon.svg`: Cream on Crimson vector signature with 12.5% inset.
@@ -441,16 +444,19 @@ Every development script was executed and verified directly:
 ## 7. Classic Timed Sprints, Daily Archive & Clerk Auth Sync (2026-10-14)
 
 ### 1. Classic Timed Sprints
+
 - Introduced customizable sprint durations: 1, 2, 3, or 5 minutes in `ClassicSprintBoard.tsx`.
 - Continuous sequential puzzle delivery with live score accumulation, hints deduction, and skip options.
 - End-of-sprint summary detailing total puzzles solved, cumulative score, and review list.
 
 ### 2. Daily Archive Date Guardrails
+
 - Chronological archive view strictly filtered by `item.date <= todayStr` in `daily-scheduler.ts` and `src/app/archive/page.tsx`.
 - Future dates (Oct 15–19) blocked from resolution via `resolveServerDailyAssignment`.
 - Streak protection ensures completing past daily puzzles does not inflate current daily streak.
 
 ### 3. Clerk Authentication & Cloud Sync
+
 - Integrated Clerk Core 3 auth (`@clerk/nextjs` v7) with resilient fallbacks for missing environment keys in `middleware.ts` and `layout.tsx`.
 - `/api/user/sync` endpoint merges local client progress with server account records under the user's Clerk user ID.
 - Protected `/stats` route requiring sign-in to view statistics with prominent modal CTA buttons and cloud sync status.
@@ -460,10 +466,12 @@ Every development script was executed and verified directly:
 ## 8. Times of India Tribute & Brand Intro Animation (2026-10-14)
 
 ### 1. Times of India Tribute & Free-to-Play Origins
+
 - Added dedicated "Origins & Community Spirit" section on the home page and footer tribute.
-- Formally documents the game's inspiration from the Times of India *Flipped It* puzzle, highlighting that while the original requires a paid newspaper subscription, **FLIPPED** is 100% free with sprint modes, full archives, and cross-device sync.
+- Formally documents the game's inspiration from the Times of India _Flipped It_ puzzle, highlighting that while the original requires a paid newspaper subscription, **FLIPPED** is 100% free with sprint modes, full archives, and cross-device sync.
 
 ### 2. Smooth 4-to-5-Second Brand Splash Intro
+
 - Created `SplashIntro.tsx` featuring the split-F symbol and `FLIPPED` wordmark in Cream White (`#F7F0E5`) on Crimson Red (`#7B1E2B`).
 - Smooth 700ms fade-in, ~4.2s hold duration, and 700ms ease-out fade to the home screen (total ~4.9s).
 - Click-to-skip support and automated test acceleration (100ms in Playwright/Vitest).

@@ -43,8 +43,8 @@ describe("Round Configuration Factory", () => {
       }
     });
 
-    it("returns failure for unpublished dates", () => {
-      const result = createDailyRoundConfiguration("2026-10-20");
+    it("returns failure for future dates", () => {
+      const result = createDailyRoundConfiguration("2099-06-15");
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.result.status).toBe("FUTURE_UNPUBLISHED");

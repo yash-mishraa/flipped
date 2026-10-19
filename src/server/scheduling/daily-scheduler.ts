@@ -1,11 +1,7 @@
 import { inMemoryDb } from "../db/client";
 import { extractCookie } from "../auth/guest-session";
-
-export const DEFAULT_SERVER_TIMEZONE = "UTC";
-
-export function getServerTimezone(): string {
-  return process.env.APP_TIMEZONE || DEFAULT_SERVER_TIMEZONE;
-}
+import { getAssignmentForDate } from "@/features/game/data/daily-schedule";
+import { isValidCalendarDate } from "@/features/game/domain/calendar-date";
 
 /**
  * Validates whether a timezone identifier is a recognized IANA timezone string.
@@ -21,36 +17,62 @@ export function isValidTimezone(tz: string | null | undefined): boolean {
 }
 
 /**
+ * Returns the timezone of the server runtime.
+ *
+ * The daily challenge follows each player's local clock, so there is no global
+ * "UTC" game timezone. This value is only a last-resort fallback when a request
+ * does not carry any timezone information at all.
+ */
+export function getRuntimeTimezone(): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz && isValidTimezone(tz)) {
+      return tz;
+    }
+  } catch {
+    // Environment does not expose a timezone
+  }
+  return "";
+}
+
+export function getServerTimezone(): string {
+  return getRuntimeTimezone();
+}
+
+/**
  * Resolves the player's authoritative timezone from the incoming request.
  * Hierarchy:
- * 1. Unspoofable edge geolocation IP timezone (x-vercel-ip-timezone)
- * 2. Client-provided explicit header (x-timezone)
- * 3. Client cookie (flipped_tz)
+ * 1. Explicit client timezone header (x-timezone) — the device's real zone
+ * 2. Player timezone cookie (flipped_tz) — persisted device zone
+ * 3. Edge geolocation IP timezone (x-vercel-ip-timezone) — fallback proxy
  * 4. Query param (?tz=...)
- * 5. Configured server timezone fallback (APP_TIMEZONE or "UTC")
+ * 5. Runtime timezone fallback (never a forced UTC timezone)
+ *
+ * The device's own timezone wins over IP geolocation so a player on a VPN or
+ * travelling still gets the new puzzle at *their* local midnight.
  */
 export function resolveRequestTimezone(request?: Request): string {
   if (!request) return getServerTimezone();
 
-  // 1. Edge IP geolocation header (Vercel / Cloudflare / edge reverse proxy)
-  const edgeTz = request.headers.get("x-vercel-ip-timezone");
-  if (edgeTz && isValidTimezone(edgeTz)) {
-    return edgeTz;
-  }
-
-  // 2. Client header
+  // 1. Explicit client header
   const headerTz = request.headers.get("x-timezone");
   if (headerTz && isValidTimezone(headerTz)) {
     return headerTz;
   }
 
-  // 3. Client cookie
+  // 2. Client cookie
   const cookieHeader = request.headers.get("cookie");
   if (cookieHeader) {
     const cookieTz = extractCookie(cookieHeader, "flipped_tz");
     if (cookieTz && isValidTimezone(cookieTz)) {
       return cookieTz;
     }
+  }
+
+  // 3. Edge IP geolocation header (Vercel / Cloudflare / edge reverse proxy)
+  const edgeTz = request.headers.get("x-vercel-ip-timezone");
+  if (edgeTz && isValidTimezone(edgeTz)) {
+    return edgeTz;
   }
 
   // 4. Query parameter
@@ -67,32 +89,67 @@ export function resolveRequestTimezone(request?: Request): string {
   return getServerTimezone();
 }
 
+function formatRuntimeLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+const dateFormatterCache = new Map<string, Intl.DateTimeFormat>();
+
+function getZonedDateFormatter(timezone: string): Intl.DateTimeFormat {
+  const cached = dateFormatterCache.get(timezone);
+  if (cached) return cached;
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  dateFormatterCache.set(timezone, formatter);
+  return formatter;
+}
+
 /**
- * Calculates current calendar date in the configured authoritative game timezone.
+ * Formats a date in a timezone by reading its calendar parts explicitly.
+ * This avoids depending on any locale's output order.
+ */
+function formatZonedDate(formatter: Intl.DateTimeFormat, date: Date): string | null {
+  const parts = formatter.formatToParts(date);
+  let year = "";
+  let month = "";
+  let day = "";
+
+  for (const part of parts) {
+    if (part.type === "year") year = part.value;
+    else if (part.type === "month") month = part.value;
+    else if (part.type === "day") day = part.value;
+  }
+
+  if (!year || !month || !day) return null;
+  return `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
+/**
+ * Calculates the current calendar date in the player's local timezone.
+ * Falls back to the runtime's local calendar fields (never a forced UTC date).
  * Returns strict YYYY-MM-DD.
  */
 export function getServerDailyDateString(
   date: Date = new Date(),
   timezone: string = getServerTimezone()
 ): string {
-  try {
-    const tz = isValidTimezone(timezone) ? timezone : DEFAULT_SERVER_TIMEZONE;
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: tz,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    return formatter.format(date);
-  } catch {
-    const fallbackFormatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: DEFAULT_SERVER_TIMEZONE,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    return fallbackFormatter.format(date);
+  if (isValidTimezone(timezone)) {
+    try {
+      const formatted = formatZonedDate(getZonedDateFormatter(timezone), date);
+      if (formatted) return formatted;
+    } catch {
+      // Fall through to the runtime-local calendar fields
+    }
   }
+  return formatRuntimeLocalDate(date);
 }
 
 export type ServerDailyScheduleResult =
@@ -114,18 +171,41 @@ export type ServerDailyScheduleResult =
     };
 
 /**
- * Resolves the authoritative daily puzzle assignment from the database.
- * Strictly verifies the requested date against the server's authoritative atomic clock
- * projected into the player's resolved timezone.
+ * Resolves the authoritative daily puzzle assignment.
  *
- * Anti-cheat: Changing local device clock forward cannot unlock future days because
- * the server validates using new Date() projected to the player's timezone.
+ * The requested calendar date is compared against the current date in the
+ * player's resolved timezone. This is what makes the puzzle unlock at the
+ * player's exact local midnight while still preventing access to future days.
+ *
+ * `now` is injectable so the local-midnight behaviour can be tested
+ * deterministically across timezones.
  */
 export async function resolveServerDailyAssignment(
   dateString: string,
-  timezone: string = getServerTimezone()
+  timezone: string = getServerTimezone(),
+  now: Date = new Date()
 ): Promise<ServerDailyScheduleResult> {
-  const assignment = inMemoryDb.getDailyAssignment(dateString);
+  if (!isValidCalendarDate(dateString)) {
+    return {
+      status: "UNAVAILABLE",
+      date: dateString,
+      message: `No puzzle challenge is scheduled for ${dateString}.`,
+    };
+  }
+
+  // Curated assignment first, then deterministic auto-scheduling fallback.
+  // An UNPUBLISHED/stale database row is ignored so the daily challenge can
+  // never be taken offline by an old schedule flag.
+  const stored = inMemoryDb.getDailyAssignment(dateString);
+  const assignment =
+    stored?.publicationStatus === "PUBLISHED"
+      ? {
+          date: stored.date,
+          puzzleId: stored.puzzleId,
+          publicationStatus: stored.publicationStatus,
+          note: stored.note,
+        }
+      : getAssignmentForDate(dateString);
 
   if (!assignment) {
     return {
@@ -135,7 +215,7 @@ export async function resolveServerDailyAssignment(
     };
   }
 
-  const authoritativeTodayStr = getServerDailyDateString(new Date(), timezone);
+  const authoritativeTodayStr = getServerDailyDateString(now, timezone);
   if (dateString > authoritativeTodayStr || assignment.publicationStatus !== "PUBLISHED") {
     return {
       status: "FUTURE_UNPUBLISHED",

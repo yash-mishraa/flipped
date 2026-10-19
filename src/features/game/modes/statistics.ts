@@ -1,6 +1,7 @@
 import type { StoredProgressSchema } from "../persistence/local-progress";
 import type { DailyAttemptRecord } from "./mode-types";
 import { getDailyDateString, getClientTimezone } from "./daily-scheduler";
+import { daysBetweenCalendarDates, previousCalendarDate } from "../domain/calendar-date";
 
 export interface PlayerStatistics {
   readonly totalPlayed: number;
@@ -39,25 +40,17 @@ export interface PlayerStatistics {
 
 /**
  * Calculates day difference between two ISO YYYY-MM-DD date strings.
+ * Uses pure calendar arithmetic, so DST and timezone never affect the result.
  */
 export function getDaysBetween(dateStrA: string, dateStrB: string): number {
-  const [y1, m1, d1] = dateStrA.split("-").map(Number);
-  const [y2, m2, d2] = dateStrB.split("-").map(Number);
-  if (!y1 || !m1 || !d1 || !y2 || !m2 || !d2) return 0;
-
-  const utc1 = Date.UTC(y1, m1 - 1, d1);
-  const utc2 = Date.UTC(y2, m2 - 1, d2);
-  return Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24));
+  return daysBetweenCalendarDates(dateStrA, dateStrB);
 }
 
 /**
  * Calculates the previous calendar date string (YYYY-MM-DD).
  */
 export function getPreviousDateString(dateStr: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  if (!y || !m || !d) return dateStr;
-  const utc = new Date(Date.UTC(y, m - 1, d - 1));
-  return utc.toISOString().slice(0, 10);
+  return previousCalendarDate(dateStr);
 }
 
 /**
@@ -246,7 +239,7 @@ export function calculatePlayerStatistics(
   const avgSolveTime =
     dailyAvgSolveTime !== null && classicAvgSolveTime !== null
       ? Math.round((dailyAvgSolveTime + classicAvgSolveTime) / 2)
-      : dailyAvgSolveTime ?? classicAvgSolveTime;
+      : (dailyAvgSolveTime ?? classicAvgSolveTime);
 
   return {
     totalPlayed,

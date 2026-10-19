@@ -55,7 +55,7 @@ function convertFinalizedToCardProps(finalized: FinalizedResultPayload): {
   };
 
   const attempt: DailyAttemptRecord = {
-    date: finalized.date || new Date().toISOString().slice(0, 10),
+    date: finalized.date || getDailyDateString(),
     puzzleId: finalized.puzzleId,
     status: finalized.status,
     finalScore: finalized.finalScore,
@@ -340,8 +340,8 @@ function DailyPageContent(): React.JSX.Element {
                   ? `Completed archive challenge for ${currentDateDisplay}.`
                   : `Completed official challenge for ${currentDateDisplay}.`
                 : isArchiveChallenge
-                ? `Playing previous daily challenge for ${currentDateDisplay}. Does not affect your daily streak.`
-                : "One official challenge every day. 60 seconds to deduce the phrase."}
+                  ? `Playing previous daily challenge for ${currentDateDisplay}. Does not affect your daily streak.`
+                  : "One official challenge every day. 60 seconds to deduce the phrase."}
             </p>
           </div>
         </header>

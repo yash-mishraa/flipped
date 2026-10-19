@@ -45,13 +45,15 @@ describe("Security Audit — Answer Confidentiality & Bundle Leakage", () => {
   });
 
   it("ensures getDailyScheduleStatus returns publication status without loading puzzle solution", () => {
-    const todayStatus = getDailyScheduleStatus("2026-10-12");
+    const todayStatus = getDailyScheduleStatus("2026-10-12", "2026-10-14");
     expect(todayStatus).toBe("AVAILABLE");
 
-    const futureStatus = getDailyScheduleStatus("2026-10-20");
+    // Far-future date is always FUTURE_UNPUBLISHED (auto-scheduled but date > today)
+    const futureStatus = getDailyScheduleStatus("2099-06-15", "2026-10-14");
     expect(futureStatus).toBe("FUTURE_UNPUBLISHED");
 
-    const unassignedStatus = getDailyScheduleStatus("2020-01-01");
+    // Date before the game existed returns UNAVAILABLE
+    const unassignedStatus = getDailyScheduleStatus("2020-01-01", "2026-10-14");
     expect(unassignedStatus).toBe("UNAVAILABLE");
   });
 
