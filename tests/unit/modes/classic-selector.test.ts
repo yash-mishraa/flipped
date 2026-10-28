@@ -69,4 +69,47 @@ describe("Classic Puzzle Selector", () => {
       expect(result1.puzzle.id).toBe(result2.puzzle.id);
     }
   });
+
+  it("strictly avoids repeating answer words seen in recent puzzle IDs", () => {
+    // Select first puzzle
+    const res1 = selectClassicPuzzle("MEDIUM", { recentPuzzleIds: [] });
+    expect(res1.status).toBe("SUCCESS");
+    if (res1.status !== "SUCCESS") return;
+
+    const [w1, w2] = res1.puzzle.answerWords;
+
+    // Select next puzzle with res1 in recentPuzzleIds
+    const res2 = selectClassicPuzzle("MEDIUM", {
+      recentPuzzleIds: [res1.puzzle.id],
+    });
+    expect(res2.status).toBe("SUCCESS");
+    if (res2.status !== "SUCCESS") return;
+
+    expect(res2.puzzle.id).not.toBe(res1.puzzle.id);
+    expect(res2.puzzle.answerWords).not.toContain(w1);
+    expect(res2.puzzle.answerWords).not.toContain(w2);
+  });
+
+  it("never repeats any answer word across an entire sprint sequence", () => {
+    const sprintRecentIds: string[] = [];
+    const sprintWords = new Set<string>();
+
+    for (let round = 0; round < 8; round++) {
+      const result = selectClassicPuzzle("EASY", {
+        recentPuzzleIds: sprintRecentIds,
+        randomFn: () => (round * 0.1) % 1,
+      });
+
+      expect(result.status).toBe("SUCCESS");
+      if (result.status === "SUCCESS") {
+        const [w1, w2] = result.puzzle.answerWords;
+        expect(sprintWords.has(w1)).toBe(false);
+        expect(sprintWords.has(w2)).toBe(false);
+
+        sprintWords.add(w1);
+        sprintWords.add(w2);
+        sprintRecentIds.unshift(result.puzzle.id);
+      }
+    }
+  });
 });

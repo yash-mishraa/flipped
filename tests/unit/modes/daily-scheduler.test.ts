@@ -349,6 +349,53 @@ describe("Daily Scheduler", () => {
       }
     });
 
+    it("ensures 2026-10-26, 2026-10-27, and 2026-10-28 have unique answers and are not fast food", () => {
+      const d1 = getAssignmentForDate("2026-10-26");
+      const d2 = getAssignmentForDate("2026-10-27");
+      const d3 = getAssignmentForDate("2026-10-28");
+
+      expect(d1).not.toBeNull();
+      expect(d2).not.toBeNull();
+      expect(d3).not.toBeNull();
+
+      const p1 = PUZZLES_BY_ID.get(d1!.puzzleId);
+      const p2 = PUZZLES_BY_ID.get(d2!.puzzleId);
+      const p3 = PUZZLES_BY_ID.get(d3!.puzzleId);
+
+      const phrase1 = p1?.answerWords.join(" ");
+      const phrase2 = p2?.answerWords.join(" ");
+      const phrase3 = p3?.answerWords.join(" ");
+
+      expect(phrase1).not.toBe("FAST FOOD");
+      expect(phrase2).not.toBe("FAST FOOD");
+      expect(phrase3).not.toBe("FAST FOOD");
+
+      expect(phrase1).not.toBe(phrase2);
+      expect(phrase2).not.toBe(phrase3);
+      expect(phrase1).not.toBe(phrase3);
+    });
+
+    it("guarantees 1,000 consecutive days of daily challenges have completely distinct answer phrases", () => {
+      const seenPhrases = new Set<string>();
+      let cursor = "2026-10-06";
+
+      for (let day = 0; day < 1000; day++) {
+        const assignment = getAssignmentForDate(cursor);
+        expect(assignment).not.toBeNull();
+
+        const puzzle = PUZZLES_BY_ID.get(assignment!.puzzleId);
+        expect(puzzle).toBeDefined();
+
+        const phrase = puzzle!.answerWords.join(" ");
+        expect(seenPhrases.has(phrase)).toBe(false);
+        seenPhrases.add(phrase);
+
+        cursor = nextCalendarDate(cursor);
+      }
+
+      expect(seenPhrases.size).toBe(1000);
+    });
+
     it("never reuses a puzzle already reserved by the curated schedule", () => {
       const curatedIds = new Set(PUBLISHED_DAILY_SCHEDULE.map((entry) => entry.puzzleId));
       let cursor = "2026-10-26";

@@ -1,31 +1,31 @@
 {
-  "totalPhrasesInput": 164,
-  "totalCandidatesGenerated": 12726,
-  "totalRejected": 582,
+  "totalPhrasesInput": 1228,
+  "totalCandidatesGenerated": 85928,
+  "totalRejected": 4237,
   "rejectionBreakdown": {
-    "PROFANITY_DETECTED": 7,
-    "INVALID_WORD_LENGTH": 412,
-    "CIRCULAR_RELATIONSHIP": 134,
-    "IDENTICAL_CLUES": 25,
+    "PROFANITY_DETECTED": 0,
+    "INVALID_WORD_LENGTH": 3621,
+    "CIRCULAR_RELATIONSHIP": 413,
+    "IDENTICAL_CLUES": 89,
     "OBSCURE_VOCABULARY": 0,
-    "DUPLICATE_PUZZLE_ID": 0,
-    "LOW_CONFIDENCE": 6,
+    "DUPLICATE_PUZZLE_ID": 17,
+    "LOW_CONFIDENCE": 133,
     "AMBIGUOUS_CLUES": 0,
     "EMPTY_TRANSFORMATION": 0
   },
-  "totalReviewQueue": 6166,
-  "totalApproved": 3620,
+  "totalReviewQueue": 37378,
+  "totalApproved": 3630,
   "difficultyDistribution": {
-    "EASY": 1006,
-    "MEDIUM": 1607,
-    "HARD": 1007
+    "EASY": 1010,
+    "MEDIUM": 1610,
+    "HARD": 1010
   },
   "relationshipDistribution": {
-    "SYNONYM_SYNONYM": 1975,
-    "ANTONYM_ANTONYM": 983,
-    "SYNONYM_ANTONYM": 1138,
-    "ANTONYM_SYNONYM": 1882
+    "SYNONYM_SYNONYM": 16370,
+    "ANTONYM_ANTONYM": 5919,
+    "SYNONYM_ANTONYM": 7318,
+    "ANTONYM_SYNONYM": 14706
   },
-  "generatedAt": "2026-10-12T13:26:20.017Z",
+  "generatedAt": "2026-10-28T06:57:50.973Z",
   "version": "2.0.0"
 }

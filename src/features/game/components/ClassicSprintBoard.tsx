@@ -244,7 +244,7 @@ export function ClassicSprintBoard(): React.JSX.Element {
 
         const data = await res.json();
         if (data.status === "STARTED") {
-          recentIdsRef.current = [data.payload.puzzleId, ...recentIdsRef.current.slice(0, 30)];
+          recentIdsRef.current = [data.payload.puzzleId, ...recentIdsRef.current.slice(0, 100)];
           return data.payload;
         } else {
           setErrorMsg(data.message || "Failed to load next puzzle.");

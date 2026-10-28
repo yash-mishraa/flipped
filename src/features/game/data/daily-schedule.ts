@@ -1,5 +1,6 @@
 import type { DailyPuzzleAssignment } from "../modes/mode-types";
-import { CURATED_PUZZLES } from "./puzzles";
+import { CURATED_PUZZLES, PUZZLES_BY_ID } from "./puzzles";
+import dailyPoolJson from "./daily-pool.json";
 import {
   addCalendarDays,
   calendarDateToDayNumber,
@@ -156,26 +157,10 @@ export const DAILY_SCHEDULE_MAP: ReadonlyMap<string, DailyPuzzleAssignment> = ne
 /** The first calendar date the daily challenge was ever scheduled. */
 const FIRST_SCHEDULED_DATE = PUBLISHED_DAILY_SCHEDULE[0]?.date ?? "2026-10-06";
 
-/** Puzzle IDs already reserved by the curated static schedule. */
-const STATIC_PUZZLE_IDS = new Set(PUBLISHED_DAILY_SCHEDULE.map((entry) => entry.puzzleId));
-
-/** Stable, duplicate-free puzzle IDs used for automatic scheduling. */
-const AUTO_SCHEDULE_POOL: readonly string[] = (() => {
-  const seen = new Set<string>();
-  const preferred: string[] = [];
-  const fallback: string[] = [];
-
-  for (const puzzle of CURATED_PUZZLES) {
-    if (!puzzle?.id || seen.has(puzzle.id)) continue;
-    seen.add(puzzle.id);
-    fallback.push(puzzle.id);
-    if (!STATIC_PUZZLE_IDS.has(puzzle.id)) {
-      preferred.push(puzzle.id);
-    }
-  }
-
-  return preferred.length > 0 ? preferred : fallback;
-})();
+/** Dedicated, verified duplicate-free 1,150-day puzzle pool for daily challenge. */
+const AUTO_SCHEDULE_POOL: readonly string[] = (dailyPoolJson as string[]).length > 0
+  ? (dailyPoolJson as readonly string[])
+  : CURATED_PUZZLES.map((p) => p.id);
 
 /**
  * Resolves the puzzle assignment for any calendar date.
@@ -234,4 +219,36 @@ export function getAssignmentsThrough(endDate: string): readonly DailyPuzzleAssi
   }
 
   return assignments;
+}
+
+/**
+ * Returns answer words from recent daily challenges within the past `lookbackDays` (default 60 to 90).
+ * Used by Classic mode to guarantee cross-mode separation.
+ */
+export function getRecentDailyAnswerWords(
+  lookbackDays: number = 60,
+  referenceDateStr?: string
+): readonly string[] {
+  const endDate =
+    referenceDateStr && isValidCalendarDate(referenceDateStr)
+      ? referenceDateStr
+      : "2026-10-28";
+  const words = new Set<string>();
+
+  let cursor = endDate;
+  for (let i = 0; i < lookbackDays; i++) {
+    const assignment = getAssignmentForDate(cursor);
+    if (assignment) {
+      const puzzle = PUZZLES_BY_ID.get(assignment.puzzleId);
+      if (puzzle) {
+        for (const w of puzzle.answerWords) {
+          if (w) words.add(w.toUpperCase());
+        }
+      }
+    }
+    cursor = addCalendarDays(cursor, -1);
+    if (cursor < FIRST_SCHEDULED_DATE) break;
+  }
+
+  return [...words];
 }

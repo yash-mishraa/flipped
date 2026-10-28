@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { LEXICON_ENTRIES } from "./lexicon-data.ts";
+import { VOCAB_ADDITIONS } from "./vocab-additions.ts";
+import { assembleMasterPhrases } from "./collocations-data.ts";
 
 // Extra lexical additions to enrich relations and vocabulary
 const ADDITIONS = {
@@ -924,6 +926,18 @@ for (const [k, v] of Object.entries(ADDITIONS)) {
     };
   }
 }
+for (const [k, v] of Object.entries(VOCAB_ADDITIONS)) {
+  if (!merged[k]) {
+    merged[k] = {
+      lemma: k,
+      pos: v.pos,
+      zipfFrequency: v.zipfFrequency,
+      synonyms: v.synonyms,
+      antonyms: v.antonyms,
+      definition: v.definition,
+    };
+  }
+}
 
 console.log(
   `Writing ${Object.keys(merged).length} lexical entries to scripts/corpus/lexicon-data.ts...`
@@ -945,6 +959,7 @@ export const LEXICON_ENTRIES: Record<string, LexicalEntry> = ${JSON.stringify(
 
 fs.writeFileSync(path.join("scripts", "corpus", "lexicon-data.ts"), lexiconOutput, "utf-8");
 
+/*
 // Comprehensive phrases list
 const RAW_PHRASES = [
   ["FAST", "FOOD"],
@@ -1196,8 +1211,9 @@ const RAW_PHRASES = [
   ["VOICE", "MAIL"],
   ["ECHO", "SOUND"],
 ];
+*/
 
-const validPhrases = RAW_PHRASES.filter(([w1, w2]) => merged[w1] && merged[w2]);
+const validPhrases = assembleMasterPhrases(merged);
 
 console.log(
   `Writing ${validPhrases.length} valid two-word phrases to scripts/corpus/phrases-data.ts...`

@@ -235,7 +235,7 @@ export function recordClassicGame(
   won: boolean,
   points: number = 0,
   elapsedSeconds?: number,
-  maxRecentKeep: number = 20,
+  maxRecentKeep: number = 100,
   userId?: string | null
 ): void {
   const current = loadProgress(userId);

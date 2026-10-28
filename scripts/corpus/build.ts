@@ -88,17 +88,134 @@ export function buildCorpus(): {
     `Exported review queue (${queueResult.count} items) to ${queueResult.jsonPath} and ${queueResult.csvPath}`
   );
 
-  // Stage 5: Assemble balanced master corpus
+  // Stage 5: Assemble balanced master corpus & dedicated 1,150-day Daily Pool
+  // Group approved candidates by phrase and tier
+  const byPhraseAndTier = new Map<string, { EASY: RawCandidate[]; MEDIUM: RawCandidate[]; HARD: RawCandidate[] }>();
+
+  for (const candidate of validationSummary.approved) {
+    const phrase = candidate.answerWords.join(" ");
+    if (!byPhraseAndTier.has(phrase)) {
+      byPhraseAndTier.set(phrase, { EASY: [], MEDIUM: [], HARD: [] });
+    }
+    const diff = calculateCandidateDifficulty(candidate, LEXICON_ENTRIES);
+    byPhraseAndTier.get(phrase)![diff.tier].push(candidate);
+  }
+
   // Preserve 20 legacy curated puzzles intact at the start
   const existingIds = new Set(LEGACY_CURATED_PUZZLES.map((p) => p.id));
   const masterCorpus: Puzzle[] = [...LEGACY_CURATED_PUZZLES];
 
-  // Stratify balanced selection: up to 1000 EASY, 1600 MEDIUM, 1000 HARD
-  const targetEasy = tierBuckets.EASY.slice(0, 1000);
-  const targetMedium = tierBuckets.MEDIUM.slice(0, 1600);
-  const targetHard = tierBuckets.HARD.slice(0, 1000);
+  // Build the 1,130 distinct daily phrases (separate from the 20 legacy curated phrases)
+  const legacyPhrases = new Set(LEGACY_CURATED_PUZZLES.map((p) => p.answerWords.join(" ")));
+  const eligibleDailyPhrases = [...byPhraseAndTier.keys()].filter((p) => !legacyPhrases.has(p));
 
-  const selectedCandidates = [...targetEasy, ...targetMedium, ...targetHard];
+  const dailyPhrasesOrdered: string[] = [];
+  const lastWordSeen = new Map<string, number>();
+  const remainingDaily = new Set(eligibleDailyPhrases);
+  const MIN_DAILY_GAP = 50;
+
+  while (dailyPhrasesOrdered.length < Math.min(1130, eligibleDailyPhrases.length)) {
+    const currentIdx = dailyPhrasesOrdered.length;
+    let bestPhrase: string | null = null;
+    let bestGap = -1;
+
+    for (const phrase of remainingDaily) {
+      const [w1, w2] = phrase.split(" ");
+      const gap1 = currentIdx - (lastWordSeen.get(w1!) ?? -9999);
+      const gap2 = currentIdx - (lastWordSeen.get(w2!) ?? -9999);
+      const minGap = Math.min(gap1, gap2);
+
+      if (minGap >= MIN_DAILY_GAP) {
+        bestPhrase = phrase;
+        break;
+      } else if (minGap > bestGap) {
+        bestGap = minGap;
+        bestPhrase = phrase;
+      }
+    }
+
+    if (bestPhrase) {
+      dailyPhrasesOrdered.push(bestPhrase);
+      remainingDaily.delete(bestPhrase);
+      const [w1, w2] = bestPhrase.split(" ");
+      lastWordSeen.set(w1!, currentIdx);
+      lastWordSeen.set(w2!, currentIdx);
+    } else {
+      break;
+    }
+  }
+
+  // For each daily phrase, select one high quality candidate
+  const dailyCandidateMap = new Map<string, RawCandidate>();
+  for (const phrase of dailyPhrasesOrdered) {
+    const bucket = byPhraseAndTier.get(phrase)!;
+    const chosen = bucket.MEDIUM[0] || bucket.EASY[0] || bucket.HARD[0]!;
+    dailyCandidateMap.set(chosen.id, chosen);
+  }
+
+  // Selected candidates for master corpus
+  const selectedCandidates: Array<{ candidate: RawCandidate; difficulty: DifficultyScoreBreakdown }> = [];
+  const selectedIdSet = new Set<string>();
+
+  // First add all daily candidates to ensure they are present in masterCorpus
+  for (const candidate of dailyCandidateMap.values()) {
+    if (!existingIds.has(candidate.id) && !selectedIdSet.has(candidate.id)) {
+      selectedIdSet.add(candidate.id);
+      selectedCandidates.push({
+        candidate,
+        difficulty: calculateCandidateDifficulty(candidate, LEXICON_ENTRIES),
+      });
+    }
+  }
+
+  // Check counts
+  const currentCounts = { EASY: 0, MEDIUM: 0, HARD: 0 };
+  LEGACY_CURATED_PUZZLES.forEach((p) => currentCounts[p.difficulty]++);
+  selectedCandidates.forEach((c) => currentCounts[c.difficulty.tier]++);
+
+  // Evenly distribute across phrases for remaining tier quotas (EASY >= 1000, MEDIUM >= 1600, HARD >= 1000)
+  const allPhrases = [...byPhraseAndTier.keys()];
+  for (let pass = 0; pass < 3; pass++) {
+    for (const phrase of allPhrases) {
+      const bucket = byPhraseAndTier.get(phrase)!;
+
+      if (currentCounts.HARD < 1010) {
+        const item = bucket.HARD.find((c) => !existingIds.has(c.id) && !selectedIdSet.has(c.id));
+        if (item) {
+          selectedIdSet.add(item.id);
+          selectedCandidates.push({
+            candidate: item,
+            difficulty: calculateCandidateDifficulty(item, LEXICON_ENTRIES),
+          });
+          currentCounts.HARD++;
+        }
+      }
+
+      if (currentCounts.EASY < 1010) {
+        const item = bucket.EASY.find((c) => !existingIds.has(c.id) && !selectedIdSet.has(c.id));
+        if (item) {
+          selectedIdSet.add(item.id);
+          selectedCandidates.push({
+            candidate: item,
+            difficulty: calculateCandidateDifficulty(item, LEXICON_ENTRIES),
+          });
+          currentCounts.EASY++;
+        }
+      }
+
+      if (currentCounts.MEDIUM < 1610) {
+        const item = bucket.MEDIUM.find((c) => !existingIds.has(c.id) && !selectedIdSet.has(c.id));
+        if (item) {
+          selectedIdSet.add(item.id);
+          selectedCandidates.push({
+            candidate: item,
+            difficulty: calculateCandidateDifficulty(item, LEXICON_ENTRIES),
+          });
+          currentCounts.MEDIUM++;
+        }
+      }
+    }
+  }
 
   for (const { candidate, difficulty } of selectedCandidates) {
     if (existingIds.has(candidate.id)) {
@@ -135,6 +252,20 @@ export function buildCorpus(): {
 
     masterCorpus.push(puzzle);
   }
+
+  // Assemble full 1,150 daily pool sequence: 20 legacy IDs + 1,130 unique daily puzzle IDs
+  const dailyPoolIds: string[] = [
+    ...LEGACY_CURATED_PUZZLES.map((p) => p.id),
+    ...dailyPhrasesOrdered.map((phrase) => {
+      const bucket = byPhraseAndTier.get(phrase)!;
+      const chosen = bucket.MEDIUM[0] || bucket.EASY[0] || bucket.HARD[0]!;
+      return chosen.id;
+    }),
+  ];
+
+  const dailyPoolJsonPath = path.join("src", "features", "game", "data", "daily-pool.json");
+  fs.writeFileSync(dailyPoolJsonPath, JSON.stringify(dailyPoolIds, null, 2), "utf-8");
+  console.log(`Written 1,150-day unique daily challenge pool to ${dailyPoolJsonPath}`);
 
   console.log(`Final master corpus assembled: ${masterCorpus.length} total puzzles.`);
   if (masterCorpus.length < 3000) {
